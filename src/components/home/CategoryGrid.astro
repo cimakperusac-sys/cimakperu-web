@@ -1,0 +1,262 @@
+---
+import { categories } from '../../data/categories';
+import imgAluzinc from '../../assets/categories/aluzinc.svg';
+import imgUpvc from '../../assets/categories/upvc.svg';
+import imgTermo from '../../assets/categories/termo-paneles.svg';
+import imgPoli from '../../assets/categories/policarbonato.svg';
+import imgFibra from '../../assets/categories/fibra-vidrio.svg';
+import imgPlacas from '../../assets/categories/placas-colaborantes.svg';
+
+const images = {
+  'aluzinc.svg': imgAluzinc,
+  'upvc.svg': imgUpvc,
+  'termo-paneles.svg': imgTermo,
+  'policarbonato.svg': imgPoli,
+  'fibra-vidrio.svg': imgFibra,
+  'placas-colaborantes.svg': imgPlacas,
+};
+
+const items = categories.map((cat) => ({
+  ...cat,
+  src: images[cat.image].src,
+}));
+---
+
+<section
+  id="productos-categoria"
+  class="reveal-on-scroll w-full bg-[#f3f3f3] py-12 sm:py-16"
+  aria-label="Productos por categoría"
+>
+  <div class="container-cimak">
+    <div class="mb-8 flex justify-center sm:mb-10">
+      <h2 class="rounded-md bg-cimak-black px-6 py-2.5 text-center text-sm font-bold uppercase tracking-wide text-white sm:px-8 sm:text-base">
+        Productos por categoría
+      </h2>
+    </div>
+
+    <!-- Desktop: grid 3 columnas -->
+    <div class="hidden gap-5 md:grid md:grid-cols-3 lg:gap-6">
+      {items.map((item) => (
+        <a
+          href={item.href}
+          class="group relative block aspect-[3/4] overflow-hidden rounded-2xl"
+        >
+          <img
+            src={item.src}
+            alt={item.title}
+            class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            width="600"
+            height="800"
+            loading="lazy"
+          />
+          <span class="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full border border-white/90 px-5 py-1.5 text-sm font-semibold text-white backdrop-blur-sm transition group-hover:bg-white group-hover:text-cimak-black">
+            ver más
+          </span>
+        </a>
+      ))}
+    </div>
+  </div>
+
+  <!-- Mobile: carrusel animado con peek + arrastre -->
+  <div class="md:hidden">
+    <div
+      id="category-viewport"
+      class="relative cursor-grab overflow-hidden active:cursor-grabbing"
+      data-lenis-prevent
+      data-lenis-prevent-touch
+    >
+      <div
+        id="category-track"
+        class="category-track flex gap-3 will-change-transform"
+      >
+        {items.map((item, index) => (
+          <a
+            href={item.href}
+            class="category-slide relative aspect-[3/4] w-[76%] shrink-0 overflow-hidden rounded-2xl select-none"
+            data-index={index}
+            draggable="false"
+          >
+            <img
+              src={item.src}
+              alt={item.title}
+              class="pointer-events-none absolute inset-0 h-full w-full object-cover"
+              width="600"
+              height="800"
+              loading="lazy"
+              draggable="false"
+            />
+            <span class="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-white/90 px-4 py-1 text-sm font-semibold text-white">
+              ver más
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <div class="mt-5 flex justify-center gap-2.5" role="tablist" aria-label="Categorías">
+      {items.map((_, index) => (
+        <button
+          type="button"
+          class:list={[
+            'category-dot h-2.5 w-2.5 rounded-full transition',
+            index === 0 ? 'bg-cimak-yellow' : 'bg-black/25',
+          ]}
+          data-index={index}
+          aria-label={`Ir a categoría ${index + 1}`}
+        />
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .category-track {
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .category-track.is-dragging {
+    transition: none;
+  }
+
+  .category-slide {
+    transition:
+      transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.45s ease;
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+
+  .category-slide.is-active {
+    opacity: 1;
+    transform: scale(1);
+  }
+</style>
+
+<script>
+  const viewport = document.getElementById('category-viewport');
+  const track = document.getElementById('category-track');
+
+  if (viewport && track) {
+    const slides = [...track.querySelectorAll('.category-slide')];
+    const dots = [...document.querySelectorAll('.category-dot')];
+    const gap = 12;
+    let index = 0;
+    let x = 0;
+    let startX = 0;
+    let startOffset = 0;
+    let dragging = false;
+    let moved = false;
+    let lastX = 0;
+    let lastTime = 0;
+    let velocity = 0;
+
+    const slideWidth = () => slides[0]?.offsetWidth || 0;
+
+    const sidePad = () => (viewport.clientWidth - slideWidth()) / 2;
+
+    const maxIndex = () => slides.length - 1;
+
+    const offsetFor = (i) => sidePad() - i * (slideWidth() + gap);
+
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+    const setActive = (i) => {
+      slides.forEach((slide, n) => slide.classList.toggle('is-active', n === i));
+      dots.forEach((dot, n) => {
+        const active = n === i;
+        dot.classList.toggle('bg-cimak-yellow', active);
+        dot.classList.toggle('bg-black/25', !active);
+      });
+    };
+
+    const render = (animate) => {
+      track.classList.toggle('is-dragging', !animate);
+      track.style.transform = `translate3d(${x}px, 0, 0)`;
+    };
+
+    const goTo = (i, animate = true) => {
+      index = clamp(i, 0, maxIndex());
+      x = offsetFor(index);
+      setActive(index);
+      render(animate);
+    };
+
+    const onPointerDown = (event) => {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      dragging = true;
+      moved = false;
+      startX = event.clientX;
+      startOffset = x;
+      lastX = event.clientX;
+      lastTime = performance.now();
+      velocity = 0;
+      track.classList.add('is-dragging');
+      viewport.setPointerCapture(event.pointerId);
+    };
+
+    const onPointerMove = (event) => {
+      if (!dragging) return;
+      const dx = event.clientX - startX;
+      if (Math.abs(dx) > 6) moved = true;
+
+      const now = performance.now();
+      const dt = now - lastTime || 1;
+      velocity = (event.clientX - lastX) / dt;
+      lastX = event.clientX;
+      lastTime = now;
+
+      const minX = offsetFor(maxIndex());
+      const maxX = offsetFor(0);
+      // resistencia en los bordes
+      let next = startOffset + dx;
+      if (next > maxX) next = maxX + (next - maxX) * 0.35;
+      if (next < minX) next = minX + (next - minX) * 0.35;
+      x = next;
+      render(false);
+    };
+
+    const onPointerUp = (event) => {
+      if (!dragging) return;
+      dragging = false;
+      track.classList.remove('is-dragging');
+      try {
+        viewport.releasePointerCapture(event.pointerId);
+      } catch {
+        // ignore
+      }
+
+      const projected = x + velocity * 180;
+      let nextIndex = index;
+      const distance = projected - offsetFor(index);
+      const threshold = slideWidth() * 0.2;
+
+      if (distance < -threshold || velocity < -0.35) nextIndex = index + 1;
+      else if (distance > threshold || velocity > 0.35) nextIndex = index - 1;
+
+      goTo(nextIndex, true);
+    };
+
+    viewport.addEventListener('pointerdown', onPointerDown);
+    viewport.addEventListener('pointermove', onPointerMove);
+    viewport.addEventListener('pointerup', onPointerUp);
+    viewport.addEventListener('pointercancel', onPointerUp);
+
+    viewport.addEventListener(
+      'click',
+      (event) => {
+        if (!moved) return;
+        event.preventDefault();
+        event.stopPropagation();
+        moved = false;
+      },
+      true
+    );
+
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => goTo(Number(dot.dataset.index), true));
+    });
+
+    window.addEventListener('resize', () => goTo(index, false));
+    goTo(0, false);
+  }
+</script>
