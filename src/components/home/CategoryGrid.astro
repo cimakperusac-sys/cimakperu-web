@@ -60,7 +60,9 @@ const items = categories.map((cat) => ({
     <div class="md:hidden">
       <div
         id="category-viewport"
-        class="relative cursor-grab overflow-hidden active:cursor-grabbing"
+        class="relative cursor-grab overflow-hidden touch-none active:cursor-grabbing"
+        data-lenis-prevent
+        data-lenis-prevent-touch
       >
         <div
           id="category-track"
@@ -141,15 +143,12 @@ const items = categories.map((cat) => ({
     let index = 0;
     let x = 0;
     let startX = 0;
-    let startY = 0;
     let startOffset = 0;
-    let tracking = false;
-    let axis = null; // null | 'x' | 'y'
+    let dragging = false;
     let moved = false;
     let lastX = 0;
     let lastTime = 0;
     let velocity = 0;
-    let lenisStopped = false;
 
     const slideWidth = () => slides[0]?.offsetWidth || 0;
     const sidePad = () => (viewport.clientWidth - slideWidth()) / 2;
@@ -157,12 +156,6 @@ const items = categories.map((cat) => ({
     const offsetFor = (i) => sidePad() - i * (slideWidth() + gap);
     const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
     const lenis = () => window.lenis;
-
-    const resumeLenis = () => {
-      if (!lenisStopped) return;
-      lenis()?.start();
-      lenisStopped = false;
-    };
 
     const setActive = (i) => {
       slides.forEach((slide, n) => slide.classList.toggle('is-active', n === i));
@@ -187,36 +180,21 @@ const items = categories.map((cat) => ({
 
     const onPointerDown = (event) => {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
-      tracking = true;
-      axis = null;
+      dragging = true;
       moved = false;
       startX = event.clientX;
-      startY = event.clientY;
       startOffset = x;
       lastX = event.clientX;
       lastTime = performance.now();
       velocity = 0;
+      track.classList.add('is-dragging');
+      lenis()?.stop();
+      viewport.setPointerCapture(event.pointerId);
     };
 
     const onPointerMove = (event) => {
-      if (!tracking || axis === 'y') return;
-
+      if (!dragging) return;
       const dx = event.clientX - startX;
-      const dy = event.clientY - startY;
-
-      if (axis === null) {
-        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
-        axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
-        if (axis === 'y') {
-          tracking = false;
-          return;
-        }
-        track.classList.add('is-dragging');
-        lenis()?.stop();
-        lenisStopped = true;
-        viewport.setPointerCapture(event.pointerId);
-      }
-
       if (Math.abs(dx) > 6) moved = true;
 
       const now = performance.now();
@@ -235,24 +213,15 @@ const items = categories.map((cat) => ({
     };
 
     const onPointerUp = (event) => {
-      if (!tracking && axis !== 'x') {
-        resumeLenis();
-        return;
-      }
-
-      const wasHorizontal = axis === 'x';
-      tracking = false;
-      axis = null;
+      if (!dragging) return;
+      dragging = false;
       track.classList.remove('is-dragging');
-      resumeLenis();
-
+      lenis()?.start();
       try {
         viewport.releasePointerCapture(event.pointerId);
       } catch {
         // ignore
       }
-
-      if (!wasHorizontal) return;
 
       const projected = x + velocity * 180;
       let nextIndex = index;
@@ -269,6 +238,13 @@ const items = categories.map((cat) => ({
     viewport.addEventListener('pointermove', onPointerMove);
     viewport.addEventListener('pointerup', onPointerUp);
     viewport.addEventListener('pointercancel', onPointerUp);
+    viewport.addEventListener(
+      'touchmove',
+      (event) => {
+        event.preventDefault();
+      },
+      { passive: false }
+    );
 
     viewport.addEventListener(
       'click',

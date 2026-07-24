@@ -1,37 +1,40 @@
 ---
+import { Image } from 'astro:assets';
 import fondo from '../../assets/contactanos/fondo.svg';
 import persona from '../../assets/contactanos/persona.svg';
 ---
 
 <section
   id="contactanos"
-  class="reveal-on-scroll relative w-full overflow-hidden border-b-[3px] border-cimak-yellow"
+  class="reveal-on-scroll relative w-full overflow-hidden border-b-[3px] border-cimak-yellow lg:aspect-[1280/578]"
   aria-label="Contáctanos"
 >
   <img
     src={fondo.src}
     alt=""
     class="absolute inset-0 h-full w-full object-cover object-center"
-    width="1600"
-    height="700"
+    width="1280"
+    height="578"
     aria-hidden="true"
   />
 
   <div
-    class="container-cimak relative z-10 flex flex-col items-center justify-center lg:flex-row lg:items-end lg:gap-[200px] lg:pt-6"
+    class="container-cimak relative z-10 flex h-full flex-col items-center justify-center lg:flex-row lg:items-center lg:justify-center lg:gap-[200px]"
   >
-    <div class="relative z-20 flex w-full shrink-0 justify-center lg:w-auto lg:justify-start lg:self-end">
-      <img
-        src={persona.src}
+    <div class="relative z-20 hidden shrink-0 self-end lg:block">
+      <Image
+        src={persona}
         alt="Asesor CIMAK"
-        class="h-auto max-h-[340px] w-auto object-contain object-bottom drop-shadow-md sm:max-h-[400px] lg:max-h-[540px]"
-        width="420"
-        height="580"
+        width={520}
+        height={720}
+        class="h-auto w-auto max-h-[620px] origin-bottom scale-125 object-contain object-bottom drop-shadow-md"
+        loading="lazy"
+        decoding="async"
       />
     </div>
 
     <div
-      class="relative z-10 -mt-5 mb-6 w-full max-w-md rounded-2xl border border-white/50 bg-transparent p-5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] sm:p-6 lg:mt-0 lg:mb-8 lg:max-w-[490px] lg:shrink-0"
+      class="relative z-10 mb-6 mt-8 w-full max-w-md rounded-2xl border border-white/50 bg-transparent p-5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] sm:p-6 lg:mb-16 lg:mt-0 lg:max-w-[490px] lg:shrink-0 lg:self-center"
     >
       <h2 class="text-[1.4rem] font-extrabold leading-tight text-cimak-black sm:text-[1.55rem]">
         Contáctanos
