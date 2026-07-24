@@ -9,11 +9,10 @@ import fondo from '../../assets/banner-dos/fondo.svg';
   class="reveal-on-scroll relative w-full overflow-hidden"
   aria-label="Blog CIMAK"
 >
-  <!-- Fondo a todo el ancho -->
   <img
     src={fondo.src}
     alt=""
-    class="absolute inset-0 h-full w-full object-cover object-[73%_center]"
+    class="absolute inset-0 h-full w-full object-cover object-[70%_center]"
     width="1600"
     height="500"
     aria-hidden="true"
@@ -21,63 +20,65 @@ import fondo from '../../assets/banner-dos/fondo.svg';
   <div class="absolute inset-0 bg-black/60 lg:bg-transparent"></div>
   <div class="pointer-events-none absolute inset-y-0 left-0 hidden w-[55%] bg-gradient-to-r from-black via-black/80 to-transparent lg:block"></div>
 
-  <!-- Desktop: casco + texto izq | preview centro | foto der -->
-  <div class="relative z-10 hidden grid-cols-[1fr_auto_1fr] items-center gap-6 px-14 py-12 lg:grid">
-    <div class="flex max-w-md flex-col items-start gap-5">
-      <img
-        src={casco.src}
-        alt=""
-        class="h-16 w-auto"
-        width="82"
-        height="83"
-        aria-hidden="true"
-      />
-
-      <p class="text-[1.65rem] font-semibold leading-snug text-white">
-        ¡Conoce <span class="font-extrabold">nuestro blog</span> con los mejores tips de construcción!
-      </p>
-
-      <a
-        href="/blog"
-        class="inline-block rounded-md bg-[#ffba2e] px-5 py-2 text-sm font-bold text-cimak-black transition hover:brightness-105"
-      >
-        Ver más
-      </a>
-    </div>
-
-    <div class="relative w-full max-w-[300px]">
-      <button
-        type="button"
-        class="blog-prev absolute top-1/2 -left-7 z-10 -translate-y-1/2 text-3xl font-light text-white transition hover:text-cimak-yellow"
-        aria-label="Anterior"
-      >
-        ‹
-      </button>
-
-      <div class="overflow-hidden rounded-xl border border-white/40 bg-white/10 p-1 shadow-lg backdrop-blur-sm">
+  <!-- Desktop: contenido alineado al margen -->
+  <div class="container-cimak relative z-10 hidden py-12 lg:block">
+    <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
+      <div class="flex max-w-md flex-col items-start gap-5">
         <img
-          class="blog-preview block h-auto w-full rounded-lg"
-          src={preview.src}
-          alt="Vista previa del blog y productos"
-          width="320"
-          height="400"
+          src={casco.src}
+          alt=""
+          class="h-16 w-auto"
+          width="82"
+          height="83"
+          aria-hidden="true"
         />
+
+        <p class="text-[1.65rem] font-semibold leading-snug text-white">
+          ¡Conoce <span class="font-extrabold">nuestro blog</span> con los mejores tips de construcción!
+        </p>
+
+        <a
+          href="/blog"
+          class="inline-block rounded-md bg-[#ffba2e] px-5 py-2 text-sm font-bold text-cimak-black transition hover:brightness-105"
+        >
+          Ver más
+        </a>
       </div>
 
-      <button
-        type="button"
-        class="blog-next absolute top-1/2 -right-7 z-10 -translate-y-1/2 text-3xl font-light text-white transition hover:text-cimak-yellow"
-        aria-label="Siguiente"
-      >
-        ›
-      </button>
-    </div>
+      <div class="relative w-full max-w-[300px]">
+        <button
+          type="button"
+          class="blog-prev absolute top-1/2 -left-7 z-10 -translate-y-1/2 text-3xl font-light text-white transition hover:text-cimak-yellow"
+          aria-label="Anterior"
+        >
+          ‹
+        </button>
 
-    <div aria-hidden="true"></div>
+        <div class="overflow-hidden rounded-xl border border-white/40 bg-white/10 p-1 shadow-lg backdrop-blur-sm">
+          <img
+            class="blog-preview block h-auto w-full rounded-lg"
+            src={preview.src}
+            alt="Vista previa del blog y productos"
+            width="320"
+            height="400"
+          />
+        </div>
+
+        <button
+          type="button"
+          class="blog-next absolute top-1/2 -right-7 z-10 -translate-y-1/2 text-3xl font-light text-white transition hover:text-cimak-yellow"
+          aria-label="Siguiente"
+        >
+          ›
+        </button>
+      </div>
+
+      <div aria-hidden="true"></div>
+    </div>
   </div>
 
-  <!-- Mobile: sin casco, centrado (texto → preview → botón) -->
-  <div class="relative z-10 flex flex-col items-center gap-5 px-6 py-10 text-center lg:hidden">
+  <!-- Mobile -->
+  <div class="container-cimak relative z-10 flex flex-col items-center gap-5 py-10 text-center lg:hidden">
     <p class="max-w-sm text-xl font-semibold leading-snug text-white sm:text-2xl">
       ¡Conoce <span class="font-extrabold">nuestro blog</span> con los mejores tips de construcción!
     </p>
@@ -123,7 +124,6 @@ import fondo from '../../assets/banner-dos/fondo.svg';
   const slides = [...document.querySelectorAll('.blog-preview')]
     .map((el) => el.getAttribute('src'))
     .filter(Boolean);
-  // Una sola fuente de slides (mismo asset por ahora)
   const slideSrcs = slides.length ? [slides[0]] : [];
   let index = 0;
 

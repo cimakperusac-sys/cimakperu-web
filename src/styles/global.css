@@ -12,36 +12,43 @@ html.lenis.lenis-smooth {
 
 /* Colores de marca CIMAK — úsalos con clases Tailwind: bg-cimak-yellow, text-cimak-black, etc. */
 @theme {
-  --color-cimak-yellow: #f5c518;
-  --color-cimak-yellow-dark: #e0b000;
+  --color-cimak-yellow: #FFBA2E;
+  --color-cimak-yellow-dark: #000000;
   --color-cimak-black: #111111;
   --color-cimak-gray: #2a2a2a;
   --color-cimak-blue: #1e4a8c;
   --color-cimak-white: #ffffff;
   --color-cimak-whatsapp: #25d366;
 
-  --font-sans: "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Archivo", system-ui, sans-serif;
 
-  /* Layout del diseño (artboard 1280): márgenes laterales 81px */
-  --container-cimak: 1280px;
-  --spacing-gutter: 81px;
+  /* Layout: margen fijo desde el borde (sin centrar en 1280) */
+  --container-cimak: 1600px;
+  --spacing-gutter: 16px;
 }
 
 /*
-  Como en el diseño: contenido a todo el ancho de pantalla
-  con 81px de espacio a cada lado (no max-width + padding a la vez).
+  Contenedor de página
 */
 .container-cimak {
   box-sizing: border-box;
   width: 100%;
+  max-width: var(--container-cimak);
   margin-inline: auto;
-  padding-inline: 1.25rem;
+  padding-inline: var(--spacing-gutter);
 }
 
-@media (min-width: 1280px) {
-  .container-cimak {
-    padding-inline: var(--spacing-gutter); /* 81px */
-  }
+/*
+  Banners full-bleed: fondo al borde; contenido con margen pequeño
+*/
+.pad-page-left {
+  padding-left: var(--spacing-gutter);
+  padding-right: 1rem;
+}
+
+.pad-page-right {
+  padding-right: var(--spacing-gutter);
+  padding-left: 0;
 }
 
 html {

@@ -1,0 +1,102 @@
+---
+import fondo from '../../assets/contactanos/fondo.svg';
+import persona from '../../assets/contactanos/persona.svg';
+---
+
+<section
+  id="contactanos"
+  class="reveal-on-scroll relative w-full overflow-hidden border-b-[3px] border-cimak-yellow"
+  aria-label="Contáctanos"
+>
+  <img
+    src={fondo.src}
+    alt=""
+    class="absolute inset-0 h-full w-full object-cover object-center"
+    width="1600"
+    height="700"
+    aria-hidden="true"
+  />
+
+  <div
+    class="container-cimak relative z-10 flex flex-col items-center justify-center lg:flex-row lg:items-end lg:gap-[200px] lg:pt-6"
+  >
+    <div class="relative z-20 flex w-full shrink-0 justify-center lg:w-auto lg:justify-start lg:self-end">
+      <img
+        src={persona.src}
+        alt="Asesor CIMAK"
+        class="h-auto max-h-[340px] w-auto object-contain object-bottom drop-shadow-md sm:max-h-[400px] lg:max-h-[540px]"
+        width="420"
+        height="580"
+      />
+    </div>
+
+    <div
+      class="relative z-10 -mt-5 mb-6 w-full max-w-md rounded-2xl border border-white/50 bg-transparent p-5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] sm:p-6 lg:mt-0 lg:mb-8 lg:max-w-[490px] lg:shrink-0"
+    >
+      <h2 class="text-[1.4rem] font-extrabold leading-tight text-cimak-black sm:text-[1.55rem]">
+        Contáctanos
+      </h2>
+      <p class="mt-1.5 text-[0.8rem] leading-snug text-cimak-black/85 sm:text-[0.875rem]">
+        Completa el formulario y atenderemos tu requerimiento lo más pronto posible.
+      </p>
+
+      <form class="mt-4 flex flex-col gap-2.5" method="post" action="#">
+        <label class="sr-only" for="contacto-nombre">Nombres y Apellidos</label>
+        <input
+          id="contacto-nombre"
+          name="nombre"
+          type="text"
+          required
+          placeholder="Nombres y Apellidos"
+          class="w-full rounded-md border border-black/10 bg-white px-3.5 py-2.5 text-sm text-cimak-black outline-none placeholder:text-black/35 focus:border-cimak-yellow"
+        />
+
+        <label class="sr-only" for="contacto-email">Correo electrónico</label>
+        <input
+          id="contacto-email"
+          name="email"
+          type="email"
+          required
+          placeholder="Correo electrónico"
+          class="w-full rounded-md border border-black/10 bg-white px-3.5 py-2.5 text-sm text-cimak-black outline-none placeholder:text-black/35 focus:border-cimak-yellow"
+        />
+
+        <label class="sr-only" for="contacto-telefono">Teléfono</label>
+        <input
+          id="contacto-telefono"
+          name="telefono"
+          type="tel"
+          required
+          placeholder="Teléfono"
+          class="w-full rounded-md border border-black/10 bg-white px-3.5 py-2.5 text-sm text-cimak-black outline-none placeholder:text-black/35 focus:border-cimak-yellow"
+        />
+
+        <label class="sr-only" for="contacto-empresa">Empresa / RUC</label>
+        <input
+          id="contacto-empresa"
+          name="empresa"
+          type="text"
+          placeholder="Empresa / RUC"
+          class="w-full rounded-md border border-black/10 bg-white px-3.5 py-2.5 text-sm text-cimak-black outline-none placeholder:text-black/35 focus:border-cimak-yellow"
+        />
+
+        <label class="sr-only" for="contacto-mensaje">Mensaje</label>
+        <textarea
+          id="contacto-mensaje"
+          name="mensaje"
+          rows="3"
+          required
+          placeholder="Mensaje"
+          class="w-full resize-y rounded-md border border-black/10 bg-white px-3.5 py-2.5 text-sm text-cimak-black outline-none placeholder:text-black/35 focus:border-cimak-yellow"
+        ></textarea>
+
+        <button
+          type="submit"
+          class="mt-0.5 w-fit rounded-md bg-cimak-yellow px-8 py-2.5 text-sm font-bold text-cimak-black transition hover:brightness-105"
+        >
+          Enviar
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
