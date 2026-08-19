@@ -1,0 +1,21 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AluzincHero from '../components/productos/AluzincHero.astro';
+import AluzincEspecificaciones from '../components/productos/AluzincEspecificaciones.astro';
+import AluzincColores from '../components/productos/AluzincColores.astro';
+import AluzincContacto from '../components/productos/AluzincContacto.astro';
+import AluzincFooter from '../components/productos/AluzincFooter.astro';
+
+import heroFondo from '../assets/aluzinc/seccion/hero/hero-fondo.svg';
+import productAluzinc from '../assets/aluzinc/seccion/hero/aluzinc.svg';
+---
+
+<Layout title="Aluzinc | CIMAK Perú" showHeader={false} showFooter={false}>
+  <main>
+    <AluzincHero overlayImage={heroFondo} productImage={productAluzinc} />
+    <AluzincEspecificaciones />
+    <AluzincColores />
+    <AluzincContacto />
+  </main>
+  <AluzincFooter />
+</Layout>

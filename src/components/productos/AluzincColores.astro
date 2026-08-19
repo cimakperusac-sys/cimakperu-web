@@ -1,0 +1,93 @@
+---
+import { Image } from 'astro:assets';
+import coloresImg from '../../assets/aluzinc/seccion/colores/colores.svg';
+
+const colores = [
+  { ral: 'RAL 3002', nombre: 'Rojo', hex: '#9B1B14' },
+  { ral: 'RAL 3020', nombre: 'Rojo', hex: '#CC2A17' },
+  { ral: 'RAL 3002', nombre: 'Rojo', hex: '#9E1B10' },
+  { ral: 'RAL 6003', nombre: 'Verde', hex: '#4B4F3E' },
+  { ral: 'RAL 6002', nombre: 'Verde', hex: '#1F5B33' },
+  { ral: 'RAL 5002', nombre: 'Azul', hex: '#22306E' },
+  { ral: 'RAL 5015', nombre: 'Azul', hex: '#0B7CC4' },
+  { ral: 'RAL 7004', nombre: 'Gris', hex: '#9DA0A3' },
+  { ral: 'RAL 2008', nombre: 'Anaranjado', hex: '#EE7B22' },
+  { ral: 'RAL 2008', nombre: 'Blanco', hex: '#ECEDE7' },
+];
+---
+
+<section
+  id="colores"
+  class="reveal-on-scroll w-full bg-white py-10 sm:py-14"
+  aria-label="Colores disponibles"
+>
+  <div class="container-cimak">
+    <div class="flex justify-center">
+      <h2 class="rounded-full bg-cimak-black px-10 py-2.5 text-center text-xs font-bold uppercase tracking-wide text-white sm:text-sm">
+        Colores
+      </h2>
+    </div>
+
+    <div class="mt-8 grid gap-8 lg:mt-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:gap-10">
+      <div>
+        <p class="text-justify text-sm leading-relaxed text-cimak-black/85 sm:text-xs lg:text-sm lg:leading-6">
+          Nuestra línea de colores RAL ofrece la combinación perfecta entre estética y
+          durabilidad para tus coberturas. Acabados de alta resistencia a la intemperie que
+          mantienen su color vivo año tras año. Además de nuestra gama estándar, creamos
+          colores personalizados para que tu diseño arquitectónico sea exactamente como lo
+          imaginaste.
+        </p>
+
+        <ul class="mt-7 grid grid-cols-2 gap-3 min-[420px]:grid-cols-3 sm:gap-4 md:grid-cols-5 lg:mt-9 lg:gap-5">
+          {
+            colores.map((color) => (
+              <li class="overflow-hidden rounded-md bg-white shadow-[0_1px_6px_rgba(0,0,0,0.14)]">
+                <span
+                  class="block h-16 w-full lg:h-[74px]"
+                  style={`background-color:${color.hex}`}
+                  aria-hidden="true"
+                ></span>
+                <span class="block px-2.5 py-2">
+                  <span class="block text-[0.65rem] font-bold text-cimak-black lg:text-[0.65rem]">
+                    {color.ral}
+                  </span>
+                  <span class="block text-[0.65rem] text-cimak-black/70 lg:text-[0.65rem]">
+                    {color.nombre}
+                  </span>
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-stretch">
+        <div class="min-w-0 flex-1 overflow-hidden rounded-md">
+          <Image
+            src={coloresImg}
+            alt="Cobertura de aluzinc en color rojo instalada en estructura metálica"
+            class="h-full w-full object-cover"
+            width={332}
+            height={302}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+
+        <ul
+          class="flex shrink-0 flex-row flex-wrap justify-center gap-1.5 lg:flex-col lg:justify-between"
+          aria-hidden="true"
+        >
+          {
+            colores.map((color) => (
+              <li
+                class="h-6 w-6 rounded-sm lg:h-[26px] lg:w-[26px]"
+                style={`background-color:${color.hex}`}
+              ></li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

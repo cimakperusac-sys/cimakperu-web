@@ -1,0 +1,82 @@
+---
+import { Image } from 'astro:assets';
+import fotoEspecificaciones from '../../assets/aluzinc/seccion/especificaciones/especificaciones.svg';
+import altaResistencia from '../../assets/aluzinc/seccion/especificaciones/alta-resistencia.svg';
+import excelenteReflectividad from '../../assets/aluzinc/seccion/especificaciones/excelente-reflectividad.svg';
+import largaVida from '../../assets/aluzinc/seccion/especificaciones/larga-vida.svg';
+import acabadoEstetico from '../../assets/aluzinc/seccion/especificaciones/acabado-estetico.svg';
+
+const items = [
+  {
+    icon: altaResistencia,
+    title: 'Alta resistencia a\nla corrosión',
+    text: 'El aluminio actúa como una barrera protectora, mientras que el zinc proporciona protección galvánica. Esto hace que el aluzinc soporte ambientes húmedos, salinos o industriales mucho mejor que el acero convencional, evitando la oxidación prematura.',
+  },
+  {
+    icon: excelenteReflectividad,
+    title: 'Excelente reflectividad\ntérmica',
+    text: 'Su superficie brillante refleja una gran cantidad de luz solar y calor. Cuando se usa en techos, ayuda a mantener el interior de las edificaciones considerablemente más fresco, lo que se traduce en ahorro de energía en climatización.',
+  },
+  {
+    icon: largaVida,
+    title: 'Larga vida\nútil',
+    text: 'Gracias a la sinergia de sus componentes, una cubierta de aluzinc puede durar de 2 a 6 veces más que una lámina de acero galvanizado regular bajo las mismas condiciones ambientales.',
+  },
+  {
+    icon: acabadoEstetico,
+    title: 'Acabado estético y\nligereza',
+    text: 'Resulta visualmente atractivo incluso sin pintar. Además, al ser un material muy ligero, facilita el transporte, la manipulación y la instalación, reduciendo el peso estructural sobre la edificación.',
+  },
+];
+---
+
+<section
+  id="especificaciones"
+  class="reveal-on-scroll w-full bg-white py-10 sm:py-14"
+  aria-label="Especificaciones del Aluzinc"
+>
+  <div class="container-cimak">
+    <div class="flex justify-center">
+      <h2 class="rounded-full bg-cimak-black px-8 py-2.5 text-center text-xs font-bold uppercase tracking-wide text-white sm:text-sm">
+        Especificaciones
+      </h2>
+    </div>
+
+    <div class="mt-6 aspect-[16/10] overflow-hidden rounded-2xl sm:mt-8 sm:aspect-[2/1] sm:rounded-3xl lg:aspect-[1036/302]">
+      <Image
+        src={fotoEspecificaciones}
+        alt="Cobertura de aluzinc instalada en nave industrial"
+        class="h-full w-full object-cover"
+        width={1036}
+        height={302}
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+
+    <div class="mt-9 grid gap-8 sm:grid-cols-2 sm:gap-10 lg:mt-14 lg:grid-cols-4 lg:gap-8">
+      {
+        items.map((item) => (
+          <article class="flex flex-col items-center">
+            <Image
+              src={item.icon}
+              alt=""
+              class="h-16 w-auto sm:h-20 lg:h-[88px]"
+              width={110}
+              height={88}
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+            />
+            <h3 class="mt-4 whitespace-pre-line text-center text-[0.8rem] font-bold uppercase leading-snug text-cimak-black sm:mt-5 sm:text-xs lg:text-sm">
+              {item.title}
+            </h3>
+            <p class="mt-3 text-justify text-xs leading-relaxed text-cimak-black/80 sm:mt-4 sm:text-[0.7rem] lg:text-xs">
+              {item.text}
+            </p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

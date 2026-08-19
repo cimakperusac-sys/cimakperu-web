@@ -1,0 +1,129 @@
+---
+import { Image } from 'astro:assets';
+import { site } from '../../data/site';
+import persona from '../../assets/aluzinc/seccion/contactanos/contacto.svg';
+
+const inputClass =
+  'w-full rounded-md border-0 bg-[#efefef] px-4 py-3 text-sm text-cimak-black outline-none placeholder:text-black/40 focus:ring-2 focus:ring-cimak-yellow';
+---
+
+<section
+  id="contacto"
+  class="reveal-on-scroll relative w-full overflow-hidden bg-white pt-10 sm:pt-14"
+  aria-label="Contáctanos para tu proyecto"
+>
+  <div class="container-cimak">
+    <div class="grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.62fr)] lg:gap-6">
+      <div class="pb-6 lg:pb-14">
+        <h2 class="text-[1.75rem] font-extrabold uppercase leading-[1.05] tracking-tight text-cimak-black min-[420px]:text-3xl sm:text-4xl lg:text-[2.6rem]">
+          Contáctanos<br />para tu proyecto
+        </h2>
+
+        <form class="mt-7 flex flex-col gap-4 lg:mt-10" method="post" action="#">
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label class="sr-only" for="aluzinc-nombre">Primer nombre</label>
+              <input
+                id="aluzinc-nombre"
+                name="nombre"
+                type="text"
+                placeholder="Primer nombre"
+                class={inputClass}
+              />
+            </div>
+            <div>
+              <label class="sr-only" for="aluzinc-apellidos">Apellido(s)</label>
+              <input
+                id="aluzinc-apellidos"
+                name="apellidos"
+                type="text"
+                placeholder="Apellido(s)"
+                class={inputClass}
+              />
+            </div>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label class="sr-only" for="aluzinc-email">Correo electrónico</label>
+              <input
+                id="aluzinc-email"
+                name="email"
+                type="email"
+                required
+                placeholder="Correo electrónico*"
+                class={inputClass}
+              />
+            </div>
+            <div>
+              <label class="sr-only" for="aluzinc-whatsapp">Número de Whatsapp</label>
+              <input
+                id="aluzinc-whatsapp"
+                name="whatsapp"
+                type="tel"
+                placeholder="Número de Whatsapp"
+                class={inputClass}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="sr-only" for="aluzinc-requerimientos">Indicar requerimientos</label>
+            <textarea
+              id="aluzinc-requerimientos"
+              name="requerimientos"
+              rows="6"
+              placeholder="Indicar requerimientos:"
+              class={`${inputClass} resize-y`}></textarea>
+          </div>
+
+          <p class="mt-2 text-xs leading-relaxed text-cimak-black/85 sm:text-[0.7rem]">
+            Utilizaremos tu información personal únicamente para comunicarnos y gestionar tu
+            consulta.
+          </p>
+
+          <p class="text-justify text-xs leading-relaxed text-cimak-black/85 sm:text-[0.7rem]">
+            De vez en cuando, nos gustaría contactarte acerca de nuestros productos y
+            servicios, así como otros contenidos que puedan interesarte. Si das tu
+            consentimiento para que te contactemos con este fin, por favor marca la casilla a
+            continuación:
+          </p>
+
+          <label class="mt-2 flex items-start gap-3 text-xs leading-relaxed text-cimak-black/85 sm:text-[0.7rem]">
+            <input
+              type="checkbox"
+              name="marketing"
+              class="mt-0.5 h-4 w-4 shrink-0 rounded-sm border border-black/30 accent-cimak-yellow"
+            />
+            <span>Acepto recibir otras comunicaciones de marketing de Cimak Perú S.A.C</span>
+          </label>
+
+          <p class="text-justify text-xs leading-relaxed text-cimak-black/85 sm:text-[0.7rem]">
+            Puedes darte de baja en cualquier momento respondiendo a cualquiera de nuestras
+            comunicaciones o enviando una solicitud a {site.email}. Almacenaremos y
+            procederemos tus datos personales según los términos definidos aquí.
+          </p>
+
+          <button
+            type="submit"
+            class="mt-2 w-full rounded-md bg-cimak-yellow px-9 py-3 text-sm font-bold uppercase text-cimak-black transition hover:brightness-105 sm:w-fit"
+          >
+            Enviar
+          </button>
+        </form>
+      </div>
+
+      <div class="flex justify-center">
+        <Image
+          src={persona}
+          alt="Asesor de CIMAK Perú"
+          class="h-auto w-full max-w-[240px] object-contain object-bottom sm:max-w-[300px] lg:max-w-[383px]"
+          width={383}
+          height={671}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    </div>
+  </div>
+</section>

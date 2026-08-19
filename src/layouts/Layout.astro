@@ -6,9 +6,11 @@ import WhatsAppButton from '../components/ui/WhatsAppButton.astro';
 
 interface Props {
 	title?: string;
+	showHeader?: boolean;
+	showFooter?: boolean;
 }
 
-const { title = 'CIMAK Perú' } = Astro.props;
+const { title = 'CIMAK Perú', showHeader = true, showFooter = true } = Astro.props;
 ---
 
 <!doctype html>
@@ -28,9 +30,9 @@ const { title = 'CIMAK Perú' } = Astro.props;
 		<title>{title}</title>
 	</head>
 	<body>
-		<Header />
+		{showHeader && <Header />}
 		<slot />
-		<Footer />
+		{showFooter && <Footer />}
 		<WhatsAppButton />
 
 		<script>

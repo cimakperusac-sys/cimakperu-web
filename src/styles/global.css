@@ -99,6 +99,15 @@ body {
   animation: scroll-bounce 1.6s ease-in-out infinite;
 }
 
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Aparición al hacer scroll */
 .reveal-on-scroll {
   opacity: 0;

@@ -1,0 +1,52 @@
+---
+import { Image } from 'astro:assets';
+import { site } from '../../data/site';
+import logoBlanco from '../../assets/nosotros/logo-blanco.svg';
+---
+
+<footer class="w-full bg-white text-white">
+  <!-- Borde superior con perfil de cobertura -->
+  <svg
+    class="-mb-px block h-7 w-full sm:hidden"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <defs>
+      <pattern id="perfil-cobertura-sm" width="72" height="28" patternUnits="userSpaceOnUse">
+        <path d="M0 28 V17 H9 L16 3 H40 L47 17 H72 V28 Z" fill="#111111" />
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#perfil-cobertura-sm)" />
+  </svg>
+
+  <svg
+    class="-mb-px hidden h-10 w-full sm:block lg:h-12"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <defs>
+      <pattern id="perfil-cobertura" width="132" height="48" patternUnits="userSpaceOnUse">
+        <path d="M0 48 V30 H16 L30 6 H74 L88 30 H132 V48 Z" fill="#111111" />
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#perfil-cobertura)" />
+  </svg>
+
+  <div class="bg-cimak-black">
+    <div class="container-cimak flex flex-col items-center gap-3 py-7 sm:py-9">
+      <Image
+        src={logoBlanco}
+        alt="CIMAK Coberturas"
+        class="h-9 w-auto sm:h-10"
+        width={130}
+        height={50}
+        loading="lazy"
+        decoding="async"
+      />
+      <p class="text-center text-[0.7rem] leading-relaxed text-white/85">
+        © {new Date().getFullYear()} {site.legalName} RUC: {site.ruc} | Todos los derechos
+        reservados
+      </p>
+    </div>
+  </div>
+</footer>
