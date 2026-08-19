@@ -7,6 +7,11 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   // Build directo a www/html (carpeta hermana de cimakperu-web)
   outDir: '../html',
+  image: {
+    // Todos los assets son SVG, así que no hay nada que optimizar con Sharp,
+    // que además no puede cargarse en el servidor de producción.
+    service: { entrypoint: 'astro/assets/services/noop' }
+  },
   vite: {
     plugins: [tailwindcss()]
   }
