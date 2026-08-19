@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import { site } from '../../data/site';
 import logo from '../../assets/footer/logo.svg';
 import libro from '../../assets/footer/libro.svg';
@@ -30,12 +31,14 @@ const socials = [
 <footer class="bg-cimak-yellow text-cimak-black">
   <!-- Mobile -->
   <div class="container-cimak flex flex-col items-center px-6 py-10 text-center md:hidden">
-    <img
-      src={logo.src}
+    <Image
+      src={logo}
       alt="CIMAK"
       class="h-10 w-auto"
-      width="89"
-      height="34"
+      width={89}
+      height={34}
+      loading="lazy"
+      decoding="async"
     />
 
     <div class="mt-8 space-y-6">
@@ -87,13 +90,15 @@ const socials = [
       href="/libro-de-reclamaciones"
       class="mt-8 inline-flex w-full max-w-xs items-center justify-center gap-3 rounded-xl bg-cimak-black px-5 py-3.5 text-white transition hover:opacity-90"
     >
-      <img
-        src={libro.src}
+      <Image
+        src={libro}
         alt=""
         class="h-6 w-auto brightness-0 invert"
-        width="61"
-        height="25"
+        width={61}
+        height={25}
         aria-hidden="true"
+        loading="lazy"
+        decoding="async"
       />
       <span class="text-sm font-semibold">Libro de Reclamaciones</span>
     </a>
@@ -109,7 +114,15 @@ const socials = [
             aria-label={item.label}
             class="transition hover:opacity-80"
           >
-            <img src={item.icon.src} alt="" class="h-9 w-9" width="36" height="36" />
+            <Image
+              src={item.icon}
+              alt=""
+              class="h-9 w-9"
+              width={36}
+              height={36}
+              loading="lazy"
+              decoding="async"
+            />
           </a>
         ))
       }
@@ -196,13 +209,15 @@ const socials = [
         href="/libro-de-reclamaciones"
         class="inline-flex items-center gap-2.5 rounded-md border border-cimak-black px-3 py-2 transition hover:bg-black/5"
       >
-        <img
-          src={libro.src}
+        <Image
+          src={libro}
           alt=""
           class="h-6 w-auto"
-          width="61"
-          height="25"
+          width={61}
+          height={25}
           aria-hidden="true"
+          loading="lazy"
+          decoding="async"
         />
         <span class="text-left text-xs font-semibold leading-tight">
           Libro de<br />Reclamaciones
@@ -220,12 +235,14 @@ const socials = [
                 aria-label={item.label}
                 class="transition hover:opacity-80"
               >
-                <img
-                  src={item.icon.src}
+                <Image
+                  src={item.icon}
                   alt=""
                   class="h-7 w-7"
-                  width="40"
-                  height="40"
+                  width={40}
+                  height={40}
+                  loading="lazy"
+                  decoding="async"
                 />
               </a>
             ))
@@ -235,12 +252,14 @@ const socials = [
     </div>
 
     <div class="mt-8 flex flex-col items-center gap-3 sm:mt-10">
-      <img
-        src={logo.src}
+      <Image
+        src={logo}
         alt="CIMAK"
         class="h-9 w-auto sm:h-10"
-        width="89"
-        height="34"
+        width={89}
+        height={34}
+        loading="lazy"
+        decoding="async"
       />
       <p class="text-center text-[0.7rem] leading-relaxed text-cimak-black/90 sm:text-xs">
         © {new Date().getFullYear()} {site.legalName} RUC: {site.ruc} | Todos los derechos

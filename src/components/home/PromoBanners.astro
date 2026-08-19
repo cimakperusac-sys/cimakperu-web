@@ -1,10 +1,11 @@
 ---
+import { Image } from 'astro:assets';
 import catalogoImg from '../../assets/home/catalogo.svg';
-import bannerAluzincImg from '../../assets/home/banner-aluzinc.svg';
+import bannerAluzincImg from '../../assets/home/imagen-uno.svg';
 
 const slides = [
   {
-    src: bannerAluzincImg.src,
+    image: bannerAluzincImg,
     alt: 'Aluzinc para tu techo',
     href: '/productos/aluzinc',
   },
@@ -12,24 +13,17 @@ const slides = [
 ---
 
 <section id="promociones" class="reveal-on-scroll w-full" aria-label="Promociones">
-  <div class="grid grid-cols-1 items-stretch lg:grid-cols-2">
-    <!-- Izquierda: amarillo full bleed; contenido con margen -->
+  <div class="relative grid grid-cols-1 items-stretch lg:grid-cols-2">
+    <!-- Izquierda amarilla -->
     <a
       href="/catalogo"
-      class="group relative hidden items-center bg-cimak-yellow lg:flex"
+      class="group relative z-10 hidden min-h-full items-center overflow-visible bg-cimak-yellow lg:flex"
     >
-      <div class="promo-content-left flex w-full items-center gap-6 py-5 pr-10 lg:gap-8">
-        <img
-          src={catalogoImg.src}
-          alt="Catálogo de productos CIMAK"
-          class="h-[130px] w-auto shrink-0 rounded-md object-cover shadow-md xl:h-[150px]"
-          width="120"
-          height="150"
-        />
-
+      <!-- Texto + VER + flecha (junto al texto, no sobre el catálogo) -->
+      <div class="promo-content-left relative z-30 flex items-center gap-5 py-5 pr-4 xl:gap-6">
         <div class="flex min-w-0 flex-col items-start gap-3">
           <h2 class="text-xl font-extrabold uppercase leading-tight tracking-tight text-cimak-black xl:text-2xl">
-            Catálogo <br> de productos
+            Catálogo <br /> de productos
           </h2>
           <span class="inline-block bg-cimak-black px-5 py-1.5 text-sm font-bold uppercase tracking-wider text-white">
             Ver
@@ -37,7 +31,7 @@ const slides = [
         </div>
 
         <span
-          class="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cimak-black text-white transition group-hover:scale-105"
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cimak-black text-white transition group-hover:scale-105"
           aria-hidden="true"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -45,10 +39,23 @@ const slides = [
           </svg>
         </span>
       </div>
+
+      <!-- Catálogo más grande, solapa el verde -->
+      <div class="pointer-events-none absolute top-1/2 right-0 z-20 w-[72%] max-w-[480px] translate-x-[42%] -translate-y-1/2">
+        <Image
+          src={catalogoImg}
+          alt=""
+          class="h-auto w-full drop-shadow-xl"
+          width={339}
+          height={223}
+          loading="eager"
+          decoding="async"
+        />
+      </div>
     </a>
 
-    <!-- Derecha: imagen completa, sin recortar -->
-    <div id="promo-carousel" class="relative overflow-hidden bg-[#2a6aa8]" data-slides={slides.length}>
+    <!-- Derecha: imagen producto -->
+    <div id="promo-carousel" class="relative z-0 overflow-hidden bg-[#2a6aa8]" data-slides={slides.length}>
       {slides.map((slide, index) => (
         <a
           href={slide.href}
@@ -59,12 +66,15 @@ const slides = [
           data-index={index}
           aria-hidden={index !== 0}
         >
-          <img
-            src={slide.src}
+          <Image
+            src={slide.image}
             alt={slide.alt}
             class="block h-auto w-full"
-            width="900"
-            height="280"
+            width={900}
+            height={280}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
           />
         </a>
       ))}

@@ -9,13 +9,15 @@ import persona from '../../assets/contactanos/persona.svg';
   class="reveal-on-scroll relative w-full overflow-hidden border-b-[3px] border-cimak-yellow lg:aspect-[1280/578]"
   aria-label="Contáctanos"
 >
-  <img
-    src={fondo.src}
+  <Image
+    src={fondo}
     alt=""
     class="absolute inset-0 h-full w-full object-cover object-center"
-    width="1280"
-    height="578"
+    width={1280}
+    height={578}
     aria-hidden="true"
+    loading="lazy"
+    decoding="async"
   />
 
   <div

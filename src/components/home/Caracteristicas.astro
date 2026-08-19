@@ -1,0 +1,103 @@
+---
+import { Image } from 'astro:assets';
+import iconCalidad from '../../assets/caracteristicas/calidad.svg';
+import iconCapacidad from '../../assets/caracteristicas/capacidad.svg';
+import iconFabricacion from '../../assets/caracteristicas/fabricacion.svg';
+
+const itemsMobile = [
+  {
+    icon: iconCapacidad,
+    title: 'Gran Capacidad de Abastecimiento:',
+    text: 'Stock real y envíos rápidos a nivel nacional.',
+  },
+  {
+    icon: iconFabricacion,
+    title: 'Fabricación a Medida Exacta:',
+    text: 'Encaje perfecto para un techo 100% hermético.',
+  },
+  {
+    icon: iconCalidad,
+    title: 'Calidad Certificada:',
+    text: 'Más de 15 años de durabilidad garantizada.',
+  },
+] as const;
+
+const itemsDesktop = [
+  {
+    icon: iconCalidad,
+    title: 'Calidad Certificada:',
+    text: 'Más de 15 años de durabilidad garantizada.',
+    iconClass: 'h-12 w-auto sm:h-14',
+  },
+  {
+    icon: iconCapacidad,
+    title: 'Gran Capacidad de Abastecimiento:',
+    text: 'Stock real y envíos rápidos a nivel nacional.',
+    iconClass: 'h-14 w-auto sm:h-16',
+  },
+  {
+    icon: iconFabricacion,
+    title: 'Fabricación a Medida Exacta:',
+    text: 'Encaje perfecto para un techo 100% hermético.',
+    iconClass: 'h-12 w-auto sm:h-14',
+  },
+] as const;
+---
+
+<section
+  id="caracteristicas"
+  class="reveal-on-scroll w-full bg-[#f3f3f3] pb-10 pt-6 sm:pb-16 sm:pt-4"
+  aria-label="Características CIMAK"
+>
+  <div class="container-cimak">
+    <!-- Mobile: cards negras apiladas -->
+    <div class="flex flex-col gap-3 md:hidden">
+      {
+        itemsMobile.map((item) => (
+          <div class="flex items-center gap-4 rounded-xl bg-cimak-black px-4 py-4">
+            <Image
+              src={item.icon}
+              alt=""
+              class="h-11 w-11 shrink-0 object-contain brightness-0 invert"
+              width={48}
+              height={48}
+              loading="lazy"
+              decoding="async"
+              aria-hidden="true"
+            />
+            <div class="min-w-0 flex-1 text-left text-white">
+              <p class="text-[0.85rem] font-bold leading-tight">{item.title}</p>
+              <p class="mt-1 text-[0.8rem] font-normal leading-snug">{item.text}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Desktop: 3 columnas centradas -->
+    <div class="hidden grid-cols-3 gap-6 md:grid lg:gap-10">
+      {
+        itemsDesktop.map((item) => (
+          <div class="flex flex-col items-center text-center">
+            <Image
+              src={item.icon}
+              alt=""
+              class={`mb-4 ${item.iconClass}`}
+              width={80}
+              height={80}
+              loading="lazy"
+              decoding="async"
+              aria-hidden="true"
+            />
+            <h3 class="text-sm font-bold text-cimak-black sm:text-[0.95rem]">
+              {item.title}
+            </h3>
+            <p class="mt-1 max-w-[260px] text-sm leading-snug text-cimak-black sm:text-[0.9rem]">
+              {item.text}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
