@@ -1,25 +1,37 @@
 ---
 import { Image } from 'astro:assets';
-import coloresImg from '../../assets/aluzinc/seccion/colores/colores.svg';
+import ral3002 from '../../assets/aluzinc/seccion/colores/ral3002.svg';
+import ral3020 from '../../assets/aluzinc/seccion/colores/ral3020.svg';
+import ral3003 from '../../assets/aluzinc/seccion/colores/ral3003.svg';
+import ral6003 from '../../assets/aluzinc/seccion/colores/ral6003.svg';
+import ral6002 from '../../assets/aluzinc/seccion/colores/ral6002.svg';
+import ral5002 from '../../assets/aluzinc/seccion/colores/ral5002.svg';
+import ral5015 from '../../assets/aluzinc/seccion/colores/ral5015.svg';
+import ral7004 from '../../assets/aluzinc/seccion/colores/ral7004.svg';
+import ral2008 from '../../assets/aluzinc/seccion/colores/ral2008.svg';
+import ral9003 from '../../assets/aluzinc/seccion/colores/ral9003.svg';
 
 const colores = [
-  { ral: 'RAL 3002', nombre: 'Rojo', hex: '#9B1B14' },
-  { ral: 'RAL 3020', nombre: 'Rojo', hex: '#CC2A17' },
-  { ral: 'RAL 3002', nombre: 'Rojo', hex: '#9E1B10' },
-  { ral: 'RAL 6003', nombre: 'Verde', hex: '#4B4F3E' },
-  { ral: 'RAL 6002', nombre: 'Verde', hex: '#1F5B33' },
-  { ral: 'RAL 5002', nombre: 'Azul', hex: '#22306E' },
-  { ral: 'RAL 5015', nombre: 'Azul', hex: '#0B7CC4' },
-  { ral: 'RAL 7004', nombre: 'Gris', hex: '#9DA0A3' },
-  { ral: 'RAL 2008', nombre: 'Anaranjado', hex: '#EE7B22' },
-  { ral: 'RAL 2008', nombre: 'Blanco', hex: '#ECEDE7' },
+  { id: 'ral3002', ral: 'RAL 3002', nombre: 'Rojo', hex: '#9B1B14', image: ral3002 },
+  { id: 'ral3020', ral: 'RAL 3020', nombre: 'Rojo', hex: '#CC2A17', image: ral3020 },
+  { id: 'ral3003', ral: 'RAL 3003', nombre: 'Rojo', hex: '#9E1B10', image: ral3003 },
+  { id: 'ral6003', ral: 'RAL 6003', nombre: 'Verde', hex: '#4B4F3E', image: ral6003 },
+  { id: 'ral6002', ral: 'RAL 6002', nombre: 'Verde', hex: '#1F5B33', image: ral6002 },
+  { id: 'ral5002', ral: 'RAL 5002', nombre: 'Azul', hex: '#22306E', image: ral5002 },
+  { id: 'ral5015', ral: 'RAL 5015', nombre: 'Azul', hex: '#0B7CC4', image: ral5015 },
+  { id: 'ral7004', ral: 'RAL 7004', nombre: 'Gris', hex: '#9DA0A3', image: ral7004 },
+  { id: 'ral2008', ral: 'RAL 2008', nombre: 'Anaranjado', hex: '#EE7B22', image: ral2008 },
+  { id: 'ral9003', ral: 'RAL 9003', nombre: 'Blanco', hex: '#FFFFFF', image: ral9003 },
 ];
+
+const defaultId = 'ral3002';
 ---
 
 <section
   id="colores"
   class="reveal-on-scroll w-full bg-white py-9 sm:py-12 lg:pb-16"
   aria-label="Colores disponibles"
+  data-colores
 >
   <div class="container-cimak">
     <div class="flex justify-center">
@@ -41,20 +53,29 @@ const colores = [
         <ul class="mt-8 grid grid-cols-5 gap-x-1.5 gap-y-2.5 sm:gap-x-2.5 sm:gap-y-3.5 lg:max-w-[540px]">
           {
             colores.map((color) => (
-              <li class="overflow-hidden rounded-[4px] bg-white shadow-[0_1px_6px_rgba(0,0,0,0.12)]">
-                <span
-                  class="block h-14 w-full sm:h-[84px] lg:h-24"
-                  style={`background-color:${color.hex}`}
-                  aria-hidden="true"
-                ></span>
-                <span class="block px-1.5 py-1.5 sm:px-2.5 sm:py-2.5">
-                  <span class="block text-[9px] font-bold leading-tight text-cimak-black sm:text-[11px]">
-                    {color.ral}
+              <li>
+                <button
+                  type="button"
+                  data-color-btn={color.id}
+                  aria-pressed={color.id === defaultId ? 'true' : 'false'}
+                  aria-label={`${color.ral} ${color.nombre}`}
+                  class="group w-full overflow-hidden rounded-[4px] bg-white text-left shadow-[0_1px_6px_rgba(0,0,0,0.12)] transition ring-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cimak-yellow data-[active=true]:ring-2 data-[active=true]:ring-cimak-yellow"
+                  data-active={color.id === defaultId ? 'true' : 'false'}
+                >
+                  <span
+                    class="block h-14 w-full sm:h-[84px] lg:h-24"
+                    style={`background-color:${color.hex}`}
+                    aria-hidden="true"
+                  ></span>
+                  <span class="block px-1.5 py-1.5 sm:px-2.5 sm:py-2.5">
+                    <span class="block text-[9px] font-bold leading-tight text-cimak-black sm:text-[11px]">
+                      {color.ral}
+                    </span>
+                    <span class="mt-0.5 block text-[8px] leading-tight text-cimak-black/60 sm:text-[10px]">
+                      {color.nombre}
+                    </span>
                   </span>
-                  <span class="mt-0.5 block text-[8px] leading-tight text-cimak-black/60 sm:text-[10px]">
-                    {color.nombre}
-                  </span>
-                </span>
+                </button>
               </li>
             ))
           }
@@ -62,28 +83,40 @@ const colores = [
       </div>
 
       <div class="flex items-stretch gap-1.5 lg:gap-2.5">
-        <div class="aspect-[2/1] min-w-0 flex-1 overflow-hidden sm:aspect-[692/448] lg:aspect-auto">
-          <Image
-            src={coloresImg}
-            alt="Cobertura de aluzinc en color rojo instalada en estructura metálica"
-            class="h-full w-full object-cover"
-            width={692}
-            height={448}
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-
-        <ul
-          class="flex w-3.5 shrink-0 flex-col justify-between sm:w-6 lg:w-8"
-          aria-hidden="true"
-        >
+        <div class="relative aspect-[2/1] min-w-0 flex-1 overflow-hidden rounded-[4px] sm:aspect-[692/448] lg:aspect-auto">
           {
             colores.map((color) => (
-              <li
-                class="h-3.5 w-3.5 rounded-[2px] sm:h-6 sm:w-6 sm:rounded-[3px] lg:h-8 lg:w-8"
-                style={`background-color:${color.hex}`}
-              ></li>
+              <Image
+                src={color.image}
+                alt={`Cobertura de aluzinc en color ${color.nombre} (${color.ral})`}
+                data-color-image={color.id}
+                class:list={[
+                  'color-slide absolute inset-0 h-full w-full object-cover',
+                  color.id === defaultId ? 'is-active' : '',
+                ]}
+                width={692}
+                height={448}
+                loading={color.id === defaultId ? 'eager' : 'lazy'}
+                decoding="async"
+              />
+            ))
+          }
+        </div>
+
+        <ul class="flex w-3.5 shrink-0 flex-col justify-between sm:w-6 lg:w-8">
+          {
+            colores.map((color) => (
+              <li>
+                <button
+                  type="button"
+                  data-color-btn={color.id}
+                  aria-label={`Ver ${color.ral}`}
+                  aria-pressed={color.id === defaultId ? 'true' : 'false'}
+                  class="h-3.5 w-3.5 rounded-[2px] transition ring-offset-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cimak-yellow data-[active=true]:ring-2 data-[active=true]:ring-cimak-yellow sm:h-6 sm:w-6 sm:rounded-[3px] lg:h-8 lg:w-8"
+                  style={`background-color:${color.hex}`}
+                  data-active={color.id === defaultId ? 'true' : 'false'}
+                ></button>
+              </li>
             ))
           }
         </ul>
@@ -91,3 +124,104 @@ const colores = [
     </div>
   </div>
 </section>
+
+<style>
+  .color-slide {
+    opacity: 0;
+    transform: translateY(18%);
+    pointer-events: none;
+    transition:
+      opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+
+  .color-slide.is-active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    z-index: 2;
+  }
+
+  .color-slide.is-leaving-up {
+    opacity: 0;
+    transform: translateY(-18%);
+    z-index: 1;
+  }
+
+  .color-slide.is-leaving-down {
+    opacity: 0;
+    transform: translateY(18%);
+    z-index: 1;
+  }
+
+  .color-slide.is-entering-up {
+    transform: translateY(18%);
+  }
+
+  .color-slide.is-entering-down {
+    transform: translateY(-18%);
+  }
+</style>
+
+<script>
+  const section = document.querySelector('[data-colores]');
+  if (section) {
+    const buttons = [...section.querySelectorAll('[data-color-btn]')];
+    const images = [...section.querySelectorAll('[data-color-image]')];
+    const ids = [...new Set(buttons.map((btn) => btn.getAttribute('data-color-btn')).filter(Boolean))];
+    let currentId = 'ral3002';
+    let animating = false;
+
+    const setActiveButtons = (id) => {
+      buttons.forEach((btn) => {
+        const active = btn.getAttribute('data-color-btn') === id;
+        btn.setAttribute('data-active', active ? 'true' : 'false');
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    };
+
+    const setActive = (nextId) => {
+      if (!nextId || nextId === currentId || animating) return;
+
+      const fromIndex = ids.indexOf(currentId);
+      const toIndex = ids.indexOf(nextId);
+      const goingDown = toIndex > fromIndex;
+
+      const currentImg = images.find((img) => img.getAttribute('data-color-image') === currentId);
+      const nextImg = images.find((img) => img.getAttribute('data-color-image') === nextId);
+      if (!currentImg || !nextImg) return;
+
+      animating = true;
+      setActiveButtons(nextId);
+
+      // Preparar entrada desde abajo o arriba
+      nextImg.classList.remove('is-active', 'is-leaving-up', 'is-leaving-down');
+      nextImg.classList.add(goingDown ? 'is-entering-up' : 'is-entering-down');
+
+      // Forzar reflow para que el navegador registre la posición inicial
+      void nextImg.offsetWidth;
+
+      // Salida de la imagen actual
+      currentImg.classList.remove('is-active');
+      currentImg.classList.add(goingDown ? 'is-leaving-up' : 'is-leaving-down');
+
+      // Entrada de la nueva
+      nextImg.classList.remove('is-entering-up', 'is-entering-down');
+      nextImg.classList.add('is-active');
+
+      window.setTimeout(() => {
+        currentImg.classList.remove('is-leaving-up', 'is-leaving-down');
+        currentId = nextId;
+        animating = false;
+      }, 560);
+    };
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-color-btn');
+        if (id) setActive(id);
+      });
+    });
+  }
+</script>

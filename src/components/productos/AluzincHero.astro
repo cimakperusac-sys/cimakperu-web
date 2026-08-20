@@ -1,9 +1,9 @@
 ---
 import { Image } from 'astro:assets';
-import { site } from '../../data/site';
 import logo from '../../assets/logo/logo-blanco.svg';
 import logoNegro from '../../assets/logo/logo.svg';
 import imageFondo from '../../assets/aluzinc/seccion/hero/hero-fondo-dos.svg';
+import whatsappBtn from '../../assets/aluzinc/seccion/hero/whtasapp.svg';
 
 interface Props {
   /** Foto de fondo (planta) en tono oscuro. */
@@ -23,7 +23,7 @@ const navLinks = [
   { label: 'CONTACTO', href: '#contacto' },
 ];
 
-const whatsappHref = `https://wa.me/${site.whatsapp}`;
+const whatsappHref = 'https://wa.link/sp31iy';
 ---
 
 <section
@@ -81,7 +81,7 @@ const whatsappHref = `https://wa.me/${site.whatsapp}`;
     <div class="lg:hidden">
       <div class="bg-cimak-yellow">
         <div class="container-cimak flex items-center justify-between py-2.5">
-          <a href="/" class="shrink-0">
+          <a href="#producto" class="shrink-0" aria-label="CIMAK Coberturas">
             <Image
               src={logoNegro}
               alt="CIMAK Coberturas"
@@ -163,7 +163,7 @@ const whatsappHref = `https://wa.me/${site.whatsapp}`;
 
     <!-- Barra de escritorio -->
     <div class="nav-row container-cimak hidden items-center gap-4 py-5 lg:flex">
-      <a href="/" class="shrink-0 transition-transform duration-300 hover:scale-105">
+      <a href="#producto" class="shrink-0 transition-transform duration-300 hover:scale-105" aria-label="CIMAK Coberturas">
         <Image
           src={logo}
           alt="CIMAK Coberturas"
@@ -237,10 +237,21 @@ const whatsappHref = `https://wa.me/${site.whatsapp}`;
           </p>
 
           <a
-            href="#contacto"
-            class="mt-6 flex w-full items-center justify-center rounded-lg bg-cimak-yellow px-7 py-3.5 text-xs font-extrabold uppercase tracking-wide text-cimak-black transition hover:brightness-105 sm:py-4 sm:text-sm lg:mt-9 lg:inline-flex lg:w-auto lg:border lg:border-white/80 lg:bg-transparent lg:px-9 lg:text-base lg:text-white lg:hover:bg-white/10 lg:hover:brightness-100"
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Cotiza por WhatsApp"
+            class="mx-auto mt-6 flex w-fit justify-center transition hover:opacity-90 md:mx-0 lg:mt-9"
           >
-            Cotiza ahora
+            <Image
+              src={whatsappBtn}
+              alt="WhatsApp"
+              class="h-auto w-full max-w-[220px] sm:max-w-[260px] lg:max-w-[280px]"
+              width={280}
+              height={80}
+              loading="eager"
+              decoding="async"
+            />
           </a>
         </div>
 
