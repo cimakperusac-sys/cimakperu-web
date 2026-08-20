@@ -32,17 +32,17 @@ const items = [
 
 <section
   id="especificaciones"
-  class="reveal-on-scroll w-full bg-white py-10 sm:py-14"
+  class="reveal-on-scroll w-full bg-white py-9 sm:py-12 lg:py-16"
   aria-label="Especificaciones del Aluzinc"
 >
   <div class="container-cimak">
     <div class="flex justify-center">
-      <h2 class="rounded-full bg-cimak-black px-8 py-2.5 text-center text-xs font-bold uppercase tracking-wide text-white sm:text-sm">
+      <h2 class="rounded-full bg-cimak-black px-10 py-3 text-center text-[13px] font-bold uppercase tracking-wide text-white sm:px-16 lg:px-[70px] lg:py-3.5">
         Especificaciones
       </h2>
     </div>
 
-    <div class="mt-6 aspect-[16/10] overflow-hidden rounded-2xl sm:mt-8 sm:aspect-[2/1] sm:rounded-3xl lg:aspect-[1036/302]">
+    <div class="mt-7 aspect-[16/10] overflow-hidden rounded-xl ring-1 ring-black/10 sm:mt-10 sm:aspect-[2/1] sm:rounded-2xl lg:mt-14 lg:aspect-[1036/302] lg:ring-0">
       <Image
         src={fotoEspecificaciones}
         alt="Cobertura de aluzinc instalada en nave industrial"
@@ -54,24 +54,24 @@ const items = [
       />
     </div>
 
-    <div class="mt-9 grid gap-8 sm:grid-cols-2 sm:gap-10 lg:mt-14 lg:grid-cols-4 lg:gap-8">
+    <div class="mt-9 grid gap-9 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-12 lg:mt-14 lg:grid-cols-4 lg:gap-8">
       {
         items.map((item) => (
           <article class="flex flex-col items-center">
             <Image
               src={item.icon}
               alt=""
-              class="h-16 w-auto sm:h-20 lg:h-[88px]"
+              class="h-16 w-auto sm:h-[72px] lg:h-[88px]"
               width={110}
               height={88}
               aria-hidden="true"
               loading="lazy"
               decoding="async"
             />
-            <h3 class="mt-4 whitespace-pre-line text-center text-[0.8rem] font-bold uppercase leading-snug text-cimak-black sm:mt-5 sm:text-xs lg:text-sm">
+            <h3 class="mt-4 whitespace-pre-line text-center text-sm font-bold uppercase leading-snug text-cimak-black sm:mt-5">
               {item.title}
             </h3>
-            <p class="mt-3 text-justify text-xs leading-relaxed text-cimak-black/80 sm:mt-4 sm:text-[0.7rem] lg:text-xs">
+            <p class="mt-3 text-justify text-[13px] leading-[1.62] text-cimak-black/80 sm:mt-4">
               {item.text}
             </p>
           </article>

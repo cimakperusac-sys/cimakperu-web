@@ -28,5 +28,15 @@ document.addEventListener('click', (event) => {
   if (!el) return;
 
   event.preventDefault();
-  lenis.scrollTo(el, { offset: 0, lerp: 0.04 });
+
+  // Compensa la altura de un navbar fijo, si la página tiene uno
+  const fixedNav = document.querySelector('[data-fixed-nav]');
+  const offset = fixedNav ? -fixedNav.offsetHeight : 0;
+
+  // Duración fija (en vez de lerp) para que el salto no arrastre una cola larga
+  lenis.scrollTo(el, {
+    offset,
+    duration: 1,
+    easing: (t) => 1 - Math.pow(1 - t, 3),
+  });
 });

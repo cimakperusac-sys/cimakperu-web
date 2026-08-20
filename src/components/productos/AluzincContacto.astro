@@ -3,19 +3,20 @@ import { Image } from 'astro:assets';
 import { site } from '../../data/site';
 import persona from '../../assets/aluzinc/seccion/contactanos/contacto.svg';
 
+// text-base en móvil evita el zoom automático de Safari al enfocar el campo
 const inputClass =
-  'w-full rounded-md border-0 bg-[#efefef] px-4 py-3 text-sm text-cimak-black outline-none placeholder:text-black/40 focus:ring-2 focus:ring-cimak-yellow';
+  'w-full rounded-md border-0 bg-[#efefef] px-4 py-3 text-base text-cimak-black outline-none placeholder:text-black/40 focus:ring-2 focus:ring-cimak-yellow sm:text-sm';
 ---
 
 <section
   id="contacto"
-  class="reveal-on-scroll relative w-full overflow-hidden bg-white pt-10 sm:pt-14"
+  class="reveal-on-scroll relative w-full overflow-hidden bg-white pt-9 sm:pt-12 lg:pt-16"
   aria-label="Contáctanos para tu proyecto"
 >
   <div class="container-cimak">
     <div class="grid items-end gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.62fr)] lg:gap-6">
       <div class="pb-6 lg:pb-14">
-        <h2 class="text-[1.75rem] font-extrabold uppercase leading-[1.05] tracking-tight text-cimak-black min-[420px]:text-3xl sm:text-4xl lg:text-[2.6rem]">
+        <h2 class="text-center text-[1.6rem] font-extrabold uppercase leading-[1.05] tracking-tight text-cimak-black min-[420px]:text-3xl sm:text-4xl lg:text-left lg:text-[2.6rem]">
           Contáctanos<br />para tu proyecto
         </h2>
 
@@ -77,19 +78,19 @@ const inputClass =
               class={`${inputClass} resize-y`}></textarea>
           </div>
 
-          <p class="mt-2 text-xs leading-relaxed text-cimak-black/85 sm:text-[0.7rem]">
+          <p class="mt-2 text-[0.75rem] leading-relaxed text-cimak-black/85">
             Utilizaremos tu información personal únicamente para comunicarnos y gestionar tu
             consulta.
           </p>
 
-          <p class="text-justify text-xs leading-relaxed text-cimak-black/85 sm:text-[0.7rem]">
+          <p class="text-justify text-[0.75rem] leading-relaxed text-cimak-black/85">
             De vez en cuando, nos gustaría contactarte acerca de nuestros productos y
             servicios, así como otros contenidos que puedan interesarte. Si das tu
             consentimiento para que te contactemos con este fin, por favor marca la casilla a
             continuación:
           </p>
 
-          <label class="mt-2 flex items-start gap-3 text-xs leading-relaxed text-cimak-black/85 sm:text-[0.7rem]">
+          <label class="mt-2 flex items-start gap-3 text-[0.75rem] leading-relaxed text-cimak-black/85">
             <input
               type="checkbox"
               name="marketing"
@@ -98,7 +99,7 @@ const inputClass =
             <span>Acepto recibir otras comunicaciones de marketing de Cimak Perú S.A.C</span>
           </label>
 
-          <p class="text-justify text-xs leading-relaxed text-cimak-black/85 sm:text-[0.7rem]">
+          <p class="text-justify text-[0.75rem] leading-relaxed text-cimak-black/85">
             Puedes darte de baja en cualquier momento respondiendo a cualquiera de nuestras
             comunicaciones o enviando una solicitud a {site.email}. Almacenaremos y
             procederemos tus datos personales según los términos definidos aquí.
@@ -113,11 +114,12 @@ const inputClass =
         </form>
       </div>
 
-      <div class="flex justify-center">
+      <!-- Decorativa: solo cuando acompaña al formulario en dos columnas -->
+      <div class="hidden justify-center lg:flex">
         <Image
           src={persona}
           alt="Asesor de CIMAK Perú"
-          class="h-auto w-full max-w-[240px] object-contain object-bottom sm:max-w-[300px] lg:max-w-[383px]"
+          class="h-auto w-full max-w-[383px] object-contain object-bottom"
           width={383}
           height={671}
           loading="lazy"

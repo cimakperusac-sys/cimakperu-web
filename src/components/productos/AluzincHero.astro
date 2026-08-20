@@ -1,13 +1,14 @@
 ---
 import { Image } from 'astro:assets';
 import { site } from '../../data/site';
-import logo from '../../assets/footer/logo.svg';
-import videoFondo from '../../assets/fondo/video-fondo-2.mp4';
+import logo from '../../assets/logo/logo-blanco.svg';
+import logoNegro from '../../assets/logo/logo.svg';
+import imageFondo from '../../assets/aluzinc/seccion/hero/hero-fondo-dos.svg';
 
 interface Props {
-  /** Foto de fondo (planta). Si no se pasa, se usa el video de planta en B/N. */
+  /** Foto de fondo (planta) en tono oscuro. */
   bgImage?: any;
-  /** Degradado blanco que va encima del fondo. */
+  /** Degradado opcional que va encima del fondo. */
   overlayImage?: any;
   /** Lámina de Aluzinc. */
   productImage?: any;
@@ -16,46 +17,34 @@ interface Props {
 const { bgImage, overlayImage, productImage } = Astro.props as Props;
 
 const navLinks = [
-  { label: 'PRODUCTO', href: '#producto', active: true },
-  { label: 'ESPECIFICACIONES', href: '#especificaciones', active: false },
-  { label: 'COLORES', href: '#colores', active: false },
-  { label: 'CONTACTO', href: '#contacto', active: false },
+  { label: 'PRODUCTO', href: '#producto' },
+  { label: 'ESPECIFICACIONES', href: '#especificaciones' },
+  { label: 'COLORES', href: '#colores' },
+  { label: 'CONTACTO', href: '#contacto' },
 ];
 
 const whatsappHref = `https://wa.me/${site.whatsapp}`;
 ---
 
 <section
+  id="producto"
   aria-label="Techos de Aluzinc"
-  class="relative w-full overflow-hidden bg-white"
+  class="relative flex min-h-[100svh] w-full flex-col overflow-hidden bg-cimak-black text-white"
 >
   <!-- Fondo -->
   <div class="absolute inset-0">
-    {
-      bgImage ? (
-        <Image
-          src={bgImage}
-          alt=""
-          class="h-full w-full object-cover grayscale"
-          width={1600}
-          height={900}
-          loading="eager"
-          decoding="async"
-        />
-      ) : (
-        <video
-          class="h-full w-full object-cover grayscale"
-          src={videoFondo}
-          autoplay
-          muted
-          loop
-          playsinline
-        ></video>
-      )
-    }
+    <Image
+      src={bgImage ?? imageFondo}
+      alt=""
+      class="h-full w-full object-cover"
+      width={1920}
+      height={1080}
+      loading="eager"
+      decoding="async"
+    />
   </div>
 
-  <!-- Degradado blanco encima del fondo -->
+  <!-- Degradado encima del fondo -->
   {
     overlayImage ? (
       <Image
@@ -69,36 +58,133 @@ const whatsappHref = `https://wa.me/${site.whatsapp}`;
         aria-hidden="true"
       />
     ) : (
-      <div class="absolute inset-0 bg-gradient-to-br from-white via-white/85 to-white/40" />
+      <div
+        class="absolute inset-0 bg-gradient-to-b from-transparent via-cimak-black/55 to-cimak-black"
+        aria-hidden="true"
+      />
     )
   }
+  <!-- Oscurece la franja superior para que el navbar se lea sobre la foto -->
+  <div
+    class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-cimak-black/70 to-transparent"
+    aria-hidden="true"
+  >
+  </div>
 
   <!-- Navbar propio -->
-  <nav class="relative z-20 w-full">
-    <div class="container-cimak flex items-center gap-4 py-3.5 sm:py-5">
-      <a href="/" class="shrink-0">
+  <nav
+    id="aluzinc-nav"
+    data-fixed-nav
+    class="fixed inset-x-0 top-0 z-50 w-full transition-colors duration-300"
+  >
+    <!-- Barra amarilla con menú desplegable (móvil y tablet) -->
+    <div class="lg:hidden">
+      <div class="bg-cimak-yellow">
+        <div class="container-cimak flex items-center justify-between py-2.5">
+          <a href="/" class="shrink-0">
+            <Image
+              src={logoNegro}
+              alt="CIMAK Coberturas"
+              width={88}
+              height={32}
+              class="h-7 w-auto"
+              loading="eager"
+              decoding="async"
+            />
+          </a>
+
+          <button
+            id="nav-toggle"
+            type="button"
+            class="-mr-1 inline-flex items-center justify-center p-2 text-cimak-black"
+            aria-label="Abrir menú"
+            aria-expanded="false"
+            aria-controls="nav-mobile"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              class="h-5 w-5"
+              aria-hidden="true"
+            >
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="nav-mobile" class="hidden bg-cimak-yellow shadow-xl">
+        <ul class="container-cimak flex flex-col gap-1 pb-3 pt-1 text-[0.72rem] font-bold uppercase tracking-wide">
+          {
+            navLinks.map((link, index) => (
+              <li>
+                <a
+                  href={link.href}
+                  data-nav-link
+                  class:list={[
+                    'nav-pill-mob block rounded-lg px-3 py-2.5',
+                    index === 0 && 'is-active',
+                  ]}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+          <li class="pt-1">
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-center gap-2 rounded-lg bg-cimak-whatsapp px-3 py-2.5 text-white"
+            >
+              <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-cimak-whatsapp">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 22 22"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  class="h-3 w-3"
+                >
+                  <path d="M0 21.6326L1.51938 15.8579C0.550482 14.0244 0.0622708 11.9874 0.222894 9.90297C0.340684 8.4255 0.726177 7.05503 1.37144 5.7992C4.41019 -0.113491 11.9384 -1.8484 17.1696 2.19945C19.6555 4.12302 21.1836 7.05986 21.3192 10.226C21.458 13.4621 20.1369 16.5659 17.7395 18.7095C14.4172 21.6801 9.6116 22.2227 5.73682 20.09L0 21.6326ZM6.08106 17.8957C9.61477 20.2987 14.2641 19.6543 17.0986 16.4999C19.8359 13.4528 20.0683 8.86717 17.6598 5.57474C14.5865 1.37363 8.65301 0.813296 4.89602 4.39977C1.8422 7.31488 1.32662 12.0176 3.69511 15.5369L2.8579 18.7416L6.08106 17.8961V17.8957Z" />
+                  <path d="M13.0349 11.908C13.3982 11.6489 13.9055 11.7298 14.2636 11.9381L15.4328 12.6179C15.9607 12.9249 16.0261 13.5355 15.739 14.085C15.2289 15.0608 14.1312 15.5491 13.0179 15.4329C9.96131 14.813 7.48612 12.6803 6.08414 9.90073C5.36987 8.48441 5.55311 6.69922 6.81707 5.96591C7.33463 5.66583 7.95015 5.78249 8.27814 6.29737C8.6085 6.81547 8.87819 7.3931 9.04 8.00332C9.17762 8.52262 8.88533 9.02906 8.53593 9.37459C8.29638 9.61152 8.25871 9.86654 8.43162 10.1457C9.2625 11.4872 10.4824 12.5492 11.976 13.0809C12.3068 13.1988 12.5344 12.2648 13.0346 11.908H13.0349Z" />
+                </svg>
+              </span>
+              <span>Whatsapp</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Barra de escritorio -->
+    <div class="nav-row container-cimak hidden items-center gap-4 py-5 lg:flex">
+      <a href="/" class="shrink-0 transition-transform duration-300 hover:scale-105">
         <Image
           src={logo}
           alt="CIMAK Coberturas"
           width={160}
           height={62}
-          class="h-8 w-auto sm:h-9 lg:h-11"
+          class="nav-logo h-11 w-auto"
           loading="eager"
           decoding="async"
         />
       </a>
 
-      <ul class="mx-auto hidden items-center gap-5 text-[0.68rem] font-semibold tracking-wide text-cimak-black lg:flex xl:gap-10 xl:text-xs">
+      <ul class="mx-auto flex items-center gap-1 rounded-full bg-white/10 p-1 text-[0.68rem] font-semibold tracking-wide text-white ring-1 ring-white/15 backdrop-blur-sm xl:text-xs">
         {
-          navLinks.map((link) => (
+          navLinks.map((link, index) => (
             <li>
               <a
                 href={link.href}
+                data-nav-link
                 class:list={[
-                  'transition',
-                  link.active
-                    ? 'rounded-full bg-cimak-yellow px-6 py-2.5 text-cimak-black'
-                    : 'hover:opacity-60',
+                  'nav-pill block rounded-full px-6 py-2.5 xl:px-8',
+                  index === 0 && 'is-active',
                 ]}
               >
                 {link.label}
@@ -112,81 +198,332 @@ const whatsappHref = `https://wa.me/${site.whatsapp}`;
         href={whatsappHref}
         target="_blank"
         rel="noopener noreferrer"
-        class="ml-auto inline-flex shrink-0 items-center gap-2 rounded-full bg-cimak-whatsapp px-3.5 py-2 text-[0.7rem] font-semibold text-white transition hover:opacity-90 sm:px-5 sm:py-2.5 sm:text-xs lg:ml-0"
+        class="nav-whatsapp inline-flex shrink-0 items-center gap-2 rounded-full bg-cimak-whatsapp px-4 py-2 text-xs font-semibold text-white transition-transform duration-300 hover:scale-105"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="sm:h-[18px] sm:w-[18px]">
-          <path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.1-1.34A9.96 9.96 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm5.47 12.3c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.5h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.48.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z" />
-        </svg>
+        <span class="nav-whatsapp-icon inline-flex h-6 w-6 items-center justify-center rounded-full bg-white text-cimak-whatsapp">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 22 22"
+            fill="currentColor"
+            aria-hidden="true"
+            class="h-3.5 w-3.5"
+          >
+            <path d="M0 21.6326L1.51938 15.8579C0.550482 14.0244 0.0622708 11.9874 0.222894 9.90297C0.340684 8.4255 0.726177 7.05503 1.37144 5.7992C4.41019 -0.113491 11.9384 -1.8484 17.1696 2.19945C19.6555 4.12302 21.1836 7.05986 21.3192 10.226C21.458 13.4621 20.1369 16.5659 17.7395 18.7095C14.4172 21.6801 9.6116 22.2227 5.73682 20.09L0 21.6326ZM6.08106 17.8957C9.61477 20.2987 14.2641 19.6543 17.0986 16.4999C19.8359 13.4528 20.0683 8.86717 17.6598 5.57474C14.5865 1.37363 8.65301 0.813296 4.89602 4.39977C1.8422 7.31488 1.32662 12.0176 3.69511 15.5369L2.8579 18.7416L6.08106 17.8961V17.8957Z" />
+            <path d="M13.0349 11.908C13.3982 11.6489 13.9055 11.7298 14.2636 11.9381L15.4328 12.6179C15.9607 12.9249 16.0261 13.5355 15.739 14.085C15.2289 15.0608 14.1312 15.5491 13.0179 15.4329C9.96131 14.813 7.48612 12.6803 6.08414 9.90073C5.36987 8.48441 5.55311 6.69922 6.81707 5.96591C7.33463 5.66583 7.95015 5.78249 8.27814 6.29737C8.6085 6.81547 8.87819 7.3931 9.04 8.00332C9.17762 8.52262 8.88533 9.02906 8.53593 9.37459C8.29638 9.61152 8.25871 9.86654 8.43162 10.1457C9.2625 11.4872 10.4824 12.5492 11.976 13.0809C12.3068 13.1988 12.5344 12.2648 13.0346 11.908H13.0349Z" />
+          </svg>
+        </span>
         <span>Whatsapp</span>
       </a>
     </div>
 
-    <!-- Menú en pantallas pequeñas -->
-    <div class="container-cimak lg:hidden">
-      <ul class="no-scrollbar flex items-center gap-2 overflow-x-auto pb-3 text-[0.62rem] font-semibold tracking-wide text-cimak-black sm:gap-3 sm:text-[0.7rem]">
-        {
-          navLinks.map((link) => (
-            <li class="shrink-0">
-              <a
-                href={link.href}
-                class:list={[
-                  'block rounded-full px-4 py-1.5 transition',
-                  link.active
-                    ? 'bg-cimak-yellow text-cimak-black'
-                    : 'bg-white/70 text-cimak-black/80',
-                ]}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
+    <!-- Progreso de lectura de la página -->
+    <span
+      id="nav-progress"
+      class="absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-cimak-yellow"
+      aria-hidden="true"
+    ></span>
   </nav>
 
   <!-- Contenido -->
-  <div class="relative z-10 container-cimak">
-    <div class="grid items-center gap-6 pb-10 pt-6 sm:pb-12 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:gap-4 md:pb-16 md:pt-10 lg:pb-20 lg:pt-14">
-      <div>
-        <h1 class="text-[2.1rem] font-extrabold uppercase leading-[0.95] tracking-tight text-cimak-black min-[420px]:text-[2.6rem] sm:text-5xl md:text-[3.4rem] lg:text-[4.5rem] xl:text-[5.5rem]">
-          Techos de<br />Aluzinc
-        </h1>
-        <p class="mt-2.5 text-sm font-medium uppercase tracking-[0.3em] text-cimak-black min-[420px]:text-base sm:text-lg sm:tracking-[0.35em] lg:mt-4 lg:text-2xl">
-          Modelos TR4 / TR5
-        </p>
+  <div class="relative z-10 flex flex-1 items-center">
+    <div class="container-cimak w-full">
+      <div class="grid items-center gap-6 pb-10 pt-4 sm:gap-8 sm:pb-14 sm:pt-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-4 md:pb-20 md:pt-10">
+        <div>
+          <h1 class="text-[2.25rem] font-black uppercase leading-none tracking-normal min-[420px]:text-[2.75rem] sm:text-6xl md:text-[3.9rem] lg:text-[70px]">
+            <span class="lg:text-cimak-yellow">Techos</span> de<br />Aluzinc
+          </h1>
+          <p class="mt-2.5 text-[0.8rem] font-medium uppercase tracking-[0.22em] text-white min-[420px]:text-sm min-[420px]:tracking-[0.3em] sm:text-lg sm:tracking-[0.35em] lg:mt-4 lg:text-2xl">
+            Modelos TR4 / TR5
+          </p>
 
-        <a
-          href="#contacto"
-          class="mt-6 inline-flex items-center justify-center rounded-lg bg-cimak-yellow px-7 py-3.5 text-xs font-extrabold uppercase tracking-wide text-cimak-black transition hover:opacity-90 sm:px-9 sm:py-4 sm:text-sm lg:mt-9 lg:text-base"
-        >
-          Cotiza ahora
-        </a>
-      </div>
+          <a
+            href="#contacto"
+            class="mt-6 flex w-full items-center justify-center rounded-lg bg-cimak-yellow px-7 py-3.5 text-xs font-extrabold uppercase tracking-wide text-cimak-black transition hover:brightness-105 sm:py-4 sm:text-sm lg:mt-9 lg:inline-flex lg:w-auto lg:border lg:border-white/80 lg:bg-transparent lg:px-9 lg:text-base lg:text-white lg:hover:bg-white/10 lg:hover:brightness-100"
+          >
+            Cotiza ahora
+          </a>
+        </div>
 
-      <div class="flex justify-center md:justify-end">
-        {
-          productImage ? (
-            <Image
-              src={productImage}
-              alt="Cobertura de Aluzinc TR4 / TR5"
-              class="h-auto w-full max-w-[420px] object-contain drop-shadow-2xl sm:max-w-[520px] md:max-w-none md:translate-x-4 lg:translate-x-10"
-              width={607}
-              height={566}
-              loading="eager"
-              decoding="async"
-            />
-          ) : (
-            <div class="flex aspect-[607/566] w-full max-w-[520px] items-center justify-center rounded-xl border border-dashed border-black/25 bg-white/40">
-              <span class="text-sm font-semibold text-cimak-black/60">
-                IMAGEN DEL PRODUCTO
-              </span>
-            </div>
-          )
-        }
+        <div class="flex justify-center md:justify-end">
+          <div class="relative w-full max-w-[300px] min-[420px]:max-w-[400px] sm:max-w-[520px] md:max-w-none md:translate-x-4 lg:translate-x-10">
+            {
+              productImage ? (
+                <Image
+                  src={productImage}
+                  alt="Cobertura de Aluzinc TR4 / TR5"
+                  class="h-auto w-full object-contain drop-shadow-2xl"
+                  width={607}
+                  height={566}
+                  loading="eager"
+                  decoding="async"
+                />
+              ) : (
+                <div class="flex aspect-[607/566] w-full items-center justify-center rounded-xl border border-dashed border-white/25 bg-white/5">
+                  <span class="text-sm font-semibold text-white/60">
+                    IMAGEN DEL PRODUCTO
+                  </span>
+                </div>
+              )
+            }
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div id="producto" class="h-0 w-0" aria-hidden="true"></div>
 </section>
+
+<style>
+  /*
+    El navbar es fijo, así que el hero reserva su altura. El valor real lo mide
+    el script (--nav-h); estos son los respaldos por breakpoint sin JS.
+  */
+  #producto {
+    padding-top: var(--nav-h, 48px);
+  }
+
+  @media (min-width: 1024px) {
+    #producto {
+      padding-top: var(--nav-h, 88px);
+    }
+  }
+
+  #aluzinc-nav {
+    animation: nav-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transition:
+      background-color 0.4s ease,
+      box-shadow 0.4s ease,
+      backdrop-filter 0.4s ease;
+  }
+
+  /* Fondo del navbar una vez que se sale del hero */
+  #aluzinc-nav.is-scrolled {
+    background-color: color-mix(in srgb, var(--color-cimak-black) 92%, transparent);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px -12px rgb(0 0 0 / 0.6);
+  }
+
+  /* Al hacer scroll la barra se compacta */
+  .nav-row,
+  .nav-logo {
+    transition:
+      padding 0.4s ease,
+      height 0.4s ease;
+  }
+
+  #aluzinc-nav.is-scrolled .nav-row {
+    padding-block: 0.5rem;
+  }
+
+  #aluzinc-nav.is-scrolled .nav-logo {
+    height: 1.75rem;
+  }
+
+  #nav-progress {
+    transition: transform 0.15s linear;
+  }
+
+  .nav-pill,
+  .nav-pill-mob {
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease,
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .nav-pill:hover:not(.is-active) {
+    background-color: rgb(255 255 255 / 0.14);
+    transform: translateY(-2px);
+  }
+
+  .nav-pill.is-active {
+    background-color: var(--color-cimak-yellow);
+    color: var(--color-cimak-black);
+    box-shadow: 0 8px 18px -8px color-mix(in srgb, var(--color-cimak-yellow) 80%, transparent);
+    animation: pill-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Menú desplegable sobre la barra amarilla */
+  .nav-pill-mob {
+    color: color-mix(in srgb, var(--color-cimak-black) 75%, transparent);
+  }
+
+  .nav-pill-mob.is-active {
+    background-color: var(--color-cimak-black);
+    color: #fff;
+  }
+
+  #nav-mobile:not(.hidden) {
+    animation: panel-drop 0.28s ease-out;
+  }
+
+  @keyframes panel-drop {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .nav-whatsapp:hover .nav-whatsapp-icon {
+    animation: icon-ring 0.6s ease-in-out;
+  }
+
+  @keyframes nav-enter {
+    from {
+      opacity: 0;
+      transform: translateY(-100%);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes pill-pop {
+    0% {
+      transform: scale(0.9);
+    }
+    55% {
+      transform: scale(1.07);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes icon-ring {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    25% {
+      transform: rotate(-14deg);
+    }
+    75% {
+      transform: rotate(14deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #aluzinc-nav,
+    #nav-mobile,
+    .nav-pill,
+    .nav-pill-mob,
+    .nav-whatsapp .nav-whatsapp-icon {
+      animation: none;
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const nav = document.getElementById('aluzinc-nav');
+  const links = Array.from(
+    document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]')
+  );
+
+  if (nav && links.length) {
+    const targets = links
+      .map((link) => document.querySelector(link.hash))
+      .filter((el): el is HTMLElement => el instanceof HTMLElement);
+
+    const setActive = (hash: string) => {
+      links.forEach((link) => {
+        link.classList.toggle('is-active', link.hash === hash);
+      });
+    };
+
+    const progress = document.getElementById('nav-progress');
+
+    // Al hacer clic la píldora se pinta al instante: mientras dura el
+    // desplazamiento suave se ignora lo que dicta el scroll.
+    let pendingHash: string | null = null;
+    let pendingTimer: number | undefined;
+
+    const sync = () => {
+      nav.classList.toggle('is-scrolled', window.scrollY > 24);
+
+      if (progress) {
+        const scrollable = document.body.scrollHeight - window.innerHeight;
+        const ratio = scrollable > 0 ? window.scrollY / scrollable : 0;
+        progress.style.transform = `scaleX(${Math.min(ratio, 1)})`;
+      }
+
+      // La sección activa es la última que ya pasó por debajo del navbar
+      const limit = nav.offsetHeight + 8;
+      let current = targets[0];
+
+      targets.forEach((target) => {
+        if (target.getBoundingClientRect().top <= limit) current = target;
+      });
+
+      if (pendingHash) {
+        if (current && `#${current.id}` === pendingHash) pendingHash = null;
+        return;
+      }
+
+      if (current) setActive(`#${current.id}`);
+    };
+
+    // El hero reserva la altura del navbar; se mide sin compactar para que
+    // el layout no salte cuando la barra se encoge al hacer scroll.
+    // Menú desplegable de la barra amarilla
+    const toggle = document.getElementById('nav-toggle');
+    const panel = document.getElementById('nav-mobile');
+
+    const measureNav = () => {
+      if (nav.classList.contains('is-scrolled')) return;
+
+      // El panel desplegado flota sobre el hero, no reserva espacio
+      const panelHeight =
+        panel && !panel.classList.contains('hidden') ? panel.offsetHeight : 0;
+
+      document.documentElement.style.setProperty(
+        '--nav-h',
+        `${nav.offsetHeight - panelHeight}px`
+      );
+    };
+
+    const setMenu = (open: boolean) => {
+      if (!panel || !toggle) return;
+      panel.classList.toggle('hidden', !open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    };
+
+    toggle?.addEventListener('click', () => {
+      setMenu(panel?.classList.contains('hidden') ?? false);
+    });
+
+    links.forEach((link) => {
+      link.addEventListener('click', () => {
+        pendingHash = link.hash;
+        setActive(link.hash);
+        setMenu(false);
+
+        // Por si el destino nunca llega al tope (última sección corta)
+        clearTimeout(pendingTimer);
+        pendingTimer = window.setTimeout(() => {
+          pendingHash = null;
+        }, 1600);
+      });
+    });
+
+    measureNav();
+    sync();
+
+    // La tipografía puede cambiar la altura de la barra al terminar de cargar
+    document.fonts?.ready.then(measureNav);
+
+    window.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', () => {
+      measureNav();
+      sync();
+    });
+  }
+</script>
