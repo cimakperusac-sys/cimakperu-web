@@ -1,5 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import AluzincHero from '../components/productos/AluzincHero.astro';
+import AluzincEspecificaciones from '../components/productos/AluzincEspecificaciones.astro';
+import AluzincColores from '../components/productos/AluzincColores.astro';
+import AluzincContacto from '../components/productos/AluzincContacto.astro';
+import AluzincFooter from '../components/productos/AluzincFooter.astro';
+
+import heroFondo from '../assets/aluzinc/seccion/hero/hero-fondo-dos.svg';
+import productAluzinc from '../assets/aluzinc/seccion/hero/aluzinc.svg';
+
+/*
 import Hero from '../components/home/Hero.astro';
 import PromoBanners from '../components/home/PromoBanners.astro';
 import CategoryGrid from '../components/home/CategoryGrid.astro';
@@ -8,8 +18,33 @@ import ContactSection from '../components/home/ContactSection.astro';
 import Nosotros from '../components/home/Nosotros.astro';
 import Caracteristicas from '../components/home/Caracteristicas.astro';
 import Comentarios from '../components/home/Comentarios.astro';
+*/
 ---
 
+<!-- Landing Aluzinc como página principal -->
+<Layout
+	title="Techos de Aluzinc TR4 / TR5 | CIMAK Perú"
+	description="Techos de Aluzinc modelos TR4 y TR5 fabricados en Perú. Alta resistencia a la corrosión, reflectividad térmica y colores RAL. Cotiza con CIMAK Perú sin intermediarios."
+	image="/og-aluzinc.svg"
+	imageAlt="Láminas de Aluzinc TR4 / TR5 de CIMAK Perú"
+	keywords="techos de aluzinc, aluzinc Perú, cobertura aluzinc, TR4, TR5, CIMAK, coberturas metálicas Lima, techos metálicos, RAL aluzinc"
+	type="product"
+	canonical="/"
+	showHeader={false}
+	showFooter={false}
+	showWhatsApp={false}
+>
+	<main>
+		<AluzincHero bgImage={heroFondo} productImage={productAluzinc} />
+		<AluzincEspecificaciones />
+		<AluzincColores />
+		<AluzincContacto />
+	</main>
+	<AluzincFooter />
+</Layout>
+
+<!--
+Home anterior (comentado):
 <Layout title="CIMAK Perú">
 	<main>
 		<Hero />
@@ -22,3 +57,4 @@ import Comentarios from '../components/home/Comentarios.astro';
 		<ContactSection />
 	</main>
 </Layout>
+-->

@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://cimak.com',
   // Build directo a www/html (carpeta hermana de cimakperu-web)
   outDir: '../html',
   image: {
