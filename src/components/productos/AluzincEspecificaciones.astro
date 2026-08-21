@@ -1,10 +1,18 @@
 ---
 import { Image } from 'astro:assets';
-import fotoEspecificaciones from '../../assets/aluzinc/seccion/especificaciones/especificaciones.svg';
+import especUno from '../../assets/aluzinc/seccion/especificaciones/especificaciones-uno.svg';
+import especDos from '../../assets/aluzinc/seccion/especificaciones/especificaciones-dos.svg';
+import especTres from '../../assets/aluzinc/seccion/especificaciones/especificaciones-tres.svg';
 import altaResistencia from '../../assets/aluzinc/seccion/especificaciones/alta-resistencia.svg';
 import excelenteReflectividad from '../../assets/aluzinc/seccion/especificaciones/excelente-reflectividad.svg';
 import largaVida from '../../assets/aluzinc/seccion/especificaciones/larga-vida.svg';
 import acabadoEstetico from '../../assets/aluzinc/seccion/especificaciones/acabado-estetico.svg';
+
+const slides = [
+  { src: especUno, alt: 'Instalación de cobertura de aluzinc en nave industrial' },
+  { src: especDos, alt: 'Detalle de cobertura de aluzinc' },
+  { src: especTres, alt: 'Proyecto con techos de aluzinc' },
+];
 
 const items = [
   {
@@ -42,16 +50,54 @@ const items = [
       </h2>
     </div>
 
-    <div class="mt-7 aspect-[16/10] overflow-hidden rounded-xl ring-1 ring-black/10 sm:mt-10 sm:aspect-[2/1] sm:rounded-2xl lg:mt-14 lg:aspect-[1036/302] lg:ring-0">
-      <Image
-        src={fotoEspecificaciones}
-        alt="Cobertura de aluzinc instalada en nave industrial"
-        class="h-full w-full object-cover"
-        width={1036}
-        height={302}
-        loading="lazy"
-        decoding="async"
-      />
+    <div class="mt-7 sm:mt-10 lg:mt-14" data-espec-carousel>
+      <div
+        class="relative aspect-[16/10] cursor-grab overflow-hidden rounded-xl ring-1 ring-black/10 active:cursor-grabbing sm:aspect-[2/1] sm:rounded-2xl lg:aspect-[1036/302] lg:ring-0 touch-pan-y select-none"
+        data-espec-viewport
+      >
+        <div
+          class="espec-track flex h-full w-full"
+          data-espec-track
+          style={`width: ${slides.length * 100}%`}
+        >
+          {
+            slides.map((slide, index) => (
+              <div class="h-full shrink-0" style={`width: ${100 / slides.length}%`} data-espec-slide>
+                <Image
+                  src={slide.src}
+                  alt={slide.alt}
+                  draggable="false"
+                  class="pointer-events-none h-full w-full object-cover"
+                  width={1036}
+                  height={302}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <div
+        class="mt-4 flex items-center justify-center gap-2.5"
+        role="tablist"
+        aria-label="Imágenes de especificaciones"
+      >
+        {
+          slides.map((_, index) => (
+            <button
+              type="button"
+              data-espec-dot
+              role="tab"
+              aria-label={`Ver imagen ${index + 1}`}
+              aria-selected={index === 0 ? 'true' : 'false'}
+              class="h-2.5 w-2.5 rounded-full bg-cimak-black/25 transition hover:bg-cimak-black/50 data-[active=true]:bg-cimak-black"
+              data-active={index === 0 ? 'true' : 'false'}
+            ></button>
+          ))
+        }
+      </div>
     </div>
 
     <div class="mt-9 grid gap-9 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-12 lg:mt-14 lg:grid-cols-4 lg:gap-8">
@@ -80,3 +126,146 @@ const items = [
     </div>
   </div>
 </section>
+
+<style>
+  .espec-track {
+    will-change: transform;
+    touch-action: pan-y;
+  }
+
+  .espec-track.is-animating {
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+</style>
+
+<script>
+  const root = document.querySelector('[data-espec-carousel]');
+  if (root) {
+    const viewport = root.querySelector('[data-espec-viewport]');
+    const track = root.querySelector('[data-espec-track]');
+    const slides = [...root.querySelectorAll('[data-espec-slide]')];
+    const dots = [...root.querySelectorAll('[data-espec-dot]')];
+    const total = slides.length;
+
+    let index = 0;
+    let timer;
+    let dragX = 0;
+    let startX = 0;
+    let startY = 0;
+    let dragging = false;
+    let locked = false;
+    let width = 0;
+
+    const updateDots = () => {
+      dots.forEach((dot, i) => {
+        const active = i === index;
+        dot.setAttribute('data-active', active ? 'true' : 'false');
+        dot.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+    };
+
+    const setTransform = (withTransition) => {
+      if (!track || !viewport) return;
+      width = viewport.clientWidth;
+      const x = -index * width + dragX;
+      track.classList.toggle('is-animating', withTransition);
+      track.style.transform = `translate3d(${x}px, 0, 0)`;
+    };
+
+    const goTo = (next, animate = true) => {
+      index = (next + total) % total;
+      dragX = 0;
+      setTransform(animate);
+      updateDots();
+    };
+
+    const start = () => {
+      stop();
+      timer = window.setInterval(() => goTo(index + 1, true), 4500);
+    };
+
+    const stop = () => {
+      if (timer) window.clearInterval(timer);
+    };
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        goTo(i, true);
+        start();
+      });
+    });
+
+    if (viewport && track) {
+      const onPointerDown = (event) => {
+        dragging = true;
+        locked = false;
+        startX = event.clientX;
+        startY = event.clientY;
+        width = viewport.clientWidth;
+        dragX = 0;
+        stop();
+        track.classList.remove('is-animating');
+        viewport.setPointerCapture?.(event.pointerId);
+      };
+
+      const onPointerMove = (event) => {
+        if (!dragging) return;
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+
+        if (!locked) {
+          if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+          if (Math.abs(dy) > Math.abs(dx)) {
+            dragging = false;
+            return;
+          }
+          locked = true;
+        }
+
+        event.preventDefault();
+
+        // Resistencia suave en los extremos
+        let offset = dx;
+        if ((index === 0 && dx > 0) || (index === total - 1 && dx < 0)) {
+          offset = dx * 0.35;
+        }
+        dragX = offset;
+        setTransform(false);
+      };
+
+      const onPointerUp = () => {
+        if (!dragging && dragX === 0) return;
+        dragging = false;
+
+        const threshold = width * 0.2;
+        if (dragX <= -threshold) {
+          goTo(index + 1, true);
+        } else if (dragX >= threshold) {
+          goTo(index - 1, true);
+        } else {
+          dragX = 0;
+          setTransform(true);
+        }
+        start();
+      };
+
+      viewport.addEventListener('pointerdown', onPointerDown);
+      viewport.addEventListener('pointermove', onPointerMove, { passive: false });
+      viewport.addEventListener('pointerup', onPointerUp);
+      viewport.addEventListener('pointercancel', onPointerUp);
+
+      window.addEventListener('resize', () => {
+        dragX = 0;
+        setTransform(false);
+      });
+    }
+
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', () => {
+      if (!dragging) start();
+    });
+
+    setTransform(false);
+    start();
+  }
+</script>

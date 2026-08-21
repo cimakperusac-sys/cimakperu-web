@@ -10,7 +10,7 @@ const inputClass =
 
 <section
   id="contacto"
-  class="reveal-on-scroll relative w-full overflow-hidden bg-white pt-9 sm:pt-12 lg:pt-16"
+  class="reveal-on-scroll relative z-10 -mt-px w-full overflow-visible bg-white pt-9 sm:pt-12 lg:pt-16"
   aria-label="Contáctanos para tu proyecto"
 >
   <div class="container-cimak">
@@ -114,14 +114,17 @@ const inputClass =
         </form>
       </div>
 
-      <!-- Decorativa: solo cuando acompaña al formulario en dos columnas -->
-      <div class="hidden justify-center lg:flex">
+      <!--
+        El casco debe quedar DENTRO de esta sección (si se sale hacia Colores,
+        el borde blanco corta y se ve una línea). Solo sobresale hacia el footer.
+      -->
+      <div class="relative z-20 -mb-16 hidden max-h-full justify-center self-end overflow-visible lg:-mb-24 lg:flex xl:-mb-28">
         <Image
           src={persona}
           alt="Asesor de CIMAK Perú"
-          class="h-auto w-full max-w-[383px] object-contain object-bottom"
-          width={383}
-          height={671}
+          class="h-auto w-full max-w-[440px] origin-bottom object-contain object-bottom xl:max-w-[500px]"
+          width={500}
+          height={875}
           loading="lazy"
           decoding="async"
         />
