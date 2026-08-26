@@ -1,83 +1,59 @@
 ---
-import { Image } from 'astro:assets';
-import logo from '../../assets/footer/logo.svg';
-import nosotrosImg from '../../assets/nosotros/nosotros.svg';
+import type { WebBloque } from '../../lib/types/web';
+import { cmsHtml, cmsPlain, cmsTitleHtml } from '../../lib/cmsHtml';
+
+interface Props {
+  bloque?: WebBloque | null;
+}
+
+const { bloque } = Astro.props;
+if (!bloque || (!bloque.titulo && !bloque.contenido && !bloque.url)) {
+  return null;
+}
+
+const titleHtml = cmsTitleHtml(bloque.titulo) || cmsTitleHtml('¿Quiénes somos?');
+const bodyHtml = cmsHtml(bloque.contenido || bloque.subtitulo);
+const img = bloque.url || null;
+const aria = cmsPlain(bloque.titulo) || 'Quiénes somos';
 ---
 
-<section
-  id="nosotros"
-  class="reveal-on-scroll w-full bg-[#f3f3f3] py-8 sm:py-14"
-  aria-label="Quiénes somos"
->
+<section id="nosotros" class="reveal-on-scroll w-full bg-[#f3f3f3] py-8 sm:py-14" aria-label={aria}>
   <div class="container-cimak">
-    <!-- Mobile: botón amarillo -->
     <div class="mb-5 flex justify-center md:hidden">
-      <h2 class="rounded-md bg-cimak-yellow px-6 py-2 text-center text-sm font-bold text-cimak-black">
-        ¿Quiénes Somos?
-      </h2>
+      <div class="rounded-md bg-cimak-yellow px-6 py-2 text-center text-sm font-bold text-cimak-black">
+        <div class="cms-prose cms-prose--title" set:html={titleHtml} />
+      </div>
     </div>
 
-    <!-- Desktop: título -->
-    <h2 class="mb-8 hidden text-center text-2xl font-extrabold text-cimak-black md:block lg:text-[1.75rem]">
-      ¿Quiénes somos?
-    </h2>
+    <div class="mb-8 hidden text-center text-2xl font-extrabold text-cimak-black md:block lg:text-[1.75rem]">
+      <div class="cms-prose cms-prose--title" set:html={titleHtml} />
+    </div>
 
-    <!-- Mobile: card blanca con borde -->
     <div class="rounded-xl border border-cimak-black bg-white px-5 py-7 md:hidden">
-      <div class="flex flex-col items-center">
-        <Image
-          src={logo}
-          alt="CIMAK Coberturas"
-          class="mb-5 h-10 w-auto"
-          width={89}
-          height={34}
-          loading="lazy"
-          decoding="async"
-        />
-        <p class="text-center text-sm leading-relaxed text-cimak-black">
-          En <span class="font-bold">CIMAK PERÚ</span> somos líderes en la fabricación de
-          coberturas metálicas y soluciones arquitectónicas. Protegemos los proyectos de los
-          peruanos con materiales de grado estructural diseñados para soportar los climas más
-          exigentes de la costa, sierra y selva.
-        </p>
-      </div>
+      {bodyHtml && <div class="cms-prose text-center text-sm text-cimak-black" set:html={bodyHtml} />}
+      {img && (
+        <img src={img} alt={aria} class="mt-5 h-auto w-full rounded-lg object-cover" loading="lazy" decoding="async" />
+      )}
     </div>
 
-    <!-- Desktop: imagen en proporción natural; texto se iguala a su altura -->
     <div class="hidden items-stretch gap-8 md:grid md:grid-cols-2 lg:gap-10">
-      <div class="aspect-[538/460] overflow-hidden rounded-2xl">
-        <Image
-          src={nosotrosImg}
-          alt="Equipo CIMAK en planta de producción"
-          class="h-full w-full object-cover object-top"
-          width={538}
-          height={519}
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-
-      <div class="flex flex-col items-center justify-center">
-        <Image
-          src={logo}
-          alt="CIMAK Coberturas"
-          class="mb-8 h-24 w-auto lg:mb-10 lg:h-28"
-          width={280}
-          height={112}
-          loading="lazy"
-          decoding="async"
-        />
-        <p class="w-full text-left text-sm leading-8 text-cimak-black lg:text-[0.95rem] lg:leading-8">
-          En <span class="font-bold">CIMAK PERÚ</span> somos líderes en la fabricación de
-          coberturas metálicas y soluciones arquitectónicas. Nacimos con un objetivo claro en
-          la industria de la construcción: eliminar a los intermediarios para llevar la
-          verdadera calidad industrial directamente a tu obra.
-        </p>
-        <p class="mt-6 w-full text-left text-sm leading-8 text-cimak-black lg:mt-8 lg:text-[0.95rem] lg:leading-8">
-          Protegemos los proyectos de los peruanos con materiales de grado estructural
-          (Aluzinc, paneles termoaislantes y UPVC) diseñados para soportar los climas más
-          exigentes de la costa, sierra y selva.
-        </p>
+      {img ? (
+        <div class="overflow-hidden rounded-2xl">
+          <img src={img} alt={aria} class="h-full w-full object-cover object-top" loading="lazy" decoding="async" />
+        </div>
+      ) : (
+        <div class="rounded-2xl bg-cimak-black/5"></div>
+      )}
+      <div class="flex flex-col items-center justify-center px-2">
+        {bodyHtml && <div class="cms-prose text-center text-base text-cimak-black" set:html={bodyHtml} />}
+        {bloque.cta_texto && bloque.cta_url && (
+          <a
+            href={bloque.cta_url}
+            class="mt-6 inline-block rounded-md bg-cimak-yellow px-5 py-2 text-sm font-bold text-cimak-black"
+          >
+            {bloque.cta_texto}
+          </a>
+        )}
       </div>
     </div>
   </div>

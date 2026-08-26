@@ -1,151 +1,51 @@
 ---
-import { Image } from 'astro:assets';
-import casco from '../../assets/banner-dos/casco.svg';
-import preview from '../../assets/banner-dos/preview.svg';
-import fondo from '../../assets/banner-dos/fondo.svg';
+import type { WebBloque } from '../../lib/types/web';
+import { cmsHtml, cmsPlain, cmsTitleHtml } from '../../lib/cmsHtml';
+
+interface Props {
+  bloque?: WebBloque | null;
+}
+
+const { bloque } = Astro.props;
+if (!bloque || (!bloque.titulo && !bloque.contenido && !bloque.url)) {
+  return null;
+}
+
+const titleHtml = cmsTitleHtml(bloque.titulo) || cmsTitleHtml('Blog');
+const bodyHtml = cmsHtml(bloque.contenido || bloque.subtitulo);
+const href = bloque.cta_url || '/blog';
+const cta = bloque.cta_texto || 'Ver más';
+const bg = bloque.url || null;
+const aria = cmsPlain(bloque.titulo) || 'Blog';
 ---
 
 <section
   id="blog-banner"
-  class="reveal-on-scroll relative w-full overflow-hidden aspect-[360/243] lg:aspect-auto"
-  aria-label="Blog CIMAK"
+  class="reveal-on-scroll relative w-full overflow-hidden min-h-[220px] sm:min-h-[280px]"
+  aria-label={aria}
 >
-  <Image
-    src={fondo}
-    alt=""
-    class="absolute inset-0 h-full w-full object-cover object-[70%_center]"
-    width={360}
-    height={243}
-    aria-hidden="true"
-    loading="lazy"
-    decoding="async"
-  />
-  <div class="absolute inset-0 bg-black/60 lg:bg-transparent"></div>
-  <div class="pointer-events-none absolute inset-y-0 left-0 hidden w-[55%] bg-gradient-to-r from-black via-black/80 to-transparent lg:block"></div>
+  {bg ? (
+    <img
+      src={bg}
+      alt=""
+      class="absolute inset-0 h-full w-full object-cover"
+      aria-hidden="true"
+      loading="lazy"
+      decoding="async"
+    />
+  ) : (
+    <div class="absolute inset-0 bg-cimak-black" aria-hidden="true"></div>
+  )}
+  <div class="absolute inset-0 bg-black/55"></div>
 
-  <!-- Desktop: contenido alineado al margen -->
-  <div class="container-cimak relative z-10 hidden py-12 lg:block">
-    <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
-      <div class="flex max-w-md flex-col items-start gap-5">
-        <Image
-          src={casco}
-          alt=""
-          class="h-16 w-auto"
-          width={82}
-          height={83}
-          aria-hidden="true"
-          loading="lazy"
-          decoding="async"
-        />
-
-        <p class="text-[1.65rem] font-semibold leading-snug text-white">
-          ¡Conoce <span class="font-extrabold">nuestro blog</span> con los mejores tips de construcción!
-        </p>
-
-        <a
-          href="/blog"
-          class="inline-block rounded-md bg-[#ffba2e] px-5 py-2 text-sm font-bold text-cimak-black transition hover:brightness-105"
-        >
-          Ver más
-        </a>
-      </div>
-
-      <div class="relative w-full max-w-[300px]">
-        <button
-          type="button"
-          class="blog-prev absolute top-1/2 -left-7 z-10 -translate-y-1/2 text-3xl font-light text-white transition hover:text-cimak-yellow"
-          aria-label="Anterior"
-        >
-          ‹
-        </button>
-
-        <div class="overflow-hidden rounded-xl border border-white/40 bg-white/10 p-1 shadow-lg backdrop-blur-sm">
-          <Image
-            class="blog-preview block h-auto w-full rounded-lg"
-            src={preview}
-            alt="Vista previa del blog y productos"
-            width={320}
-            height={400}
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-
-        <button
-          type="button"
-          class="blog-next absolute top-1/2 -right-7 z-10 -translate-y-1/2 text-3xl font-light text-white transition hover:text-cimak-yellow"
-          aria-label="Siguiente"
-        >
-          ›
-        </button>
-      </div>
-
-      <div aria-hidden="true"></div>
-    </div>
-  </div>
-
-  <!-- Mobile: contenido dentro de 360×243 -->
-  <div class="container-cimak relative z-10 flex h-full flex-col items-center justify-center gap-2.5 py-3 text-center lg:hidden">
-    <p class="max-w-[280px] text-[0.95rem] font-semibold leading-snug text-white">
-      ¡Conoce <span class="font-extrabold">nuestro blog</span> con los mejores tips de construcción!
-    </p>
-
-    <div class="relative w-[42%] max-w-[150px]">
-      <button
-        type="button"
-        class="blog-prev absolute top-1/2 -left-5 z-10 -translate-y-1/2 text-2xl font-light text-white"
-        aria-label="Anterior"
-      >
-        ‹
-      </button>
-
-      <div class="overflow-hidden rounded-lg border border-white/50 bg-white shadow-lg">
-        <Image
-          class="blog-preview block h-auto w-full"
-          src={preview}
-          alt="Vista previa del blog y productos"
-          width={150}
-          height={190}
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-
-      <button
-        type="button"
-        class="blog-next absolute top-1/2 -right-5 z-10 -translate-y-1/2 text-2xl font-light text-white"
-        aria-label="Siguiente"
-      >
-        ›
-      </button>
-    </div>
-
+  <div class="container-cimak relative z-10 flex flex-col items-start gap-4 py-12 text-white sm:py-16">
+    <div class="cms-prose cms-prose--title max-w-md text-[1.35rem] font-semibold leading-snug sm:text-[1.65rem]" set:html={titleHtml} />
+    {bodyHtml && <div class="cms-prose max-w-lg text-sm text-white/90 sm:text-base" set:html={bodyHtml} />}
     <a
-      href="/blog"
-      class="inline-block rounded-md bg-[#ffba2e] px-4 py-1.5 text-xs font-bold text-cimak-black transition hover:brightness-105"
+      href={href}
+      class="inline-block rounded-md bg-[#ffba2e] px-5 py-2 text-sm font-bold text-cimak-black transition hover:brightness-105"
     >
-      Ver más
+      {cta}
     </a>
   </div>
 </section>
-
-<script>
-  const slides = [...document.querySelectorAll('.blog-preview')]
-    .map((el) => el.getAttribute('src'))
-    .filter(Boolean);
-  const slideSrcs = slides.length ? [slides[0]] : [];
-  let index = 0;
-
-  const previews = [...document.querySelectorAll('.blog-preview')];
-  const prevBtns = [...document.querySelectorAll('.blog-prev')];
-  const nextBtns = [...document.querySelectorAll('.blog-next')];
-
-  const show = (i) => {
-    if (slideSrcs.length === 0) return;
-    index = (i + slideSrcs.length) % slideSrcs.length;
-    previews.forEach((img) => img.setAttribute('src', slideSrcs[index]));
-  };
-
-  prevBtns.forEach((btn) => btn.addEventListener('click', () => show(index - 1)));
-  nextBtns.forEach((btn) => btn.addEventListener('click', () => show(index + 1)));
-</script>

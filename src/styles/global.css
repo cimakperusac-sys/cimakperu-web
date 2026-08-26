@@ -142,3 +142,75 @@ a[href='#promociones'] {
     transition: none;
   }
 }
+
+/* Contenido HTML desde el CMS (Quill) */
+.cms-prose {
+  line-height: 1.55;
+}
+
+.cms-prose p {
+  margin: 0 0 0.75em;
+}
+
+.cms-prose p:last-child {
+  margin-bottom: 0;
+}
+
+.cms-prose strong,
+.cms-prose b {
+  font-weight: 700;
+}
+
+.cms-prose em,
+.cms-prose i {
+  font-style: italic;
+}
+
+.cms-prose u {
+  text-decoration: underline;
+}
+
+.cms-prose ul,
+.cms-prose ol {
+  margin: 0.5em 0 0.75em;
+  padding-left: 1.25em;
+}
+
+.cms-prose li {
+  margin: 0.2em 0;
+}
+
+.cms-prose a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cms-prose h2,
+.cms-prose h3 {
+  font-weight: 700;
+  margin: 0.6em 0 0.35em;
+}
+
+.cms-prose h2 {
+  font-size: 1.25em;
+}
+
+.cms-prose h3 {
+  font-size: 1.1em;
+}
+
+/* Títulos multilínea (Enter de Quill) — compactos como Figma */
+.cms-prose--title {
+  line-height: 1.12;
+}
+
+.cms-prose--title p {
+  margin: 0;
+  line-height: inherit;
+}
+
+#hero .cms-prose--title {
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}

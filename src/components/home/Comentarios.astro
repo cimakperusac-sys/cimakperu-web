@@ -2,44 +2,23 @@
 import { Image } from 'astro:assets';
 import logoEstrellas from '../../assets/comentarios/logo-estrellas.svg';
 
-const reviews = [
-  {
-    name: 'ANDY',
-    initial: 'A',
-    color: '#4285F4',
-    text: '',
-  },
-  {
-    name: 'JOSUE',
-    initial: 'J',
-    color: '#8B7355',
-    text: 'Recomiendo el menu de sharon',
-  },
-  {
-    name: 'BRYAN',
-    initial: 'B',
-    color: '#34A853',
-    text: 'Siempre compro acá',
-  },
-  {
-    name: 'JEANPIERRE',
-    initial: 'J',
-    color: '#9B8EC4',
-    text: 'Excelente atención y productos de calidad',
-  },
-  {
-    name: 'MARIA',
-    initial: 'M',
-    color: '#EA4335',
-    text: 'Muy buen servicio, lo recomiendo',
-  },
-  {
-    name: 'CARLOS',
-    initial: 'C',
-    color: '#FBBC05',
-    text: 'Materiales de primera, llegaron a tiempo',
-  },
-] as const;
+type Review = {
+  name: string;
+  initial: string;
+  color: string;
+  text: string;
+};
+
+interface Props {
+  reviews?: Review[];
+}
+
+const { reviews: propReviews } = Astro.props;
+const reviews = propReviews ?? [];
+
+if (!reviews.length) {
+  return null;
+}
 ---
 
 <section
@@ -111,9 +90,7 @@ const reviews = [
           </div>
 
           {review.text && (
-            <p class="mt-3 text-sm leading-snug text-cimak-black/85">
-              {review.text}
-            </p>
+            <div class="cms-prose mt-3 text-sm leading-snug text-cimak-black/85" set:html={review.text} />
           )}
         </article>
       ))}

@@ -1,49 +1,71 @@
 ---
-import { Image } from 'astro:assets';
-import fondo from '../../assets/contactanos/fondo.svg';
-import persona from '../../assets/contactanos/persona.svg';
+import type { WebBloque } from '../../lib/types/web';
+import { cmsHtml, cmsPlain, cmsTitleHtml } from '../../lib/cmsHtml';
+
+interface Props {
+  bloque?: WebBloque | null;
+}
+
+const { bloque } = Astro.props;
+if (!bloque) {
+  return null;
+}
+
+const titleHtml = cmsTitleHtml(bloque.titulo) || cmsTitleHtml('Contáctanos');
+const bodyHtml =
+  cmsHtml(bloque.contenido || bloque.subtitulo) ||
+  cmsHtml('Completa el formulario y atenderemos tu requerimiento lo más pronto posible.');
+const extra = (bloque.extra && typeof bloque.extra === 'object' ? bloque.extra : {}) as Record<
+  string,
+  unknown
+>;
+const bg = bloque.url || (typeof extra.fondo_url === 'string' ? extra.fondo_url : null);
+const persona = typeof extra.persona_url === 'string' ? extra.persona_url : null;
+const cta = bloque.cta_texto || 'Enviar';
+const aria = cmsPlain(bloque.titulo) || 'Contáctanos';
 ---
 
 <section
   id="contactanos"
-  class="reveal-on-scroll relative w-full overflow-hidden border-b-[3px] border-cimak-yellow lg:aspect-[1280/578]"
-  aria-label="Contáctanos"
+  class="reveal-on-scroll relative w-full overflow-hidden border-b-[3px] border-cimak-yellow min-h-[420px] lg:min-h-[520px]"
+  aria-label={aria}
 >
-  <Image
-    src={fondo}
-    alt=""
-    class="absolute inset-0 h-full w-full object-cover object-center"
-    width={1280}
-    height={578}
-    aria-hidden="true"
-    loading="lazy"
-    decoding="async"
-  />
+  {bg ? (
+    <img
+      src={bg}
+      alt=""
+      class="absolute inset-0 h-full w-full object-cover object-center"
+      aria-hidden="true"
+      loading="lazy"
+      decoding="async"
+    />
+  ) : (
+    <div class="absolute inset-0 bg-[#e8eef5]" aria-hidden="true"></div>
+  )}
 
   <div
-    class="container-cimak relative z-10 flex h-full flex-col items-center justify-center lg:flex-row lg:items-center lg:justify-center lg:gap-[200px]"
+    class="container-cimak relative z-10 flex h-full flex-col items-center justify-center py-10 lg:flex-row lg:items-center lg:justify-center lg:gap-16"
   >
-    <div class="relative z-20 hidden shrink-0 self-end lg:block">
-      <Image
-        src={persona}
-        alt="Asesor CIMAK"
-        width={520}
-        height={720}
-        class="h-auto w-auto max-h-[620px] origin-bottom scale-125 object-contain object-bottom drop-shadow-md"
-        loading="lazy"
-        decoding="async"
-      />
-    </div>
+    {persona && (
+      <div class="relative z-20 hidden shrink-0 self-end lg:block">
+        <img
+          src={persona}
+          alt="Asesor"
+          class="h-auto w-auto max-h-[560px] origin-bottom object-contain object-bottom drop-shadow-md"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    )}
 
     <div
-      class="relative z-10 mb-6 mt-8 w-full max-w-md rounded-2xl border border-white/50 bg-transparent p-5 shadow-[0_12px_40px_rgba(0,0,0,0.28)] sm:p-6 lg:mb-16 lg:mt-0 lg:max-w-[490px] lg:shrink-0 lg:self-center"
+      class="relative z-10 w-full max-w-md rounded-2xl border border-white/50 bg-white/90 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.18)] backdrop-blur-sm sm:p-6 lg:max-w-[490px]"
     >
-      <h2 class="text-[1.4rem] font-extrabold leading-tight text-cimak-black sm:text-[1.55rem]">
-        Contáctanos
-      </h2>
-      <p class="mt-1.5 text-[0.8rem] leading-snug text-cimak-black/85 sm:text-[0.875rem]">
-        Completa el formulario y atenderemos tu requerimiento lo más pronto posible.
-      </p>
+      <div class="cms-prose cms-prose--title text-[1.4rem] font-extrabold leading-tight text-cimak-black sm:text-[1.55rem]" set:html={titleHtml} />
+      <div
+        class="cms-prose mt-1.5 text-[0.8rem] leading-snug text-cimak-black/85 sm:text-[0.875rem]"
+        set:html={bodyHtml}
+      />
 
       <form class="mt-4 flex flex-col gap-2.5" method="post" action="#">
         <label class="sr-only" for="contacto-nombre">Nombres y Apellidos</label>
@@ -99,7 +121,7 @@ import persona from '../../assets/contactanos/persona.svg';
           type="submit"
           class="mt-0.5 w-fit rounded-md bg-cimak-yellow px-8 py-2.5 text-sm font-bold text-cimak-black transition hover:brightness-105"
         >
-          Enviar
+          {cta}
         </button>
       </form>
     </div>

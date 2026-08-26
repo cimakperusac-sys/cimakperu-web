@@ -1,15 +1,5 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import AluzincHero from '../components/productos/AluzincHero.astro';
-import AluzincEspecificaciones from '../components/productos/AluzincEspecificaciones.astro';
-import AluzincColores from '../components/productos/AluzincColores.astro';
-import AluzincContacto from '../components/productos/AluzincContacto.astro';
-import AluzincFooter from '../components/productos/AluzincFooter.astro';
-
-import heroFondo from '../assets/aluzinc/seccion/hero/hero-fondo-dos.svg';
-import productAluzinc from '../assets/aluzinc/seccion/hero/aluzinc.svg';
-
-/*
 import Hero from '../components/home/Hero.astro';
 import PromoBanners from '../components/home/PromoBanners.astro';
 import CategoryGrid from '../components/home/CategoryGrid.astro';
@@ -18,43 +8,74 @@ import ContactSection from '../components/home/ContactSection.astro';
 import Nosotros from '../components/home/Nosotros.astro';
 import Caracteristicas from '../components/home/Caracteristicas.astro';
 import Comentarios from '../components/home/Comentarios.astro';
-*/
+import { getHome } from '../lib/api';
+import type { WebTestimonio } from '../lib/types/web';
+
+const home = await getHome();
+const meta = home?.meta ?? null;
+const bloques = home?.bloques ?? {};
+const familias = home?.familias ?? [];
+const testimoniosApi = home?.testimonios ?? [];
+
+const AVATAR_COLORS = ['#4285F4', '#8B7355', '#34A853', '#9B8EC4', '#EA4335', '#FBBC05'];
+
+function mapTestimonios(list: WebTestimonio[]) {
+  return list.map((t, i) => {
+    const name = (t.nombre || 'Cliente').toUpperCase();
+    return {
+      name,
+      initial: name.charAt(0),
+      color: AVATAR_COLORS[i % AVATAR_COLORS.length],
+      text: t.comentario || '',
+    };
+  });
+}
+
+const categoryItems = familias
+  .filter((f) => f.slug && f.url)
+  .map((f) => ({
+    title: f.nombre,
+    href: `/familias/${f.slug}`,
+    imageUrl: f.url as string,
+  }));
+
+const reviews = testimoniosApi.length ? mapTestimonios(testimoniosApi) : [];
+
+const hasAnyContent =
+  Boolean(bloques.hero?.url) ||
+  Boolean(bloques.promo_catalogo) ||
+  categoryItems.length > 0 ||
+  Boolean(bloques.blog_banner) ||
+  Boolean(bloques.nosotros) ||
+  Boolean(bloques.caracteristicas) ||
+  reviews.length > 0 ||
+  Boolean(bloques.contacto);
 ---
 
-<!-- Landing Aluzinc como página principal -->
 <Layout
-	title="Techos de Aluzinc TR4 / TR5 | CIMAK Perú"
-	description="Techos de Aluzinc modelos TR4 y TR5 fabricados en Perú. Alta resistencia a la corrosión, reflectividad térmica y colores RAL. Cotiza con CIMAK Perú sin intermediarios."
-	image="/og-aluzinc.svg"
-	imageAlt="Láminas de Aluzinc TR4 / TR5 de CIMAK Perú"
-	keywords="techos de aluzinc, aluzinc Perú, cobertura aluzinc, TR4, TR5, CIMAK, coberturas metálicas Lima, techos metálicos, RAL aluzinc"
-	type="product"
-	canonical="/"
-	showHeader={false}
-	showFooter={false}
-	showWhatsApp={true}
+  title={meta?.seo_title || 'CIMAK Perú'}
+  description={meta?.seo_description || undefined}
+  keywords={meta?.seo_keywords || undefined}
+  image={meta?.og_image || undefined}
+  canonical={meta?.canonical || undefined}
 >
-	<main>
-		<AluzincHero bgImage={heroFondo} productImage={productAluzinc} />
-		<AluzincEspecificaciones />
-		<AluzincColores />
-		<AluzincContacto />
-	</main>
-	<AluzincFooter />
-</Layout>
+  <main>
+    <Hero bloque={bloques.hero} />
+    <PromoBanners bloque={bloques.promo_catalogo} />
+    {categoryItems.length > 0 && <CategoryGrid items={categoryItems} />}
+    <BlogBanner bloque={bloques.blog_banner} />
+    <Nosotros bloque={bloques.nosotros} />
+    <Caracteristicas bloque={bloques.caracteristicas} />
+    {reviews.length > 0 && <Comentarios reviews={reviews} />}
+    <ContactSection bloque={bloques.contacto} />
 
-<!--
-Home anterior (comentado):
-<Layout title="CIMAK Perú">
-	<main>
-		<Hero />
-		<PromoBanners />
-		<CategoryGrid />
-		<BlogBanner />
-		<Nosotros />
-		<Caracteristicas />
-		<Comentarios />
-		<ContactSection />
-	</main>
+    {!hasAnyContent && (
+      <section class="container-cimak py-24 text-center text-cimak-black/70">
+        <p class="text-lg font-semibold">Sitio en configuración</p>
+        <p class="mt-2 text-sm">
+          Publica bloques, familias y testimonios desde el CRM (Página Web / Productos).
+        </p>
+      </section>
+    )}
+  </main>
 </Layout>
--->
