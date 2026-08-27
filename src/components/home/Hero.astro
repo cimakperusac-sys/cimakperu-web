@@ -1,5 +1,5 @@
 ---
-import type { WebBloque } from '../../lib/types/web';
+import type { WebBloque, WebTipoMedia } from '../../lib/types/web';
 import { cmsHtml, cmsPlain, cmsTitleHtml } from '../../lib/cmsHtml';
 
 interface Props {
@@ -11,24 +11,144 @@ if (!bloque?.url) {
   return null;
 }
 
-const src = bloque.url;
-const isVideo = /\.(mp4|webm|ogg|mov)(\?|$)/i.test(src);
+function esVideo(url: string, tipo?: WebTipoMedia | null, mime?: string | null): boolean {
+  if (tipo === 'video') return true;
+  if (tipo === 'image') return false;
+  if (mime?.startsWith('video/')) return true;
+  if (mime?.startsWith('image/')) return false;
+  return /\.(mp4|webm|ogg|ogv|mov|m4v)(\?|$)/i.test(url);
+}
+
+const desktop = {
+  src: bloque.url,
+  video: esVideo(bloque.url, bloque.tipo_media, bloque.mime_type),
+};
+
+const mobile = bloque.url_mobile
+  ? {
+      src: bloque.url_mobile,
+      video: esVideo(bloque.url_mobile, bloque.tipo_media_mobile, bloque.mime_type_mobile),
+    }
+  : null;
+
+/** Dos imágenes se resuelven con <picture>: una sola descarga y cero JS. */
+const soloImagenes = Boolean(mobile) && !desktop.video && !mobile!.video;
+
 const nextHref = '#promociones';
 const titleHtml = cmsTitleHtml(bloque.titulo);
 const bodyHtml = cmsHtml(bloque.contenido || bloque.subtitulo);
 const aria = cmsPlain(bloque.titulo) || 'Hero';
+
+const mediaClass = 'h-full w-full object-cover md:h-auto';
 ---
 
 <section
   id="hero"
-  class="relative w-full overflow-hidden bg-cimak-black"
+  class="relative flex min-h-[70svh] w-full overflow-hidden bg-cimak-black md:min-h-0"
   aria-label={aria}
 >
-  {isVideo ? (
-    <video class="block h-auto w-full" src={src} autoplay muted loop playsinline></video>
-  ) : (
-    <img class="block h-auto w-full object-cover" src={src} alt={aria} />
-  )}
+  <div class="absolute inset-0 md:relative md:inset-auto md:w-full">
+    {soloImagenes ? (
+      <picture class="block h-full">
+        <source media="(min-width: 768px)" srcset={desktop.src} />
+        <img
+          src={mobile!.src}
+          alt={aria}
+          class={`block ${mediaClass}`}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </picture>
+    ) : mobile ? (
+      <div class="h-full" data-hero-media>
+        <div class="h-full md:hidden">
+          {mobile.video ? (
+            <video
+              class={`block ${mediaClass}`}
+              data-hero-src={mobile.src}
+              data-hero-when="mobile"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              aria-label={aria}
+            ></video>
+          ) : (
+            <img
+              class={`block ${mediaClass}`}
+              data-hero-src={mobile.src}
+              data-hero-when="mobile"
+              alt={aria}
+              decoding="async"
+            />
+          )}
+        </div>
+
+        <div class="hidden h-full md:block">
+          {desktop.video ? (
+            <video
+              class={`block ${mediaClass}`}
+              data-hero-src={desktop.src}
+              data-hero-when="desktop"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              aria-label={aria}
+            ></video>
+          ) : (
+            <img
+              class={`block ${mediaClass}`}
+              data-hero-src={desktop.src}
+              data-hero-when="desktop"
+              alt={aria}
+              decoding="async"
+            />
+          )}
+        </div>
+
+        <noscript>
+          <div class="h-full md:hidden">
+            {mobile.video ? (
+              <video class={`block ${mediaClass}`} src={mobile.src} autoplay muted loop playsinline></video>
+            ) : (
+              <img class={`block ${mediaClass}`} src={mobile.src} alt={aria} />
+            )}
+          </div>
+          <div class="hidden h-full md:block">
+            {desktop.video ? (
+              <video class={`block ${mediaClass}`} src={desktop.src} autoplay muted loop playsinline></video>
+            ) : (
+              <img class={`block ${mediaClass}`} src={desktop.src} alt={aria} />
+            )}
+          </div>
+        </noscript>
+      </div>
+    ) : desktop.video ? (
+      <video
+        class={`block ${mediaClass}`}
+        src={desktop.src}
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        aria-label={aria}
+      ></video>
+    ) : (
+      <img
+        class={`block ${mediaClass}`}
+        src={desktop.src}
+        alt={aria}
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      />
+    )}
+  </div>
 
   {(titleHtml || bodyHtml || bloque.cta_texto) && (
     <div class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/35 px-4 text-center text-white">
@@ -44,7 +164,7 @@ const aria = cmsPlain(bloque.titulo) || 'Hero';
       {bloque.cta_texto && bloque.cta_url && (
         <a
           href={bloque.cta_url}
-          class="mt-5 inline-block rounded-md bg-cimak-yellow px-5 py-2 text-sm font-bold text-cimak-black"
+          class="mt-5 inline-flex min-h-11 items-center rounded-md bg-cimak-yellow px-5 py-2 text-sm font-bold text-cimak-black"
         >
           {bloque.cta_texto}
         </a>
@@ -65,3 +185,25 @@ const aria = cmsPlain(bloque.titulo) || 'Hero';
     </span>
   </a>
 </section>
+
+<script>
+  const root = document.querySelector('[data-hero-media]');
+
+  if (root) {
+    const media = [...root.querySelectorAll('[data-hero-src]')];
+    const desktopQuery = window.matchMedia('(min-width: 768px)');
+
+    const activar = () => {
+      const objetivo = desktopQuery.matches ? 'desktop' : 'mobile';
+      media.forEach((el) => {
+        if (el.dataset.heroWhen !== objetivo || el.dataset.heroLoaded) return;
+        el.src = el.dataset.heroSrc;
+        el.dataset.heroLoaded = '1';
+        if (el.tagName === 'VIDEO') el.play?.().catch(() => {});
+      });
+    };
+
+    activar();
+    desktopQuery.addEventListener('change', activar);
+  }
+</script>

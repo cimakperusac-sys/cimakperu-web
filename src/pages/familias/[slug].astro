@@ -1,0 +1,210 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CatalogoSidebar from '../../components/catalogo/CatalogoSidebar.astro';
+import ProductoCard from '../../components/catalogo/ProductoCard.astro';
+import { getFamilia, getFamilias } from '../../lib/api';
+import { getMenuConFallback } from '../../lib/catalogo';
+import { cmsHtml, cmsPlain } from '../../lib/cmsHtml';
+import { categoriesFallback } from '../../data/categories';
+import { site } from '../../data/site';
+import type { WebProductoCard, WebSubcategoria } from '../../lib/types/web';
+
+export async function getStaticPaths() {
+  const fromApi = await getFamilias();
+  const slugs = new Set<string>();
+
+  for (const f of fromApi) {
+    if (f.slug) slugs.add(String(f.slug));
+  }
+  for (const c of categoriesFallback) {
+    const slug = c.href.replace(/^\/familias\//, '');
+    if (slug) slugs.add(slug);
+  }
+
+  return [...slugs].map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+if (!slug) {
+  return Astro.redirect('/');
+}
+
+const familia = await getFamilia(slug);
+const fallback = categoriesFallback.find((c) => c.href === `/familias/${slug}`);
+
+if (!familia && !fallback) {
+  return Astro.redirect('/');
+}
+
+const nombre = familia?.nombre || fallback?.title || slug;
+const descHtml = cmsHtml(familia?.descripcion_web || familia?.descripcion || '');
+const productos: WebProductoCard[] = Array.isArray(familia?.productos) ? familia.productos : [];
+const subcategorias: WebSubcategoria[] = Array.isArray(familia?.subcategorias)
+  ? familia.subcategorias.filter((s) => s.productos?.length)
+  : [];
+
+const menu = familia?.menu?.length ? familia.menu : await getMenuConFallback();
+
+const heroUrl = familia?.url || null;
+const canonical = `/familias/${slug}`;
+const seoTitle = familia?.seo_title || `${nombre} | CIMAK Perú`;
+const seoDesc =
+  familia?.seo_description ||
+  cmsPlain(familia?.descripcion_web || familia?.descripcion || '') ||
+  `Conoce los modelos de ${nombre} que fabricamos en CIMAK Perú.`;
+
+const siteUrl = (Astro.site?.href || site.url).replace(/\/$/, '');
+const absoluta = (path: string) => new URL(path, `${siteUrl}/`).href;
+
+const schemas = [
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: absoluta('/') },
+      { '@type': 'ListItem', position: 2, name: nombre, item: absoluta(canonical) },
+    ],
+  },
+  {
+    '@type': 'CollectionPage',
+    name: nombre,
+    description: seoDesc,
+    url: absoluta(canonical),
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: productos.length,
+      itemListElement: productos.map((producto, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: producto.nombre,
+        ...(producto.slug ? { url: absoluta(`/productos/${producto.slug}`) } : {}),
+      })),
+    },
+  },
+];
+---
+
+<Layout
+  title={seoTitle}
+  description={seoDesc}
+  image={heroUrl || undefined}
+  canonical={canonical}
+  schemas={schemas}
+>
+  <main class="bg-[#f3f3f3]">
+    <div class="container-cimak py-6 lg:py-10">
+      <nav class="mb-4 text-xs text-cimak-black/60" aria-label="Ruta">
+        <a href="/" class="hover:text-cimak-black">Inicio</a>
+        <span class="mx-1.5">/</span>
+        <span class="font-semibold text-cimak-black">{nombre}</span>
+      </nav>
+
+      <div class="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-10">
+        <CatalogoSidebar menu={menu} familiaActiva={slug} />
+
+        <div class="min-w-0">
+          <header class="border-b border-black/10 pb-4">
+            <h1 class="text-2xl font-extrabold uppercase tracking-tight text-cimak-black sm:text-3xl">
+              {nombre}
+            </h1>
+            {descHtml && (
+              <div
+                class="cms-prose mt-3 max-w-3xl text-sm text-cimak-black/75"
+                set:html={descHtml}
+              />
+            )}
+          </header>
+
+          {productos.length === 0 ? null : subcategorias.length > 0 ? (
+            <div class="mt-6 flex flex-col gap-8 lg:gap-10">
+              {subcategorias.map((seccion) => (
+                <section class="reveal-on-scroll min-w-0" aria-label={seccion.nombre}>
+                  <h2 class="mb-3 text-sm font-bold text-cimak-black sm:text-base">
+                    {seccion.nombre}
+                  </h2>
+
+                  <div class="relative" data-carrusel>
+                    <div
+                      class="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 lg:gap-4"
+                      data-carrusel-pista
+                    >
+                      {seccion.productos.map((producto) => (
+                        <div class="w-[44vw] min-w-[140px] max-w-[240px] shrink-0 snap-start lg:w-[calc((100%-2rem)/3)] lg:max-w-none">
+                          <ProductoCard producto={producto} />
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      class="absolute -right-3 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-md bg-cimak-black text-white shadow-lg transition hover:bg-cimak-black/85 lg:flex"
+                      data-carrusel-next
+                      aria-label={`Ver más productos de ${seccion.nombre || nombre}`}
+                      style="display:none"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="h-4 w-4" aria-hidden="true">
+                        <path d="m9 18 6-6-6-6" />
+                      </svg>
+                    </button>
+                  </div>
+                </section>
+              ))}
+            </div>
+          ) : (
+            <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:gap-5">
+              {productos.map((producto) => (
+                <ProductoCard producto={producto} />
+              ))}
+            </div>
+          )}
+
+          {productos.length === 0 && (
+            <div class="mt-6 rounded-xl border border-dashed border-cimak-black/20 bg-white px-6 py-12 text-center">
+              <p class="font-semibold text-cimak-black">
+                Aún no hay productos publicados en esta familia.
+              </p>
+              <p class="mt-2 text-sm text-cimak-black/60">
+                En el CRM: productos del grupo con <strong>mostrar en web</strong> activo.
+              </p>
+              {slug === 'aluzinc' && (
+                <a
+                  href="/productos/aluzinc"
+                  class="mt-5 inline-flex min-h-11 items-center rounded-md bg-cimak-yellow px-5 text-sm font-bold text-cimak-black"
+                >
+                  Ver página Aluzinc
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  document.querySelectorAll('[data-carrusel]').forEach((root) => {
+    const pista = root.querySelector('[data-carrusel-pista]');
+    const boton = root.querySelector('[data-carrusel-next]');
+    if (!pista || !boton) return;
+
+    const sincronizar = () => {
+      const desborda = pista.scrollWidth - pista.clientWidth > 8;
+      boton.style.display = desborda ? '' : 'none';
+      if (!desborda) return;
+      const alFinal = pista.scrollLeft + pista.clientWidth >= pista.scrollWidth - 8;
+      boton.style.opacity = alFinal ? '0.35' : '1';
+    };
+
+    boton.addEventListener('click', () => {
+      const alFinal = pista.scrollLeft + pista.clientWidth >= pista.scrollWidth - 8;
+      pista.scrollTo({
+        left: alFinal ? 0 : pista.scrollLeft + pista.clientWidth,
+        behavior: 'smooth',
+      });
+    });
+
+    pista.addEventListener('scroll', sincronizar, { passive: true });
+    window.addEventListener('resize', sincronizar);
+    sincronizar();
+  });
+</script>

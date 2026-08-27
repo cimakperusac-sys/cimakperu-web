@@ -1,38 +1,40 @@
-export const categories = [
+import aluzinc from '../assets/categories/aluzinc.svg';
+import upvc from '../assets/categories/upvc.svg';
+import termoPaneles from '../assets/categories/termo-paneles.svg';
+import policarbonato from '../assets/categories/policarbonato.svg';
+import fibraVidrio from '../assets/categories/fibra-vidrio.svg';
+import placasColaborantes from '../assets/categories/placas-colaborantes.svg';
+
+/** Fallback Figma (6 categorías) si el CRM aún no tiene familias con mostrar_web=1 */
+export const categoriesFallback = [
   {
-    id: 'aluzinc',
-    title: '',
-    href: '/productos/aluzinc',
-    image: 'aluzinc.svg',
+    title: 'Techos de ALUZINC',
+    href: '/familias/aluzinc',
+    image: aluzinc,
   },
   {
-    id: 'upvc',
     title: 'Techos de UPVC',
-    href: '/productos/upvc',
-    image: 'upvc.svg',
+    href: '/familias/upvc',
+    image: upvc,
   },
   {
-    id: 'termo-paneles',
-    title: 'Techos TERMO PANELES',
-    href: '/productos/paneles',
-    image: 'termo-paneles.svg',
+    title: 'TERMO PANELES',
+    href: '/familias/termo-paneles',
+    image: termoPaneles,
   },
   {
-    id: 'policarbonato',
     title: 'Techos de POLICARBONATO',
-    href: '/productos/policarbonato',
-    image: 'policarbonato.svg',
+    href: '/familias/policarbonato',
+    image: policarbonato,
   },
   {
-    id: 'fibra-vidrio',
     title: 'Techos de FIBRA DE VIDRIO',
-    href: '/productos/fibra-vidrio',
-    image: 'fibra-vidrio.svg',
+    href: '/familias/fibra-vidrio',
+    image: fibraVidrio,
   },
   {
-    id: 'placas-colaborantes',
-    title: 'Techos de Placas COLABORANTES',
-    href: '/productos/placas-colaborantes',
-    image: 'placas-colaborantes.svg',
+    title: 'PLACAS COLABORANTES',
+    href: '/familias/placas-colaborantes',
+    image: placasColaborantes,
   },
 ] as const;

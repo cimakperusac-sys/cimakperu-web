@@ -1,0 +1,429 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProductoCard from '../../components/catalogo/ProductoCard.astro';
+import { getFamilia, getFamilias, getProducto } from '../../lib/api';
+import { cotizarHref } from '../../lib/catalogo';
+import { cmsHtml, cmsPlain } from '../../lib/cmsHtml';
+import { site } from '../../data/site';
+
+export async function getStaticPaths() {
+  const familias = await getFamilias();
+  const slugs = new Set<string>();
+
+  for (const f of familias) {
+    if (!f.slug) continue;
+    const detalle = await getFamilia(String(f.slug));
+    for (const p of detalle?.productos ?? []) {
+      if (p.slug) slugs.add(String(p.slug));
+    }
+  }
+
+  // No chocar con /productos/aluzinc.astro estático
+  slugs.delete('aluzinc');
+
+  return [...slugs].map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+if (!slug) {
+  return Astro.redirect('/');
+}
+
+const producto = await getProducto(slug);
+if (!producto) {
+  return Astro.redirect('/');
+}
+
+const nombre = producto.nombre;
+const familiaNombre = producto.familia?.nombre?.trim() || '';
+const familiaHrefUrl = producto.familia?.slug ? `/familias/${producto.familia.slug}` : '/#productos';
+
+/** El hero separa familia (blanco) y modelo (amarillo) como en el diseño. */
+const modelo = (() => {
+  if (!familiaNombre) return nombre;
+  const limpio = nombre.trim();
+  if (limpio.toLowerCase().startsWith(familiaNombre.toLowerCase())) {
+    return limpio.slice(familiaNombre.length).trim() || limpio;
+  }
+  return limpio;
+})();
+
+const galeria = (producto.galeria ?? []).filter((g) => g?.url);
+const heroImg = producto.url || galeria[0]?.url || null;
+const miniaturas = [
+  ...(producto.url ? [{ url: producto.url, alt: nombre }] : []),
+  ...galeria.map((g) => ({ url: g.url as string, alt: g.alt || g.titulo || nombre })),
+].filter((item, index, list) => list.findIndex((x) => x.url === item.url) === index);
+
+const atributos = (producto.atributos ?? []).filter((a) => a?.label || a?.valor);
+const colores = (producto.colores ?? []).filter((c) => c?.hex || c?.url || c?.codigo);
+const relacionados = producto.relacionados ?? [];
+const fichaUrl = producto.ficha_url || null;
+
+const tabs = [
+  { id: 'detalles', label: 'Detalles', html: cmsHtml(producto.especificaciones_web || producto.especificaciones_tecnicas || '') },
+  { id: 'descripcion', label: 'Descripción', html: cmsHtml(producto.descripcion_web || producto.descripcion || '') },
+  { id: 'caracteristicas', label: 'Características', html: cmsHtml(producto.caracteristicas_web || '') },
+].filter((tab) => tab.html);
+
+const filaTab = ['md:row-start-1', 'md:row-start-2', 'md:row-start-3'];
+/** Filas explícitas: los tabs se reparten la altura del panel como en el diseño. */
+const filasTabs = ['', 'md:grid-rows-1', 'md:grid-rows-2', 'md:grid-rows-3'][tabs.length] ?? '';
+
+const canonical = `/productos/${slug}`;
+const seoTitle = producto.seo_title || `${nombre} | CIMAK Perú`;
+const seoDesc =
+  producto.seo_description ||
+  cmsPlain(producto.descripcion_web || producto.descripcion || producto.especificaciones_web || '') ||
+  `${nombre}${familiaNombre ? ` — ${familiaNombre}` : ''} fabricado por CIMAK Perú.`;
+
+const siteUrl = (Astro.site?.href || site.url).replace(/\/$/, '');
+const absoluta = (path: string) => new URL(path, `${siteUrl}/`).href;
+
+const schemas = [
+  {
+    '@type': 'Product',
+    name: nombre,
+    description: seoDesc,
+    ...(heroImg ? { image: heroImg } : {}),
+    brand: { '@type': 'Brand', name: 'CIMAK' },
+    sku: String(producto.id),
+    ...(familiaNombre ? { category: familiaNombre } : {}),
+    url: absoluta(canonical),
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: absoluta('/') },
+      ...(familiaNombre
+        ? [{ '@type': 'ListItem', position: 2, name: familiaNombre, item: absoluta(familiaHrefUrl) }]
+        : []),
+      {
+        '@type': 'ListItem',
+        position: familiaNombre ? 3 : 2,
+        name: nombre,
+        item: absoluta(canonical),
+      },
+    ],
+  },
+];
+---
+
+<Layout
+  title={seoTitle}
+  description={seoDesc}
+  image={heroImg || undefined}
+  imageAlt={nombre}
+  canonical={canonical}
+  type="product"
+  schemas={schemas}
+>
+  <main>
+    <section class="bg-cimak-black text-white">
+      <div class="container-cimak py-8 sm:py-12 lg:py-16">
+        <nav class="text-[0.7rem] text-white/55" aria-label="Ruta">
+          <a href="/" class="hover:text-white">Inicio</a>
+          {familiaNombre && (
+            <>
+              <span class="mx-1.5">/</span>
+              <a href={familiaHrefUrl} class="hover:text-white">{familiaNombre}</a>
+            </>
+          )}
+          <span class="mx-1.5">/</span>
+          <span class="text-white/85">{nombre}</span>
+        </nav>
+
+        <div class="mt-5 grid items-center gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-10">
+          <div class="order-1 flex justify-center">
+            {heroImg ? (
+              <img
+                id="producto-hero-img"
+                src={heroImg}
+                alt={nombre}
+                class="h-auto max-h-[46vh] w-full object-contain drop-shadow-2xl lg:max-h-[440px]"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+              />
+            ) : (
+              <div class="flex aspect-[4/3] w-full items-center justify-center rounded-xl border border-dashed border-white/25 text-sm text-white/50">
+                Sin imagen
+              </div>
+            )}
+          </div>
+
+          <div class="order-2 min-w-0">
+            {familiaNombre && modelo !== nombre && (
+              <p class="text-2xl font-black uppercase leading-none tracking-tight break-words sm:text-4xl lg:text-5xl">
+                {familiaNombre}
+              </p>
+            )}
+            <h1
+              class:list={[
+                'font-black uppercase leading-none tracking-tight break-words text-cimak-yellow',
+                familiaNombre && modelo !== nombre
+                  ? 'mt-1 text-2xl sm:text-4xl lg:text-5xl'
+                  : 'text-[1.7rem] sm:text-4xl lg:text-5xl',
+              ]}
+            >
+              {modelo}
+            </h1>
+
+            <div class="mt-5 flex flex-wrap gap-2.5">
+              <a
+                href={cotizarHref(nombre)}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex min-h-11 items-center rounded-sm bg-cimak-yellow px-6 text-xs font-bold uppercase tracking-wide text-cimak-black transition hover:brightness-105 sm:text-sm"
+              >
+                Cotizar
+              </a>
+              {fichaUrl && (
+                <a
+                  href={fichaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex min-h-11 items-center rounded-sm border border-white/70 px-6 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-white hover:text-cimak-black sm:text-sm"
+                >
+                  Ficha técnica
+                </a>
+              )}
+            </div>
+
+            {atributos.length > 0 && (
+              <dl class="mt-6 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/15 pt-5">
+                {atributos.map((atributo) => (
+                  <div>
+                    <dt class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white/55">
+                      {atributo.label}
+                    </dt>
+                    <dd class="mt-0.5 text-sm font-bold text-white sm:text-base">{atributo.valor}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+
+            {miniaturas.length > 1 && (
+              <div class="no-scrollbar mt-6 flex gap-2 overflow-x-auto pb-1" data-galeria>
+                {miniaturas.map((item, index) => (
+                  <button
+                    type="button"
+                    data-galeria-src={item.url}
+                    data-galeria-alt={item.alt}
+                    aria-label={`Ver ${item.alt}`}
+                    aria-pressed={index === 0 ? 'true' : 'false'}
+                    class="h-14 w-14 shrink-0 overflow-hidden rounded-sm border border-white/20 bg-white/10 transition aria-pressed:border-cimak-yellow sm:h-16 sm:w-16"
+                  >
+                    <img
+                      src={item.url}
+                      alt=""
+                      class="h-full w-full object-contain p-1"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {colores.length > 0 && (
+      <section class="reveal-on-scroll bg-white py-8 sm:py-12" aria-label="Colores disponibles">
+        <div class="container-cimak">
+          <h2 class="text-xs font-bold uppercase tracking-wide text-cimak-black sm:text-sm">
+            Colores Disponibles
+          </h2>
+
+          <div class="no-scrollbar -mx-4 mt-4 flex gap-1.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0">
+            {colores.map((color) => (
+              <div class="w-[68px] shrink-0 overflow-hidden rounded-[3px] bg-white shadow-[0_1px_6px_rgba(0,0,0,0.14)] sm:w-[76px]">
+                {color.url ? (
+                  <img
+                    src={color.url}
+                    alt={color.nombre || color.codigo || 'Color'}
+                    class="block h-12 w-full object-cover sm:h-14"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <span
+                    class="block h-12 w-full sm:h-14"
+                    style={`background-color:${color.hex}`}
+                    aria-hidden="true"
+                  ></span>
+                )}
+                <span class="block px-1.5 py-1.5">
+                  {color.codigo && (
+                    <span class="block truncate text-[8px] font-bold leading-tight text-cimak-black sm:text-[9px]">
+                      {color.codigo}
+                    </span>
+                  )}
+                  {color.nombre && (
+                    <span class="mt-0.5 block truncate text-[7px] leading-tight text-cimak-black/60 sm:text-[8px]">
+                      {color.nombre}
+                    </span>
+                  )}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <p class="mt-4 text-center text-[10px] text-cimak-black/55 sm:text-[11px]">
+            *Colores disponibles según stock o requerimiento por proyecto establecido.
+          </p>
+        </div>
+      </section>
+    )}
+
+    {tabs.length > 0 && (
+      <section class="reveal-on-scroll bg-[#f3f3f3] py-8 sm:py-12" aria-label="Información del producto">
+        <div class="container-cimak">
+          {tabs.length === 1 ? (
+            <div class="rounded-lg bg-white p-5 sm:p-7">
+              <h2 class="mb-3 text-sm font-bold uppercase tracking-wide text-cimak-black">
+                {tabs[0].label}
+              </h2>
+              <div class="cms-prose text-sm text-cimak-black/85" set:html={tabs[0].html} />
+            </div>
+          ) : (
+            <div
+              class:list={[
+                'grid gap-2 overflow-hidden rounded-lg bg-white md:grid-cols-[200px_minmax(0,1fr)] md:gap-0',
+                filasTabs,
+              ]}
+              data-tabs
+            >
+              {tabs.map((tab, index) => (
+                <>
+                  <button
+                    type="button"
+                    data-tab-btn={tab.id}
+                    aria-expanded={index === 0 ? 'true' : 'false'}
+                    aria-controls={`panel-${tab.id}`}
+                    class:list={[
+                      'flex min-h-12 items-center justify-between gap-3 px-5 text-left text-sm font-semibold transition md:col-start-1 md:justify-start md:border-b md:border-black/5',
+                      filaTab[index],
+                      index === 0
+                        ? 'bg-cimak-black text-white'
+                        : 'bg-white text-cimak-black hover:bg-black/5',
+                    ]}
+                  >
+                    <span>{tab.label}</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      class="h-3.5 w-3.5 shrink-0 md:hidden"
+                      aria-hidden="true"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+
+                  <div
+                    id={`panel-${tab.id}`}
+                    data-tab-panel={tab.id}
+                    class:list={[
+                      'cms-prose px-5 pb-5 text-sm text-cimak-black/85 md:col-start-2 md:row-start-1 md:row-end-[-1] md:px-8 md:py-7',
+                      index !== 0 && 'hidden',
+                    ]}
+                    set:html={tab.html}
+                  />
+                </>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    )}
+
+    {relacionados.length > 0 && (
+      <section class="reveal-on-scroll bg-white py-8 sm:py-12" aria-label="Recomendaciones">
+        <div class="container-cimak">
+          <h2 class="mb-4 text-xs font-bold uppercase tracking-wide text-cimak-black sm:text-sm">
+            Recomendaciones
+          </h2>
+
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+            {relacionados.slice(0, 8).map((item) => (
+              <ProductoCard producto={item} showCotizar />
+            ))}
+          </div>
+
+          {familiaNombre && (
+            <a
+              href={familiaHrefUrl}
+              class="mt-6 inline-flex min-h-11 items-center rounded-md bg-cimak-black px-6 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-cimak-black/85"
+            >
+              Ver toda la familia {familiaNombre}
+            </a>
+          )}
+        </div>
+      </section>
+    )}
+  </main>
+</Layout>
+
+<script>
+  const galeria = document.querySelector('[data-galeria]');
+  const heroImg = document.getElementById('producto-hero-img');
+
+  if (galeria && heroImg) {
+    const botones = [...galeria.querySelectorAll('[data-galeria-src]')];
+    botones.forEach((boton) => {
+      boton.addEventListener('click', () => {
+        heroImg.src = boton.dataset.galeriaSrc;
+        heroImg.alt = boton.dataset.galeriaAlt || heroImg.alt;
+        botones.forEach((otro) => otro.setAttribute('aria-pressed', String(otro === boton)));
+      });
+    });
+  }
+
+  const tabs = document.querySelector('[data-tabs]');
+
+  if (tabs) {
+    const botones = [...tabs.querySelectorAll('[data-tab-btn]')];
+    const paneles = [...tabs.querySelectorAll('[data-tab-panel]')];
+    const escritorio = window.matchMedia('(min-width: 768px)');
+
+    const activar = (id) => {
+      botones.forEach((boton) => {
+        const activo = boton.dataset.tabBtn === id;
+        boton.setAttribute('aria-expanded', String(activo));
+        boton.classList.toggle('bg-cimak-black', activo);
+        boton.classList.toggle('text-white', activo);
+        boton.classList.toggle('bg-white', !activo);
+        boton.classList.toggle('text-cimak-black', !activo);
+        boton.classList.toggle('hover:bg-black/5', !activo);
+      });
+      paneles.forEach((panel) => {
+        panel.classList.toggle('hidden', panel.dataset.tabPanel !== id);
+      });
+    };
+
+    botones.forEach((boton) => {
+      boton.addEventListener('click', () => {
+        const id = boton.dataset.tabBtn;
+        const yaActivo = boton.getAttribute('aria-expanded') === 'true';
+        if (yaActivo && !escritorio.matches) {
+          boton.setAttribute('aria-expanded', 'false');
+          boton.classList.remove('bg-cimak-black', 'text-white');
+          boton.classList.add('bg-white', 'text-cimak-black', 'hover:bg-black/5');
+          tabs.querySelector(`[data-tab-panel="${id}"]`)?.classList.add('hidden');
+          return;
+        }
+        activar(id);
+      });
+    });
+
+    escritorio.addEventListener('change', () => {
+      const abierto = botones.find((boton) => boton.getAttribute('aria-expanded') === 'true');
+      activar(abierto?.dataset.tabBtn ?? botones[0]?.dataset.tabBtn);
+    });
+  }
+</script>

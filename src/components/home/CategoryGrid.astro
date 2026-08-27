@@ -26,18 +26,19 @@ if (!items.length) {
   aria-label="Productos por categoría"
 >
   <div class="container-cimak">
-    <div class="mb-5 hidden justify-center sm:mb-6 md:flex">
+    <div class="mb-5 flex justify-center sm:mb-6">
       <h2 class="rounded-md bg-cimak-black px-5 py-2 text-center text-sm font-bold uppercase tracking-wide text-white sm:px-7 sm:text-base">
         Productos por categoría
       </h2>
     </div>
 
-    <!-- Desktop -->
-    <div class="hidden gap-4 md:grid md:grid-cols-3 lg:gap-10">
+    <!-- Desktop: grilla 2×3 como Figma -->
+    <div class="hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
       {items.map((item) => (
         <a
           href={item.href}
-          class="group relative block aspect-[3/4] w-full overflow-hidden rounded-xl"
+          class="group relative block aspect-[4/5] w-full overflow-hidden rounded-xl"
+          aria-label={item.title || 'Ver categoría'}
         >
           {item.imageUrl ? (
             <img
@@ -45,7 +46,7 @@ if (!items.length) {
               alt={item.title || 'Categoría'}
               class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
               width={400}
-              height={520}
+              height={500}
               loading="lazy"
               decoding="async"
             />
@@ -55,21 +56,21 @@ if (!items.length) {
               alt={item.title || 'Categoría'}
               class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
               width={400}
-              height={520}
+              height={500}
               loading="lazy"
               decoding="async"
             />
           ) : (
             <div class="absolute inset-0 bg-cimak-black/80" />
           )}
-          <span class="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-white/90 px-4 py-1 text-xs font-semibold text-white backdrop-blur-sm transition group-hover:bg-white group-hover:text-cimak-black sm:text-sm">
-            ver más
+          <span class="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-white/90 bg-black/20 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-white backdrop-blur-sm transition group-hover:bg-white group-hover:text-cimak-black sm:text-sm">
+            Ver más
           </span>
         </a>
       ))}
     </div>
 
-    <!-- Mobile: carrusel dentro del margen-->
+    <!-- Mobile: carrusel -->
     <div class="md:hidden">
       <div
         id="category-viewport"
@@ -84,9 +85,10 @@ if (!items.length) {
           {items.map((item, index) => (
             <a
               href={item.href}
-              class="category-slide relative aspect-[3/4] w-[70%] max-w-[260px] shrink-0 overflow-hidden rounded-xl select-none"
+              class="category-slide relative aspect-[4/5] w-[70%] max-w-[260px] shrink-0 overflow-hidden rounded-xl select-none"
               data-index={index}
               draggable="false"
+              aria-label={item.title || 'Ver categoría'}
             >
               {item.imageUrl ? (
                 <img
@@ -94,7 +96,7 @@ if (!items.length) {
                   alt={item.title || 'Categoría'}
                   class="pointer-events-none absolute inset-0 h-full w-full object-cover"
                   width={260}
-                  height={350}
+                  height={325}
                   loading="lazy"
                   decoding="async"
                   draggable="false"
@@ -105,7 +107,7 @@ if (!items.length) {
                   alt={item.title || 'Categoría'}
                   class="pointer-events-none absolute inset-0 h-full w-full object-cover"
                   width={260}
-                  height={350}
+                  height={325}
                   loading="lazy"
                   decoding="async"
                   draggable="false"
@@ -113,8 +115,8 @@ if (!items.length) {
               ) : (
                 <div class="pointer-events-none absolute inset-0 bg-cimak-black/80" />
               )}
-              <span class="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-white/90 px-3 py-1 text-xs font-semibold text-white">
-                ver más
+              <span class="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-white/90 bg-black/20 px-3 py-1 text-xs font-semibold uppercase text-white">
+                Ver más
               </span>
             </a>
           ))}

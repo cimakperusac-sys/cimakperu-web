@@ -3,12 +3,14 @@ import Layout from '../layouts/Layout.astro';
 import Hero from '../components/home/Hero.astro';
 import PromoBanners from '../components/home/PromoBanners.astro';
 import CategoryGrid from '../components/home/CategoryGrid.astro';
+import ProductosPorFamilia from '../components/home/ProductosPorFamilia.astro';
 import BlogBanner from '../components/home/BlogBanner.astro';
 import ContactSection from '../components/home/ContactSection.astro';
 import Nosotros from '../components/home/Nosotros.astro';
 import Caracteristicas from '../components/home/Caracteristicas.astro';
 import Comentarios from '../components/home/Comentarios.astro';
 import { getHome } from '../lib/api';
+import { categoriesFallback } from '../data/categories';
 import type { WebTestimonio } from '../lib/types/web';
 
 const home = await getHome();
@@ -31,20 +33,35 @@ function mapTestimonios(list: WebTestimonio[]) {
   });
 }
 
-const categoryItems = familias
-  .filter((f) => f.slug && f.url)
+const categoryItemsFromApi = familias
+  .filter((f) => f.slug)
   .map((f) => ({
     title: f.nombre,
     href: `/familias/${f.slug}`,
-    imageUrl: f.url as string,
+    imageUrl: f.url || undefined,
   }));
+
+/** CRM primero; si no hay familias web, usa las 6 del Figma */
+const categoryItems =
+  categoryItemsFromApi.length > 0
+    ? categoryItemsFromApi
+    : categoriesFallback.map((c) => ({
+        title: c.title,
+        href: c.href,
+        image: c.image,
+      }));
 
 const reviews = testimoniosApi.length ? mapTestimonios(testimoniosApi) : [];
 
+/** Con productos del CRM la vista rica manda en móvil; las tarjetas de familia quedan en desktop. */
+const familiasConProductos = familias.filter((f) => (f.productos?.length ?? 0) > 0);
+const hayProductos = familiasConProductos.length > 0;
+
 const hasAnyContent =
   Boolean(bloques.hero?.url) ||
-  Boolean(bloques.promo_catalogo) ||
+  Boolean(bloques.promo_catalogo?.url) ||
   categoryItems.length > 0 ||
+  hayProductos ||
   Boolean(bloques.blog_banner) ||
   Boolean(bloques.nosotros) ||
   Boolean(bloques.caracteristicas) ||
@@ -61,8 +78,11 @@ const hasAnyContent =
 >
   <main>
     <Hero bloque={bloques.hero} />
-    <PromoBanners bloque={bloques.promo_catalogo} />
-    {categoryItems.length > 0 && <CategoryGrid items={categoryItems} />}
+    <PromoBanners />
+    <div class:list={[hayProductos && 'hidden md:block']}>
+      <CategoryGrid items={categoryItems} />
+    </div>
+    <ProductosPorFamilia familias={familiasConProductos} />
     <BlogBanner bloque={bloques.blog_banner} />
     <Nosotros bloque={bloques.nosotros} />
     <Caracteristicas bloque={bloques.caracteristicas} />

@@ -17,6 +17,8 @@ interface Props {
 	showHeader?: boolean;
 	showFooter?: boolean;
 	showWhatsApp?: boolean;
+	/** Nodos JSON-LD extra que se añaden al @graph global de la página. */
+	schemas?: Record<string, unknown>[];
 }
 
 const {
@@ -31,6 +33,7 @@ const {
 	showHeader = true,
 	showFooter = true,
 	showWhatsApp = true,
+	schemas = [],
 } = Astro.props;
 
 const siteUrl = (Astro.site?.href || site.url).replace(/\/$/, '');
@@ -82,6 +85,7 @@ const jsonLd = {
 			},
 			inLanguage: 'es-PE',
 		},
+		...schemas,
 	],
 };
 ---

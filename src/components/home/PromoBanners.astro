@@ -1,109 +1,158 @@
 ---
-import type { WebBloque } from '../../lib/types/web';
-import { cmsHtml, cmsPlain, cmsTitleHtml } from '../../lib/cmsHtml';
+import { Image } from 'astro:assets';
+import catalogoImg from '../../assets/home/catalogo.svg';
+import bannerAluzincImg from '../../assets/home/imagen-uno.svg';
 
-interface Props {
-  bloque?: WebBloque | null;
-}
-
-type Slide = { url: string; href?: string; alt?: string };
-
-const { bloque } = Astro.props;
-if (!bloque) {
-  return null;
-}
-
-const extra = (bloque.extra && typeof bloque.extra === 'object' ? bloque.extra : {}) as Record<
-  string,
-  unknown
->;
-const slidesFromExtra = Array.isArray(extra.slides) ? (extra.slides as Slide[]) : [];
-const slides: Slide[] =
-  slidesFromExtra.filter((s) => s?.url).length > 0
-    ? slidesFromExtra.filter((s) => s?.url)
-    : bloque.url
-      ? [{ url: bloque.url, href: bloque.cta_url || '/catalogo', alt: cmsPlain(bloque.titulo) }]
-      : [];
-
-if (!slides.length && !bloque.titulo) {
-  return null;
-}
-
-const catalogHref = bloque.cta_url || '/catalogo';
-const titleHtml = cmsTitleHtml(bloque.titulo) || cmsTitleHtml('Catálogo de productos');
-const subHtml = cmsHtml(bloque.subtitulo);
-const catalogCta = bloque.cta_texto || 'Ver';
-const catalogImg = typeof extra.catalogo_url === 'string' ? extra.catalogo_url : null;
-const aria = cmsPlain(bloque.titulo) || 'Promociones';
+const slides = [
+  {
+    image: bannerAluzincImg,
+    alt: 'Aluzinc para tu techo',
+    href: '/productos/aluzinc',
+  },
+];
 ---
 
-<section id="promociones" class="reveal-on-scroll w-full" aria-label={aria}>
+<section id="promociones" class="reveal-on-scroll w-full" aria-label="Promociones">
   <div class="relative grid grid-cols-1 items-stretch lg:grid-cols-2">
+    <!-- Izquierda amarilla -->
     <a
-      href={catalogHref}
-      class="group relative z-10 flex min-h-[180px] items-center overflow-hidden bg-cimak-yellow px-6 py-8 lg:min-h-full lg:px-8"
+      href="/catalogo"
+      class="group relative z-10 hidden min-h-full items-center overflow-visible bg-cimak-yellow lg:flex"
     >
-      <div class="relative z-30 flex items-center gap-5">
+      <!-- Texto + VER + flecha (junto al texto, no sobre el catálogo) -->
+      <div class="promo-content-left relative z-30 flex items-center gap-5 py-5 pr-4 xl:gap-6">
         <div class="flex min-w-0 flex-col items-start gap-3">
-          <div class="cms-prose cms-prose--title text-xl font-extrabold uppercase leading-tight tracking-tight text-cimak-black xl:text-2xl" set:html={titleHtml} />
-          {subHtml && <div class="cms-prose text-sm text-cimak-black/80" set:html={subHtml} />}
+          <h2 class="text-xl font-extrabold uppercase leading-tight tracking-tight text-cimak-black xl:text-2xl">
+            Catálogo <br /> de productos
+          </h2>
           <span class="inline-block bg-cimak-black px-5 py-1.5 text-sm font-bold uppercase tracking-wider text-white">
-            {catalogCta}
+            Ver
           </span>
         </div>
+
+        <span
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cimak-black text-white transition group-hover:scale-105"
+          aria-hidden="true"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </span>
       </div>
-      {catalogImg && (
-        <img
-          src={catalogImg}
+
+      <!-- Catálogo más grande, solapa el verde -->
+      <div class="pointer-events-none absolute top-1/2 right-0 z-20 w-[72%] max-w-[480px] translate-x-[42%] -translate-y-1/2">
+        <Image
+          src={catalogoImg}
           alt=""
-          class="pointer-events-none absolute top-1/2 right-0 z-20 hidden w-[55%] max-w-[420px] translate-x-[30%] -translate-y-1/2 drop-shadow-xl lg:block"
-          loading="lazy"
+          class="h-auto w-full drop-shadow-xl"
+          width={339}
+          height={223}
+          loading="eager"
           decoding="async"
         />
-      )}
+      </div>
     </a>
 
-    {slides.length > 0 && (
-      <div id="promo-carousel" class="relative z-0 overflow-hidden bg-[#2a6aa8]" data-slides={slides.length}>
-        {slides.map((slide, index) => (
-          <a
-            href={slide.href || catalogHref}
-            class:list={[
-              'promo-slide block w-full transition-opacity duration-500',
-              index === 0 ? 'relative z-10 opacity-100' : 'pointer-events-none absolute inset-0 z-0 opacity-0',
-            ]}
-            data-index={index}
-            aria-hidden={index !== 0}
-          >
-            <img
-              src={slide.url}
-              alt={slide.alt || aria}
-              class="block h-auto w-full object-cover"
-              loading={index === 0 ? 'eager' : 'lazy'}
-              decoding="async"
+    <!-- Derecha: imagen producto -->
+    <div id="promo-carousel" class="relative z-0 overflow-hidden bg-[#2a6aa8]" data-slides={slides.length}>
+      {slides.map((slide, index) => (
+        <a
+          href={slide.href}
+          class:list={[
+            'promo-slide block w-full transition-opacity duration-500',
+            index === 0 ? 'relative z-10 opacity-100' : 'pointer-events-none absolute inset-0 z-0 opacity-0',
+          ]}
+          data-index={index}
+          aria-hidden={index !== 0}
+        >
+          <Image
+            src={slide.image}
+            alt={slide.alt}
+            class="block h-auto w-full"
+            width={900}
+            height={280}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </a>
+      ))}
+
+      {slides.length > 1 && (
+        <div class="absolute bottom-3 right-4 z-20 flex gap-2">
+          {slides.map((_, index) => (
+            <button
+              type="button"
+              class:list={[
+                'promo-dot h-2.5 w-2.5 rounded-full transition',
+                index === 0 ? 'bg-white' : 'bg-white/40',
+              ]}
+              data-index={index}
+              aria-label={`Ir al slide ${index + 1}`}
             />
-          </a>
-        ))}
-      </div>
-    )}
+          ))}
+        </div>
+      )}
+    </div>
   </div>
 </section>
+
+<style>
+  .promo-content-left {
+    padding-left: var(--spacing-gutter);
+  }
+
+  @media (min-width: 1600px) {
+    .promo-content-left {
+      padding-left: calc((100vw - var(--container-cimak)) / 2 + var(--spacing-gutter));
+    }
+  }
+</style>
 
 {slides.length > 1 && (
   <script>
     const root = document.getElementById('promo-carousel');
     if (root) {
       const slides = [...root.querySelectorAll('.promo-slide')];
-      let i = 0;
-      setInterval(() => {
-        slides[i]?.classList.remove('relative', 'z-10', 'opacity-100');
-        slides[i]?.classList.add('pointer-events-none', 'absolute', 'inset-0', 'z-0', 'opacity-0');
-        slides[i]?.setAttribute('aria-hidden', 'true');
-        i = (i + 1) % slides.length;
-        slides[i]?.classList.add('relative', 'z-10', 'opacity-100');
-        slides[i]?.classList.remove('pointer-events-none', 'absolute', 'inset-0', 'z-0', 'opacity-0');
-        slides[i]?.setAttribute('aria-hidden', 'false');
-      }, 4500);
+      const dots = [...root.querySelectorAll('.promo-dot')];
+      let current = 0;
+      let timer;
+
+      const show = (index) => {
+        current = index;
+        slides.forEach((slide, i) => {
+          const active = i === index;
+          slide.classList.toggle('opacity-100', active);
+          slide.classList.toggle('z-10', active);
+          slide.classList.toggle('relative', active);
+          slide.classList.toggle('opacity-0', !active);
+          slide.classList.toggle('z-0', !active);
+          slide.classList.toggle('absolute', !active);
+          slide.classList.toggle('inset-0', !active);
+          slide.classList.toggle('pointer-events-none', !active);
+          slide.setAttribute('aria-hidden', String(!active));
+        });
+        dots.forEach((dot, i) => {
+          dot.classList.toggle('bg-white', i === index);
+          dot.classList.toggle('bg-white/40', i !== index);
+        });
+      };
+
+      const next = () => show((current + 1) % slides.length);
+      const start = () => {
+        timer = window.setInterval(next, 4500);
+      };
+
+      dots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+          window.clearInterval(timer);
+          show(Number(dot.dataset.index));
+          start();
+        });
+      });
+
+      start();
     }
   </script>
 )}
