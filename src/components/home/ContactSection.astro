@@ -19,8 +19,19 @@ const extra = (bloque.extra && typeof bloque.extra === 'object' ? bloque.extra :
   string,
   unknown
 >;
-const bg = bloque.url || (typeof extra.fondo_url === 'string' ? extra.fondo_url : null);
-const persona = typeof extra.persona_url === 'string' ? extra.persona_url : null;
+/**
+ * CMS (bloque contacto):
+ * - Principal → persona PNG (bloque.url)
+ * - Fondo     → paisaje (extra.fondo_url)
+ * Legacy: si solo hay url y no fondo, url era el fondo.
+ */
+const fondoExtra = typeof extra.fondo_url === 'string' && extra.fondo_url ? extra.fondo_url : null;
+const personaExtra =
+  (typeof extra.persona_url === 'string' && extra.persona_url) ||
+  (typeof extra.principal_url === 'string' && extra.principal_url) ||
+  null;
+const bg = fondoExtra || (!personaExtra ? bloque.url : null) || null;
+const persona = personaExtra || (fondoExtra ? bloque.url : null);
 const cta = bloque.cta_texto || 'Enviar';
 const aria = cmsPlain(bloque.titulo) || 'Contáctanos';
 ---
@@ -43,24 +54,23 @@ const aria = cmsPlain(bloque.titulo) || 'Contáctanos';
     <div class="absolute inset-0 bg-[#e8eef5]" aria-hidden="true"></div>
   )}
 
-  <div
-    class="container-cimak relative z-10 flex h-full flex-col items-center justify-center py-10 lg:flex-row lg:items-center lg:justify-center lg:gap-16"
-  >
+  <div class="container-cimak relative z-10 min-h-[420px] lg:min-h-[520px]">
     {persona && (
-      <div class="relative z-20 hidden shrink-0 self-end lg:block">
+      <div class="absolute bottom-0 left-1/2 z-20 hidden max-w-[42%] -translate-x-[72%] lg:block xl:-translate-x-[68%]">
         <img
           src={persona}
           alt="Asesor"
-          class="h-auto w-auto max-h-[560px] origin-bottom object-contain object-bottom drop-shadow-md"
+          class="block h-auto w-auto max-h-[min(580px,92vh)] translate-y-4 object-contain object-bottom drop-shadow-md"
           loading="lazy"
           decoding="async"
         />
       </div>
     )}
 
-    <div
-      class="relative z-10 w-full max-w-md rounded-2xl border border-white/50 bg-white/90 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.18)] backdrop-blur-sm sm:p-6 lg:max-w-[490px]"
-    >
+    <div class="flex min-h-[420px] items-center justify-center py-10 lg:min-h-[520px] lg:justify-end lg:py-12 lg:pr-4 xl:pr-10">
+      <div
+        class="relative z-10 w-full max-w-md rounded-2xl border border-white/50 bg-white/90 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.18)] backdrop-blur-sm sm:p-6 lg:max-w-[490px]"
+      >
       <div class="cms-prose cms-prose--title text-[1.4rem] font-extrabold leading-tight text-cimak-black sm:text-[1.55rem]" set:html={titleHtml} />
       <div
         class="cms-prose mt-1.5 text-[0.8rem] leading-snug text-cimak-black/85 sm:text-[0.875rem]"
@@ -124,6 +134,7 @@ const aria = cmsPlain(bloque.titulo) || 'Contáctanos';
           {cta}
         </button>
       </form>
+      </div>
     </div>
   </div>
 </section>

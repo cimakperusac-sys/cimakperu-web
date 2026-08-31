@@ -1,0 +1,181 @@
+---
+import type { WebAtributo } from '../../lib/types/web';
+
+interface Props {
+  familiaNombre: string;
+  modelo: string;
+  nombreCompleto: string;
+  productoImg: string | null;
+  fondoDesktop: string | null;
+  fondoMobile: string | null;
+  cotizarHref: string;
+  fichaUrl: string | null;
+  atributos?: WebAtributo[];
+  familiaHref?: string;
+}
+
+const {
+  familiaNombre,
+  modelo,
+  nombreCompleto,
+  productoImg,
+  fondoDesktop,
+  fondoMobile,
+  cotizarHref,
+  fichaUrl,
+  atributos = [],
+  familiaHref = '/#productos',
+} = Astro.props;
+
+const fondoMovil = fondoMobile || fondoDesktop;
+---
+
+<section
+  class="producto-hero relative flex min-h-[100svh] w-full flex-col overflow-hidden bg-cimak-black text-white"
+  aria-label={nombreCompleto}
+>
+  <div class="absolute inset-0" data-producto-hero-bg>
+    {fondoDesktop ? (
+      <img
+        src={fondoDesktop}
+        alt=""
+        class="hidden h-full w-full object-cover md:block"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      />
+    ) : null}
+    {fondoMovil ? (
+      <img
+        src={fondoMovil}
+        alt=""
+        class:list={['h-full w-full object-cover', fondoDesktop ? 'md:hidden' : '']}
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      />
+    ) : (
+      <div class="h-full w-full bg-cimak-black" aria-hidden="true"></div>
+    )}
+    <div
+      class="absolute inset-0 bg-gradient-to-b from-transparent via-cimak-black/55 to-cimak-black"
+      aria-hidden="true"
+    ></div>
+    <div
+      class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-cimak-black/70 to-transparent"
+      aria-hidden="true"
+    ></div>
+  </div>
+
+  <div class="container-cimak relative z-10 flex flex-1 flex-col py-4 sm:py-6 lg:py-8">
+    <nav class="text-[0.65rem] text-white/50 sm:text-[0.7rem]" aria-label="Ruta">
+      <a href="/" class="hover:text-white">Inicio</a>
+      {familiaNombre && (
+        <>
+          <span class="mx-1.5">/</span>
+          <a href={familiaHref} class="hover:text-white">{familiaNombre}</a>
+        </>
+      )}
+      <span class="mx-1.5">/</span>
+      <span class="text-white/80">{nombreCompleto}</span>
+    </nav>
+
+    <div class="mt-4 flex flex-1 items-center pb-8 sm:mt-6 sm:pb-12 lg:pb-16">
+      <div class="grid w-full items-center gap-6 sm:gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-4 lg:gap-6">
+        <div class="flex justify-center md:justify-start">
+          <div class="producto-hero__media w-full max-w-[300px] min-[420px]:max-w-[400px] sm:max-w-[480px] md:max-w-none md:translate-x-2 lg:translate-x-6">
+            {productoImg ? (
+              <img
+                id="producto-hero-img"
+                src={productoImg}
+                alt={nombreCompleto}
+                class="producto-hero__img h-auto w-full object-contain"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+              />
+            ) : (
+              <div class="flex aspect-[607/566] w-full items-center justify-center rounded-xl border border-dashed border-white/20 bg-white/5 text-sm text-white/50">
+                Sin imagen de producto
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div class="producto-hero__panel relative flex min-h-[240px] flex-col justify-center sm:min-h-[280px] md:min-h-[420px]">
+          <div class="text-center md:text-left">
+            {familiaNombre && (
+              <p class="text-[2rem] font-black uppercase leading-none tracking-tight text-white min-[420px]:text-[2.75rem] sm:text-5xl md:text-[3.25rem] lg:text-[3.75rem]">
+                {familiaNombre}
+              </p>
+            )}
+            <h1
+              class:list={[
+                'font-black uppercase leading-none tracking-tight text-cimak-yellow',
+                familiaNombre
+                  ? 'mt-1 text-[2rem] min-[420px]:text-[2.75rem] sm:text-5xl md:text-[3.25rem] lg:text-[3.75rem]'
+                  : 'text-[2rem] min-[420px]:text-[2.75rem] sm:text-5xl md:text-[3.25rem] lg:text-[3.75rem]',
+              ]}
+            >
+              {modelo}
+            </h1>
+
+            <div class="mt-5 flex flex-wrap justify-center gap-2.5 md:justify-start lg:mt-7">
+              <a
+                href={cotizarHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex min-h-11 min-w-[140px] items-center justify-center rounded-sm bg-cimak-yellow px-7 text-xs font-bold uppercase tracking-wide text-cimak-black transition hover:brightness-105 sm:text-sm"
+              >
+                Cotizar
+              </a>
+              {fichaUrl && (
+                <a
+                  href={fichaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex min-h-11 min-w-[140px] items-center justify-center rounded-sm border border-white px-7 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-white hover:text-cimak-black sm:text-sm"
+                >
+                  Ficha técnica
+                </a>
+              )}
+            </div>
+          </div>
+
+          {atributos.length > 0 && (
+            <dl class="producto-hero__specs mt-8 grid gap-3 text-center md:absolute md:bottom-0 md:right-0 md:mt-0 md:text-left">
+              {atributos.map((atributo) => (
+                <div>
+                  <dt class="text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-cimak-yellow/90">
+                    {atributo.label}
+                  </dt>
+                  <dd class="mt-0.5 text-sm font-bold text-white sm:text-base">{atributo.valor}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .producto-hero__img {
+    filter: none;
+    box-shadow: none;
+  }
+
+  .producto-hero__media,
+  .producto-hero__panel h1,
+  .producto-hero__panel p,
+  .producto-hero__panel a {
+    text-shadow: none;
+    box-shadow: none;
+  }
+
+  .producto-hero__panel a.bg-cimak-yellow {
+    box-shadow: none;
+  }
+</style>

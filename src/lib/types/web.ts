@@ -76,6 +76,8 @@ export type WebMenuFamilia = {
   href?: string | null;
   total_productos?: number;
   subcategorias: WebMenuSubcategoria[];
+  /** Lista plana cuando la familia no usa subcategorías. */
+  productos?: WebMenuProducto[];
 };
 
 export type WebFamilia = {
@@ -133,6 +135,8 @@ export type WebProducto = {
   atributos?: WebAtributo[];
   color?: string | null;
   url?: string | null;
+  hero_url?: string | null;
+  hero_url_mobile?: string | null;
   ficha_url?: string | null;
   familia?: {
     id: number;

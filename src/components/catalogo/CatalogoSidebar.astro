@@ -113,6 +113,57 @@ if (menu.length === 0) {
                   ))}
                 </div>
               </details>
+            ) : familia.productos && familia.productos.length > 0 ? (
+              <details class="group" open={activa}>
+                <summary
+                  class="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 py-2 text-sm font-extrabold uppercase tracking-wide text-cimak-black"
+                  aria-current={activa ? 'page' : undefined}
+                >
+                  <span>{familia.nombre}</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    class="h-3.5 w-3.5 shrink-0 transition-transform group-open:rotate-180"
+                    aria-hidden="true"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </summary>
+
+                <div class="pb-3">
+                  <a
+                    href={href}
+                    class="inline-flex min-h-9 items-center text-xs font-semibold text-cimak-black/70 hover:text-cimak-black"
+                  >
+                    Ver toda la familia
+                  </a>
+
+                  <ul class="mt-2 list-disc pl-5 marker:text-cimak-black/30">
+                    {familia.productos.map((producto) => {
+                      const url = productoHref(producto);
+                      const activo = Boolean(productoActivo && producto.slug === productoActivo);
+
+                      return url ? (
+                        <li>
+                          <a
+                            href={url}
+                            aria-current={activo ? 'page' : undefined}
+                            class:list={[
+                              'block py-1.5 text-xs transition hover:text-cimak-black lg:py-1',
+                              activo ? 'font-bold text-cimak-black' : 'text-cimak-black/65',
+                            ]}
+                          >
+                            {producto.nombre}
+                          </a>
+                        </li>
+                      ) : null;
+                    })}
+                  </ul>
+                </div>
+              </details>
             ) : (
               <a
                 href={href}

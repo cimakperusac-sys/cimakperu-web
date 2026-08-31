@@ -1,55 +1,87 @@
 ---
 import type { WebBloque } from '../../lib/types/web';
 import { cmsHtml, cmsPlain, cmsTitleHtml } from '../../lib/cmsHtml';
+import logoCimak from '../../assets/logo/logo.svg';
 
 interface Props {
   bloque?: WebBloque | null;
 }
 
 const { bloque } = Astro.props;
-if (!bloque || (!bloque.titulo && !bloque.contenido && !bloque.url)) {
+if (!bloque || (!bloque.titulo && !bloque.contenido && !bloque.url && !bloque.extra)) {
   return null;
 }
 
+const extra = (bloque.extra && typeof bloque.extra === 'object' ? bloque.extra : {}) as Record<
+  string,
+  unknown
+>;
+
+/** CMS: Principal = imagen izquierda (bloque.url) */
+const imagen =
+  (typeof extra.principal_url === 'string' && extra.principal_url) ||
+  (typeof extra.imagen_url === 'string' && extra.imagen_url) ||
+  bloque.url ||
+  null;
+
 const titleHtml = cmsTitleHtml(bloque.titulo) || cmsTitleHtml('¿Quiénes somos?');
 const bodyHtml = cmsHtml(bloque.contenido || bloque.subtitulo);
-const img = bloque.url || null;
 const aria = cmsPlain(bloque.titulo) || 'Quiénes somos';
 ---
 
-<section id="nosotros" class="reveal-on-scroll w-full bg-[#f3f3f3] py-8 sm:py-14" aria-label={aria}>
+<section
+  id="nosotros"
+  class="reveal-on-scroll w-full bg-[#f3f3f3] py-10 sm:py-12 lg:py-14"
+  aria-label={aria}
+>
   <div class="container-cimak">
-    <div class="mb-5 flex justify-center md:hidden">
-      <div class="rounded-md bg-cimak-yellow px-6 py-2 text-center text-sm font-bold text-cimak-black">
-        <div class="cms-prose cms-prose--title" set:html={titleHtml} />
-      </div>
-    </div>
+    <header class="mb-8 text-center lg:mb-10">
+      <div
+        class="cms-prose cms-prose--title text-[1.65rem] font-extrabold leading-tight text-cimak-black sm:text-[1.85rem] lg:text-[2rem]"
+        set:html={titleHtml}
+      />
+    </header>
 
-    <div class="mb-8 hidden text-center text-2xl font-extrabold text-cimak-black md:block lg:text-[1.75rem]">
-      <div class="cms-prose cms-prose--title" set:html={titleHtml} />
-    </div>
-
-    <div class="rounded-xl border border-cimak-black bg-white px-5 py-7 md:hidden">
-      {bodyHtml && <div class="cms-prose text-center text-sm text-cimak-black" set:html={bodyHtml} />}
-      {img && (
-        <img src={img} alt={aria} class="mt-5 h-auto w-full rounded-lg object-cover" loading="lazy" decoding="async" />
-      )}
-    </div>
-
-    <div class="hidden items-stretch gap-8 md:grid md:grid-cols-2 lg:gap-10">
-      {img ? (
-        <div class="overflow-hidden rounded-2xl">
-          <img src={img} alt={aria} class="h-full w-full object-cover object-top" loading="lazy" decoding="async" />
+    <div
+      class:list={[
+        'mx-auto flex w-full flex-col items-center gap-8',
+        imagen ? 'lg:max-w-[920px] lg:flex-row lg:items-center lg:justify-between lg:gap-10 xl:max-w-[980px] xl:gap-14' : 'max-w-2xl',
+      ]}
+    >
+      {imagen && (
+        <div class="w-full shrink-0 overflow-hidden rounded-[10px] sm:w-auto">
+          <img
+            src={imagen}
+            alt={aria}
+            class="block h-auto w-full max-w-[400px] object-cover object-center sm:w-[min(100%,400px)]"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
-      ) : (
-        <div class="rounded-2xl bg-cimak-black/5"></div>
       )}
-      <div class="flex flex-col items-center justify-center px-2">
-        {bodyHtml && <div class="cms-prose text-center text-base text-cimak-black" set:html={bodyHtml} />}
+
+      <div class="w-full min-w-0 lg:max-w-[480px]">
+        <div class="mb-5 flex justify-center">
+          <img
+            src={logoCimak.src}
+            width={logoCimak.width}
+            height={logoCimak.height}
+            alt="Coberturas CIMAK"
+            class="h-auto w-[min(220px,75%)]"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        {bodyHtml && (
+          <div
+            class="cms-prose text-left text-[0.9rem] leading-[1.65] text-cimak-black sm:text-[0.95rem] lg:text-base"
+            set:html={bodyHtml}
+          />
+        )}
         {bloque.cta_texto && bloque.cta_url && (
           <a
             href={bloque.cta_url}
-            class="mt-6 inline-block rounded-md bg-cimak-yellow px-5 py-2 text-sm font-bold text-cimak-black"
+            class="mt-6 inline-block rounded-md bg-cimak-yellow px-8 py-2.5 text-sm font-bold text-cimak-black transition hover:brightness-105"
           >
             {bloque.cta_texto}
           </a>

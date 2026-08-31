@@ -1,8 +1,10 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import CatalogoSidebar from '../../components/catalogo/CatalogoSidebar.astro';
 import ProductoCard from '../../components/catalogo/ProductoCard.astro';
+import ProductoHero from '../../components/catalogo/ProductoHero.astro';
 import { getFamilia, getFamilias, getProducto } from '../../lib/api';
-import { cotizarHref } from '../../lib/catalogo';
+import { cotizarHref, getMenuConFallback } from '../../lib/catalogo';
 import { cmsHtml, cmsPlain } from '../../lib/cmsHtml';
 import { site } from '../../data/site';
 
@@ -18,7 +20,6 @@ export async function getStaticPaths() {
     }
   }
 
-  // No chocar con /productos/aluzinc.astro estático
   slugs.delete('aluzinc');
 
   return [...slugs].map((slug) => ({ params: { slug } }));
@@ -36,9 +37,9 @@ if (!producto) {
 
 const nombre = producto.nombre;
 const familiaNombre = producto.familia?.nombre?.trim() || '';
-const familiaHrefUrl = producto.familia?.slug ? `/familias/${producto.familia.slug}` : '/#productos';
+const familiaSlug = producto.familia?.slug || '';
+const familiaHrefUrl = familiaSlug ? `/familias/${familiaSlug}` : '/#productos';
 
-/** El hero separa familia (blanco) y modelo (amarillo) como en el diseño. */
 const modelo = (() => {
   if (!familiaNombre) return nombre;
   const limpio = nombre.trim();
@@ -49,7 +50,10 @@ const modelo = (() => {
 })();
 
 const galeria = (producto.galeria ?? []).filter((g) => g?.url);
-const heroImg = producto.url || galeria[0]?.url || null;
+const productoImg = producto.url || galeria[0]?.url || null;
+const fondoDesktop = producto.hero_url || producto.familia?.url || null;
+const fondoMobile = producto.hero_url_mobile || producto.hero_url || producto.familia?.url || null;
+
 const miniaturas = [
   ...(producto.url ? [{ url: producto.url, alt: nombre }] : []),
   ...galeria.map((g) => ({ url: g.url as string, alt: g.alt || g.titulo || nombre })),
@@ -59,6 +63,7 @@ const atributos = (producto.atributos ?? []).filter((a) => a?.label || a?.valor)
 const colores = (producto.colores ?? []).filter((c) => c?.hex || c?.url || c?.codigo);
 const relacionados = producto.relacionados ?? [];
 const fichaUrl = producto.ficha_url || null;
+const menu = producto.menu?.length ? producto.menu : await getMenuConFallback();
 
 const tabs = [
   { id: 'detalles', label: 'Detalles', html: cmsHtml(producto.especificaciones_web || producto.especificaciones_tecnicas || '') },
@@ -67,7 +72,6 @@ const tabs = [
 ].filter((tab) => tab.html);
 
 const filaTab = ['md:row-start-1', 'md:row-start-2', 'md:row-start-3'];
-/** Filas explícitas: los tabs se reparten la altura del panel como en el diseño. */
 const filasTabs = ['', 'md:grid-rows-1', 'md:grid-rows-2', 'md:grid-rows-3'][tabs.length] ?? '';
 
 const canonical = `/productos/${slug}`;
@@ -79,13 +83,14 @@ const seoDesc =
 
 const siteUrl = (Astro.site?.href || site.url).replace(/\/$/, '');
 const absoluta = (path: string) => new URL(path, `${siteUrl}/`).href;
+const heroSeoImg = productoImg || fondoDesktop || undefined;
 
 const schemas = [
   {
     '@type': 'Product',
     name: nombre,
     description: seoDesc,
-    ...(heroImg ? { image: heroImg } : {}),
+    ...(heroSeoImg ? { image: heroSeoImg } : {}),
     brand: { '@type': 'Brand', name: 'CIMAK' },
     sku: String(producto.id),
     ...(familiaNombre ? { category: familiaNombre } : {}),
@@ -112,99 +117,34 @@ const schemas = [
 <Layout
   title={seoTitle}
   description={seoDesc}
-  image={heroImg || undefined}
+  image={heroSeoImg}
   imageAlt={nombre}
   canonical={canonical}
   type="product"
   schemas={schemas}
 >
   <main>
-    <section class="bg-cimak-black text-white">
-      <div class="container-cimak py-8 sm:py-12 lg:py-16">
-        <nav class="text-[0.7rem] text-white/55" aria-label="Ruta">
-          <a href="/" class="hover:text-white">Inicio</a>
-          {familiaNombre && (
-            <>
-              <span class="mx-1.5">/</span>
-              <a href={familiaHrefUrl} class="hover:text-white">{familiaNombre}</a>
-            </>
-          )}
-          <span class="mx-1.5">/</span>
-          <span class="text-white/85">{nombre}</span>
-        </nav>
+    <ProductoHero
+      familiaNombre={familiaNombre}
+      modelo={modelo}
+      nombreCompleto={nombre}
+      productoImg={productoImg}
+      fondoDesktop={fondoDesktop}
+      fondoMobile={fondoMobile}
+      cotizarHref={cotizarHref(nombre)}
+      fichaUrl={fichaUrl}
+      atributos={atributos}
+      familiaHref={familiaHrefUrl}
+    />
 
-        <div class="mt-5 grid items-center gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-10">
-          <div class="order-1 flex justify-center">
-            {heroImg ? (
-              <img
-                id="producto-hero-img"
-                src={heroImg}
-                alt={nombre}
-                class="h-auto max-h-[46vh] w-full object-contain drop-shadow-2xl lg:max-h-[440px]"
-                loading="eager"
-                fetchpriority="high"
-                decoding="async"
-              />
-            ) : (
-              <div class="flex aspect-[4/3] w-full items-center justify-center rounded-xl border border-dashed border-white/25 text-sm text-white/50">
-                Sin imagen
-              </div>
-            )}
-          </div>
+    <div class="bg-[#f3f3f3] py-6 lg:py-8">
+      <div class="container-cimak">
+        <div class="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8">
+          <CatalogoSidebar menu={menu} familiaActiva={familiaSlug} productoActivo={slug} />
 
-          <div class="order-2 min-w-0">
-            {familiaNombre && modelo !== nombre && (
-              <p class="text-2xl font-black uppercase leading-none tracking-tight break-words sm:text-4xl lg:text-5xl">
-                {familiaNombre}
-              </p>
-            )}
-            <h1
-              class:list={[
-                'font-black uppercase leading-none tracking-tight break-words text-cimak-yellow',
-                familiaNombre && modelo !== nombre
-                  ? 'mt-1 text-2xl sm:text-4xl lg:text-5xl'
-                  : 'text-[1.7rem] sm:text-4xl lg:text-5xl',
-              ]}
-            >
-              {modelo}
-            </h1>
-
-            <div class="mt-5 flex flex-wrap gap-2.5">
-              <a
-                href={cotizarHref(nombre)}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex min-h-11 items-center rounded-sm bg-cimak-yellow px-6 text-xs font-bold uppercase tracking-wide text-cimak-black transition hover:brightness-105 sm:text-sm"
-              >
-                Cotizar
-              </a>
-              {fichaUrl && (
-                <a
-                  href={fichaUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex min-h-11 items-center rounded-sm border border-white/70 px-6 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-white hover:text-cimak-black sm:text-sm"
-                >
-                  Ficha técnica
-                </a>
-              )}
-            </div>
-
-            {atributos.length > 0 && (
-              <dl class="mt-6 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/15 pt-5">
-                {atributos.map((atributo) => (
-                  <div>
-                    <dt class="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white/55">
-                      {atributo.label}
-                    </dt>
-                    <dd class="mt-0.5 text-sm font-bold text-white sm:text-base">{atributo.valor}</dd>
-                  </div>
-                ))}
-              </dl>
-            )}
-
+          <div class="min-w-0 space-y-6 lg:space-y-8">
             {miniaturas.length > 1 && (
-              <div class="no-scrollbar mt-6 flex gap-2 overflow-x-auto pb-1" data-galeria>
+              <div class="no-scrollbar flex gap-2 overflow-x-auto rounded-xl bg-white p-3 shadow-sm" data-galeria>
                 {miniaturas.map((item, index) => (
                   <button
                     type="button"
@@ -212,7 +152,7 @@ const schemas = [
                     data-galeria-alt={item.alt}
                     aria-label={`Ver ${item.alt}`}
                     aria-pressed={index === 0 ? 'true' : 'false'}
-                    class="h-14 w-14 shrink-0 overflow-hidden rounded-sm border border-white/20 bg-white/10 transition aria-pressed:border-cimak-yellow sm:h-16 sm:w-16"
+                    class="h-16 w-16 shrink-0 overflow-hidden rounded border border-black/10 bg-neutral-50 transition aria-pressed:border-cimak-yellow sm:h-20 sm:w-20"
                   >
                     <img
                       src={item.url}
@@ -225,147 +165,141 @@ const schemas = [
                 ))}
               </div>
             )}
+
+            {colores.length > 0 && (
+              <section class="reveal-on-scroll rounded-xl bg-white p-4 shadow-sm sm:p-6" aria-label="Colores disponibles">
+                <h2 class="text-xs font-bold uppercase tracking-wide text-cimak-black sm:text-sm">
+                  Colores Disponibles
+                </h2>
+
+                <div class="no-scrollbar -mx-1 mt-4 flex gap-1.5 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:justify-center sm:overflow-visible">
+                  {colores.map((color) => (
+                    <div class="w-[68px] shrink-0 overflow-hidden rounded-[3px] bg-white shadow-[0_1px_6px_rgba(0,0,0,0.14)] sm:w-[76px]">
+                      {color.url ? (
+                        <img
+                          src={color.url}
+                          alt={color.nombre || color.codigo || 'Color'}
+                          class="block h-12 w-full object-cover sm:h-14"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <span
+                          class="block h-12 w-full sm:h-14"
+                          style={`background-color:${color.hex}`}
+                          aria-hidden="true"
+                        ></span>
+                      )}
+                      <span class="block px-1.5 py-1.5">
+                        {color.codigo && (
+                          <span class="block truncate text-[8px] font-bold leading-tight text-cimak-black sm:text-[9px]">
+                            {color.codigo}
+                          </span>
+                        )}
+                        {color.nombre && (
+                          <span class="mt-0.5 block truncate text-[7px] leading-tight text-cimak-black/60 sm:text-[8px]">
+                            {color.nombre}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <p class="mt-4 text-center text-[10px] text-cimak-black/55 sm:text-[11px]">
+                  *Colores disponibles según stock o requerimiento por proyecto establecido.
+                </p>
+              </section>
+            )}
+
+            {tabs.length > 0 && (
+              <section class="reveal-on-scroll rounded-xl bg-white p-0 shadow-sm sm:p-0" aria-label="Información del producto">
+                {tabs.length === 1 ? (
+                  <div class="p-5 sm:p-7">
+                    <h2 class="mb-3 text-sm font-bold uppercase tracking-wide text-cimak-black">
+                      {tabs[0].label}
+                    </h2>
+                    <div class="cms-prose text-sm text-cimak-black/85" set:html={tabs[0].html} />
+                  </div>
+                ) : (
+                  <div
+                    class:list={[
+                      'grid gap-2 overflow-hidden rounded-xl md:grid-cols-[200px_minmax(0,1fr)] md:gap-0',
+                      filasTabs,
+                    ]}
+                    data-tabs
+                  >
+                    {tabs.map((tab, index) => (
+                      <>
+                        <button
+                          type="button"
+                          data-tab-btn={tab.id}
+                          aria-expanded={index === 0 ? 'true' : 'false'}
+                          aria-controls={`panel-${tab.id}`}
+                          class:list={[
+                            'flex min-h-12 items-center justify-between gap-3 px-5 text-left text-sm font-semibold transition md:col-start-1 md:justify-start md:border-b md:border-black/5',
+                            filaTab[index],
+                            index === 0
+                              ? 'bg-cimak-black text-white'
+                              : 'bg-white text-cimak-black hover:bg-black/5',
+                          ]}
+                        >
+                          <span>{tab.label}</span>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            class="h-3.5 w-3.5 shrink-0 md:hidden"
+                            aria-hidden="true"
+                          >
+                            <path d="m6 9 6 6 6-6" />
+                          </svg>
+                        </button>
+
+                        <div
+                          id={`panel-${tab.id}`}
+                          data-tab-panel={tab.id}
+                          class:list={[
+                            'cms-prose px-5 pb-5 text-sm text-cimak-black/85 md:col-start-2 md:row-start-1 md:row-end-[-1] md:px-8 md:py-7',
+                            index !== 0 && 'hidden',
+                          ]}
+                          set:html={tab.html}
+                        />
+                      </>
+                    ))}
+                  </div>
+                )}
+              </section>
+            )}
+
+            {relacionados.length > 0 && (
+              <section class="reveal-on-scroll rounded-xl bg-white p-4 shadow-sm sm:p-6" aria-label="Recomendaciones">
+                <h2 class="mb-4 text-xs font-bold uppercase tracking-wide text-cimak-black sm:text-sm">
+                  Recomendaciones
+                </h2>
+
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3 lg:gap-5">
+                  {relacionados.slice(0, 6).map((item) => (
+                    <ProductoCard producto={item} showCotizar />
+                  ))}
+                </div>
+
+                {familiaNombre && (
+                  <a
+                    href={familiaHrefUrl}
+                    class="mt-6 inline-flex min-h-11 items-center rounded-md bg-cimak-black px-6 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-cimak-black/85"
+                  >
+                    Ver toda la familia {familiaNombre}
+                  </a>
+                )}
+              </section>
+            )}
           </div>
         </div>
       </div>
-    </section>
-
-    {colores.length > 0 && (
-      <section class="reveal-on-scroll bg-white py-8 sm:py-12" aria-label="Colores disponibles">
-        <div class="container-cimak">
-          <h2 class="text-xs font-bold uppercase tracking-wide text-cimak-black sm:text-sm">
-            Colores Disponibles
-          </h2>
-
-          <div class="no-scrollbar -mx-4 mt-4 flex gap-1.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0">
-            {colores.map((color) => (
-              <div class="w-[68px] shrink-0 overflow-hidden rounded-[3px] bg-white shadow-[0_1px_6px_rgba(0,0,0,0.14)] sm:w-[76px]">
-                {color.url ? (
-                  <img
-                    src={color.url}
-                    alt={color.nombre || color.codigo || 'Color'}
-                    class="block h-12 w-full object-cover sm:h-14"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                ) : (
-                  <span
-                    class="block h-12 w-full sm:h-14"
-                    style={`background-color:${color.hex}`}
-                    aria-hidden="true"
-                  ></span>
-                )}
-                <span class="block px-1.5 py-1.5">
-                  {color.codigo && (
-                    <span class="block truncate text-[8px] font-bold leading-tight text-cimak-black sm:text-[9px]">
-                      {color.codigo}
-                    </span>
-                  )}
-                  {color.nombre && (
-                    <span class="mt-0.5 block truncate text-[7px] leading-tight text-cimak-black/60 sm:text-[8px]">
-                      {color.nombre}
-                    </span>
-                  )}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <p class="mt-4 text-center text-[10px] text-cimak-black/55 sm:text-[11px]">
-            *Colores disponibles según stock o requerimiento por proyecto establecido.
-          </p>
-        </div>
-      </section>
-    )}
-
-    {tabs.length > 0 && (
-      <section class="reveal-on-scroll bg-[#f3f3f3] py-8 sm:py-12" aria-label="Información del producto">
-        <div class="container-cimak">
-          {tabs.length === 1 ? (
-            <div class="rounded-lg bg-white p-5 sm:p-7">
-              <h2 class="mb-3 text-sm font-bold uppercase tracking-wide text-cimak-black">
-                {tabs[0].label}
-              </h2>
-              <div class="cms-prose text-sm text-cimak-black/85" set:html={tabs[0].html} />
-            </div>
-          ) : (
-            <div
-              class:list={[
-                'grid gap-2 overflow-hidden rounded-lg bg-white md:grid-cols-[200px_minmax(0,1fr)] md:gap-0',
-                filasTabs,
-              ]}
-              data-tabs
-            >
-              {tabs.map((tab, index) => (
-                <>
-                  <button
-                    type="button"
-                    data-tab-btn={tab.id}
-                    aria-expanded={index === 0 ? 'true' : 'false'}
-                    aria-controls={`panel-${tab.id}`}
-                    class:list={[
-                      'flex min-h-12 items-center justify-between gap-3 px-5 text-left text-sm font-semibold transition md:col-start-1 md:justify-start md:border-b md:border-black/5',
-                      filaTab[index],
-                      index === 0
-                        ? 'bg-cimak-black text-white'
-                        : 'bg-white text-cimak-black hover:bg-black/5',
-                    ]}
-                  >
-                    <span>{tab.label}</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                      class="h-3.5 w-3.5 shrink-0 md:hidden"
-                      aria-hidden="true"
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </button>
-
-                  <div
-                    id={`panel-${tab.id}`}
-                    data-tab-panel={tab.id}
-                    class:list={[
-                      'cms-prose px-5 pb-5 text-sm text-cimak-black/85 md:col-start-2 md:row-start-1 md:row-end-[-1] md:px-8 md:py-7',
-                      index !== 0 && 'hidden',
-                    ]}
-                    set:html={tab.html}
-                  />
-                </>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-    )}
-
-    {relacionados.length > 0 && (
-      <section class="reveal-on-scroll bg-white py-8 sm:py-12" aria-label="Recomendaciones">
-        <div class="container-cimak">
-          <h2 class="mb-4 text-xs font-bold uppercase tracking-wide text-cimak-black sm:text-sm">
-            Recomendaciones
-          </h2>
-
-          <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-5">
-            {relacionados.slice(0, 8).map((item) => (
-              <ProductoCard producto={item} showCotizar />
-            ))}
-          </div>
-
-          {familiaNombre && (
-            <a
-              href={familiaHrefUrl}
-              class="mt-6 inline-flex min-h-11 items-center rounded-md bg-cimak-black px-6 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-cimak-black/85"
-            >
-              Ver toda la familia {familiaNombre}
-            </a>
-          )}
-        </div>
-      </section>
-    )}
+    </div>
   </main>
 </Layout>
 
