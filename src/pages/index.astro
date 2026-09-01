@@ -53,7 +53,7 @@ const categoryItems =
 
 const reviews = testimoniosApi.length ? mapTestimonios(testimoniosApi) : [];
 
-/** Con productos del CRM la vista rica manda en móvil; las tarjetas de familia quedan en desktop. */
+/** Familias con productos publicados (vista detallada en escritorio). */
 const familiasConProductos = familias.filter((f) => (f.productos?.length ?? 0) > 0);
 const hayProductos = familiasConProductos.length > 0;
 
@@ -79,10 +79,12 @@ const hasAnyContent =
   <main>
     <Hero bloque={bloques.hero} />
     <PromoBanners />
-    <div class:list={[hayProductos && 'hidden md:block']}>
-      <CategoryGrid items={categoryItems} />
-    </div>
-    <ProductosPorFamilia familias={familiasConProductos} />
+    <CategoryGrid items={categoryItems} />
+    {hayProductos && (
+      <div class="hidden md:block">
+        <ProductosPorFamilia familias={familiasConProductos} />
+      </div>
+    )}
     <BlogBanner bloque={bloques.blog_banner} />
     <Nosotros bloque={bloques.nosotros} />
     <Caracteristicas bloque={bloques.caracteristicas} />

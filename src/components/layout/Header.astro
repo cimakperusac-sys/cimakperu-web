@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import logo from '../../assets/logo/logo.svg';
 import { getMenuConFallback, familiaHref, productoHref } from '../../lib/catalogo';
+import { site } from '../../data/site';
 import type { WebMenuFamilia } from '../../lib/types/web';
 
 interface Props {
@@ -11,7 +12,6 @@ interface Props {
 const { menu: menuProp } = Astro.props;
 const menu = menuProp?.length ? menuProp : await getMenuConFallback();
 
-/** La barra negra muestra las primeras familias; el resto vive en el panel del hamburguesa. */
 const principales = menu.slice(0, 4);
 const rutaActual = Astro.url.pathname;
 
@@ -19,59 +19,137 @@ const esActiva = (familia: WebMenuFamilia) => {
   const href = familiaHref(familia);
   return href !== '/' && rutaActual.startsWith(href);
 };
+
+type SearchItem = {
+  label: string;
+  href: string;
+  type: 'producto' | 'familia';
+  meta?: string;
+};
+
+const searchIndex: SearchItem[] = [];
+
+for (const familia of menu) {
+  const familiaUrl = familiaHref(familia);
+  searchIndex.push({
+    label: familia.nombre,
+    href: familiaUrl,
+    type: 'familia',
+  });
+
+  for (const sub of familia.subcategorias) {
+    for (const producto of sub.productos) {
+      const href = productoHref(producto);
+      if (!href) continue;
+      searchIndex.push({
+        label: producto.nombre,
+        href,
+        type: 'producto',
+        meta: familia.nombre,
+      });
+    }
+  }
+
+  for (const producto of familia.productos ?? []) {
+    const href = productoHref(producto);
+    if (!href) continue;
+    const exists = searchIndex.some((item) => item.href === href);
+    if (!exists) {
+      searchIndex.push({
+        label: producto.nombre,
+        href,
+        type: 'producto',
+        meta: familia.nombre,
+      });
+    }
+  }
+}
 ---
 
-<header class="sticky top-0 z-50 w-full shadow-sm" data-site-header>
-  <div class="bg-cimak-yellow">
-    <div class="container-cimak flex items-center justify-between py-1.5 sm:py-2">
-      <a href="/" class="shrink-0">
+<header class="site-header sticky top-0 z-50 w-full" data-site-header>
+  <!-- Barra superior -->
+  <div class="border-b border-black/5 bg-cimak-yellow">
+    <div class="container-cimak flex h-14 items-center justify-between gap-3 sm:h-[3.75rem]">
+      <a href="/" class="shrink-0 transition-opacity hover:opacity-80">
         <Image
           src={logo}
           alt="CIMAK PERU"
-          width={72}
-          height={26}
-          class="h-5 w-auto sm:h-6"
-          loading="lazy"
+          width={88}
+          height={32}
+          class="h-6 w-auto sm:h-7"
+          loading="eager"
           decoding="async"
         />
       </a>
 
-      <div class="flex items-center gap-1 text-cimak-black">
+      <div class="flex items-center gap-0.5 text-cimak-black sm:gap-1">
         <button
           type="button"
-          aria-label="Buscar"
-          class="inline-flex h-11 w-11 items-center justify-center hover:opacity-70"
+          id="site-search-toggle"
+          aria-label="Buscar productos"
+          aria-expanded="false"
+          aria-controls="site-search-panel"
+          class="site-header__icon-btn"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="sm:h-5 sm:w-5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <circle cx="11" cy="11" r="7" />
             <path d="m20 20-3.5-3.5" />
           </svg>
         </button>
 
         <a
-          href="/cuenta"
-          aria-label="Cuenta"
-          class="inline-flex h-11 w-11 items-center justify-center hover:opacity-70"
+          href={site.social.whatsapp}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="WhatsApp"
+          class="site-header__icon-btn md:hidden"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="sm:h-5 sm:w-5">
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
           </svg>
         </a>
+
+        <a
+          href={site.phoneHref}
+          aria-label="Llamar"
+          class="site-header__icon-btn hidden sm:inline-flex"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+          </svg>
+        </a>
+
+        <button
+          type="button"
+          id="site-menu-toggle"
+          class="site-header__icon-btn site-header__menu-btn !hidden max-md:!inline-flex"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+          aria-controls="site-menu-drawer"
+        >
+          <span class="site-header__menu-icon" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
       </div>
     </div>
   </div>
 
-  <nav class="bg-cimak-black text-cimak-white" aria-label="Catálogo">
-    <div class="container-cimak flex items-center justify-between gap-4">
-      <ul class="hidden min-w-0 flex-wrap items-center gap-1 text-[0.7rem] font-semibold uppercase tracking-wide md:flex lg:gap-3 lg:text-xs">
+  <!-- Navegación escritorio -->
+  <nav class="hidden bg-cimak-black text-white md:block" aria-label="Catálogo">
+    <div class="container-cimak">
+      <ul class="flex min-w-0 items-stretch gap-0.5 text-[0.7rem] font-semibold uppercase tracking-wide lg:gap-1 lg:text-xs">
         {principales.map((familia) => (
           <li class="relative">
             {familia.subcategorias.length > 0 ? (
               <details class="group" data-nav-details>
                 <summary
-                  class="flex cursor-pointer list-none items-center gap-1.5 px-2.5 py-3 transition-colors hover:text-cimak-yellow group-open:text-cimak-yellow lg:px-3"
-                  aria-current={esActiva(familia) ? 'page' : undefined}
+                  class:list={[
+                    'site-header__nav-link flex cursor-pointer list-none items-center gap-1.5 px-3 py-3.5 transition-colors lg:px-4',
+                    esActiva(familia) && 'text-cimak-yellow',
+                  ]}
                 >
                   <span>{familia.nombre}</span>
                   <svg
@@ -80,34 +158,35 @@ const esActiva = (familia: WebMenuFamilia) => {
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2.5"
-                    class="h-3 w-3 shrink-0 transition-transform group-open:rotate-180"
+                    class="h-3 w-3 shrink-0 opacity-70 transition-transform group-open:rotate-180"
                     aria-hidden="true"
                   >
                     <path d="m6 9 6 6 6-6" />
                   </svg>
                 </summary>
 
-                <div class="absolute left-0 top-full z-40 mt-0 w-[min(92vw,560px)] rounded-b-lg border-t-2 border-cimak-yellow bg-white p-4 text-cimak-black shadow-xl">
+                <div class="absolute left-0 top-full z-40 w-[min(92vw,560px)] rounded-b-xl border-t-2 border-cimak-yellow bg-white p-5 text-cimak-black shadow-2xl">
                   <a
                     href={familiaHref(familia)}
-                    class="mb-3 inline-block text-[0.7rem] font-bold uppercase tracking-wide text-cimak-black hover:text-cimak-yellow"
+                    class="mb-4 inline-flex items-center gap-1 text-[0.7rem] font-bold uppercase tracking-wide text-cimak-black transition hover:text-cimak-yellow"
                   >
-                    Ver todo {familia.nombre} →
+                    Ver todo {familia.nombre}
+                    <span aria-hidden="true">→</span>
                   </a>
-                  <div class="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+                  <div class="grid gap-x-8 gap-y-4 sm:grid-cols-2">
                     {familia.subcategorias.map((sub) => (
                       <div>
-                        <p class="text-[0.65rem] font-bold uppercase tracking-[0.12em] text-cimak-black/50">
+                        <p class="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-cimak-black/45">
                           {sub.nombre}
                         </p>
-                        <ul class="mt-1.5 space-y-1">
+                        <ul class="mt-2 space-y-1">
                           {sub.productos.slice(0, 6).map((producto) => {
                             const href = productoHref(producto);
                             return href ? (
                               <li>
                                 <a
                                   href={href}
-                                  class="block py-0.5 text-[0.72rem] font-medium normal-case text-cimak-black/80 hover:text-cimak-yellow"
+                                  class="block rounded-sm py-1 text-[0.75rem] font-medium normal-case text-cimak-black/80 transition hover:text-cimak-yellow"
                                 >
                                   {producto.nombre}
                                 </a>
@@ -123,7 +202,10 @@ const esActiva = (familia: WebMenuFamilia) => {
             ) : (
               <a
                 href={familiaHref(familia)}
-                class="block px-2.5 py-3 transition-colors hover:text-cimak-yellow lg:px-3"
+                class:list={[
+                  'site-header__nav-link block px-3 py-3.5 transition-colors lg:px-4',
+                  esActiva(familia) && 'text-cimak-yellow',
+                ]}
                 aria-current={esActiva(familia) ? 'page' : undefined}
               >
                 {familia.nombre}
@@ -131,88 +213,190 @@ const esActiva = (familia: WebMenuFamilia) => {
             )}
           </li>
         ))}
-      </ul>
 
-      <button
-        type="button"
-        id="site-menu-toggle"
-        class="ml-auto inline-flex h-11 w-11 items-center justify-center text-cimak-white"
-        aria-label="Abrir menú"
-        aria-expanded="false"
-        aria-controls="site-menu-panel"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
+        <li class="ml-auto flex items-center">
+          <a
+            href="/#contactanos"
+            class="inline-flex items-center gap-2 rounded-sm bg-cimak-yellow px-4 py-2 text-[0.65rem] font-bold uppercase tracking-wide text-cimak-black transition hover:brightness-105 lg:text-xs"
+          >
+            Cotizar
+          </a>
+        </li>
+      </ul>
     </div>
   </nav>
 
+  <!-- Drawer móvil -->
   <div
-    id="site-menu-panel"
-    class="hidden max-h-[75svh] overflow-y-auto overscroll-contain border-t border-white/10 bg-cimak-black text-white"
+    id="site-menu-backdrop"
+    class="site-header__backdrop fixed inset-0 z-[60] hidden bg-cimak-black/60 backdrop-blur-sm md:hidden"
+    aria-hidden="true"
+  ></div>
+
+  <aside
+    id="site-menu-drawer"
+    class="site-header__drawer fixed inset-y-0 right-0 z-[70] flex w-[min(100%,320px)] translate-x-full flex-col bg-cimak-black text-white shadow-2xl transition-transform duration-300 ease-out md:hidden"
+    aria-hidden="true"
     data-lenis-prevent
   >
-    <ul class="container-cimak divide-y divide-white/10 py-2">
-      {menu.map((familia) => (
-        <li>
-          {familia.subcategorias.length > 0 ? (
-            <details class="group" data-nav-details>
-              <summary class="flex cursor-pointer list-none items-center justify-between gap-3 py-3 text-sm font-bold uppercase tracking-wide">
-                <span>{familia.nombre}</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                  class="h-4 w-4 shrink-0 text-cimak-yellow transition-transform group-open:rotate-180"
-                  aria-hidden="true"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </summary>
+    <div class="flex items-center justify-between border-b border-white/10 px-5 py-4">
+      <p class="text-xs font-bold uppercase tracking-[0.18em] text-cimak-yellow">Menú</p>
+      <button
+        type="button"
+        id="site-menu-close"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-white/20 text-white transition hover:border-white hover:bg-white/10"
+        aria-label="Cerrar menú"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
 
-              <div class="pb-3">
-                <a
-                  href={familiaHref(familia)}
-                  class="block py-2 text-xs font-bold uppercase tracking-wide text-cimak-yellow"
-                >
-                  Ver todo {familia.nombre}
-                </a>
-                {familia.subcategorias.map((sub) => (
-                  <div class="mt-1">
-                    <p class="pt-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-white/45">
-                      {sub.nombre}
-                    </p>
-                    <ul>
-                      {sub.productos.map((producto) => {
-                        const href = productoHref(producto);
-                        return href ? (
-                          <li>
-                            <a href={href} class="block py-2.5 text-sm text-white/85 hover:text-cimak-yellow">
-                              {producto.nombre}
-                            </a>
-                          </li>
-                        ) : null;
-                      })}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </details>
-          ) : (
-            <a
-              href={familiaHref(familia)}
-              class="flex items-center py-3.5 text-sm font-bold uppercase tracking-wide hover:text-cimak-yellow"
-            >
-              {familia.nombre}
-            </a>
-          )}
+    <nav class="flex-1 overflow-y-auto overscroll-contain px-4 py-3" aria-label="Menú principal">
+      <ul class="space-y-1">
+        <li>
+          <a href="/" class="site-header__drawer-link">Inicio</a>
         </li>
-      ))}
-    </ul>
+        {menu.map((familia) => (
+          <li>
+            {familia.subcategorias.length > 0 ? (
+              <details class="group rounded-sm" data-nav-details>
+                <summary class="site-header__drawer-summary">
+                  <span>{familia.nombre}</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="h-4 w-4 shrink-0 text-cimak-yellow transition-transform group-open:rotate-180" aria-hidden="true">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </summary>
+
+                <div class="pb-2 pl-3">
+                  <a href={familiaHref(familia)} class="mb-2 block py-2 text-xs font-bold uppercase tracking-wide text-cimak-yellow">
+                    Ver todo {familia.nombre}
+                  </a>
+                  {familia.subcategorias.map((sub) => (
+                    <div class="mt-1">
+                      <p class="pt-2 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-white/40">
+                        {sub.nombre}
+                      </p>
+                      <ul>
+                        {sub.productos.map((producto) => {
+                          const href = productoHref(producto);
+                          return href ? (
+                            <li>
+                              <a href={href} class="block rounded-sm py-2.5 pl-1 text-sm text-white/85 transition hover:text-cimak-yellow">
+                                {producto.nombre}
+                              </a>
+                            </li>
+                          ) : null;
+                        })}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            ) : (
+              <a href={familiaHref(familia)} class="site-header__drawer-link">
+                {familia.nombre}
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="border-t border-white/10 p-4">
+      <a
+        href={site.social.whatsapp}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mb-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-sm bg-cimak-yellow text-sm font-bold text-cimak-black transition hover:brightness-105"
+      >
+        WhatsApp
+      </a>
+      <a
+        href="/#contactanos"
+        class="flex min-h-11 w-full items-center justify-center rounded-sm border border-white/30 text-sm font-semibold text-white transition hover:bg-white/10"
+      >
+        Contacto
+      </a>
+    </div>
+  </aside>
+
+  <!-- Buscador -->
+  <div
+    id="site-search-backdrop"
+    class="site-search__backdrop fixed inset-0 z-[80] hidden bg-cimak-black/65 backdrop-blur-sm"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    id="site-search-panel"
+    class="site-search__panel fixed inset-x-0 top-0 z-[90] hidden translate-y-[-8px] opacity-0 transition-all duration-200"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="site-search-title"
+    aria-hidden="true"
+    data-lenis-prevent
+  >
+    <div class="border-b border-black/10 bg-cimak-yellow shadow-lg">
+      <div class="container-cimak py-3 sm:py-4">
+        <p id="site-search-title" class="sr-only">Buscar productos</p>
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="relative min-w-0 flex-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-cimak-black/45"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+            <input
+              id="site-search-input"
+              type="search"
+              name="q"
+              placeholder="Buscar productos o familias…"
+              autocomplete="off"
+              class="site-search__input w-full rounded-sm border border-black/10 bg-white py-3 pl-10 pr-4 text-sm text-cimak-black outline-none placeholder:text-cimak-black/40 focus:border-cimak-black/30 sm:text-base"
+            />
+          </div>
+          <button
+            type="button"
+            id="site-search-close"
+            class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border border-black/15 bg-white/70 text-cimak-black transition hover:bg-white"
+            aria-label="Cerrar búsqueda"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <p class="mt-2 hidden text-[0.65rem] text-cimak-black/55 sm:block">
+          Escribe el nombre del producto. Atajo: <kbd class="rounded border border-black/15 bg-white/60 px-1">Ctrl</kbd> + <kbd class="rounded border border-black/15 bg-white/60 px-1">K</kbd>
+        </p>
+      </div>
+    </div>
+
+    <div class="container-cimak">
+      <div
+        id="site-search-results"
+        class="site-search__results max-h-[min(60svh,420px)] overflow-y-auto rounded-b-xl border border-t-0 border-black/10 bg-white shadow-xl"
+        data-lenis-prevent
+      >
+        <p class="px-4 py-6 text-center text-sm text-cimak-black/50">
+          Escribe para buscar en el catálogo.
+        </p>
+      </div>
+    </div>
   </div>
+
+  <script type="application/json" id="site-search-data" set:html={JSON.stringify(searchIndex)} />
 </header>
 
 <script>
@@ -220,22 +404,164 @@ const esActiva = (familia: WebMenuFamilia) => {
 
   if (header) {
     const toggle = header.querySelector('#site-menu-toggle');
-    const panel = header.querySelector('#site-menu-panel');
+    const closeBtn = header.querySelector('#site-menu-close');
+    const drawer = header.querySelector('#site-menu-drawer');
+    const backdrop = header.querySelector('#site-menu-backdrop');
     const barDropdowns = [...header.querySelectorAll('nav [data-nav-details]')];
 
-    const setPanel = (open) => {
-      if (!toggle || !panel) return;
-      panel.classList.toggle('hidden', !open);
+    const searchToggle = header.querySelector('#site-search-toggle');
+    const searchClose = header.querySelector('#site-search-close');
+    const searchPanel = header.querySelector('#site-search-panel');
+    const searchBackdrop = header.querySelector('#site-search-backdrop');
+    const searchInput = header.querySelector('#site-search-input');
+    const searchResults = header.querySelector('#site-search-results');
+    const searchDataEl = header.querySelector('#site-search-data');
+
+    /** @type {{ label: string; href: string; type: string; meta?: string }[]} */
+    let searchIndex = [];
+    try {
+      searchIndex = JSON.parse(searchDataEl?.textContent || '[]');
+    } catch {
+      searchIndex = [];
+    }
+
+    const normalize = (value) =>
+      String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
+
+    const setDrawer = (open) => {
+      if (!toggle || !drawer || !backdrop) return;
+
+      drawer.classList.toggle('translate-x-full', !open);
+      drawer.classList.toggle('translate-x-0', open);
+      drawer.setAttribute('aria-hidden', String(!open));
+      backdrop.classList.toggle('hidden', !open);
+      backdrop.setAttribute('aria-hidden', String(!open));
       toggle.setAttribute('aria-expanded', String(open));
       toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+      toggle.classList.toggle('is-open', open);
+      document.documentElement.classList.toggle('site-menu-open', open);
+
+      if (open) {
+        window.lenis?.stop?.();
+      } else if (!searchPanel?.classList.contains('is-open')) {
+        window.lenis?.start?.();
+      }
+    };
+
+    const renderSearchResults = (query) => {
+      if (!searchResults) return;
+
+      const term = normalize(query);
+      if (!term) {
+        searchResults.innerHTML =
+          '<p class="px-4 py-6 text-center text-sm text-cimak-black/50">Escribe para buscar en el catálogo.</p>';
+        return;
+      }
+
+      const matches = searchIndex
+        .filter((item) => {
+          const haystack = normalize(`${item.label} ${item.meta || ''}`);
+          return haystack.includes(term);
+        })
+        .slice(0, 12);
+
+      if (!matches.length) {
+        searchResults.innerHTML =
+          '<p class="px-4 py-6 text-center text-sm text-cimak-black/55">No encontramos resultados para tu búsqueda.</p>';
+        return;
+      }
+
+      searchResults.innerHTML = matches
+        .map(
+          (item) => `
+            <a
+              href="${item.href}"
+              class="site-search__result flex items-center justify-between gap-3 border-b border-black/5 px-4 py-3 transition hover:bg-[#f7f7f7] last:border-b-0"
+            >
+              <span class="min-w-0">
+                <span class="block truncate text-sm font-semibold text-cimak-black">${item.label}</span>
+                ${item.meta ? `<span class="mt-0.5 block truncate text-xs text-cimak-black/50">${item.meta}</span>` : ''}
+              </span>
+              <span class="shrink-0 rounded-sm bg-cimak-black/5 px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-wide text-cimak-black/55">
+                ${item.type === 'familia' ? 'Familia' : 'Producto'}
+              </span>
+            </a>
+          `,
+        )
+        .join('');
+    };
+
+    const setSearch = (open) => {
+      if (!searchToggle || !searchPanel || !searchBackdrop || !searchInput) return;
+
+      searchPanel.classList.toggle('hidden', !open);
+      searchPanel.classList.toggle('is-open', open);
+      searchPanel.classList.toggle('opacity-0', !open);
+      searchPanel.classList.toggle('translate-y-[-8px]', !open);
+      searchPanel.classList.toggle('opacity-100', open);
+      searchPanel.classList.toggle('translate-y-0', open);
+      searchPanel.setAttribute('aria-hidden', String(!open));
+      searchBackdrop.classList.toggle('hidden', !open);
+      searchBackdrop.setAttribute('aria-hidden', String(!open));
+      searchToggle.setAttribute('aria-expanded', String(open));
+      document.documentElement.classList.toggle('site-search-open', open);
+
+      if (open) {
+        setDrawer(false);
+        closeBar();
+        window.lenis?.stop?.();
+        window.setTimeout(() => searchInput.focus(), 60);
+      } else {
+        searchInput.value = '';
+        renderSearchResults('');
+        if (!drawer?.classList.contains('translate-x-0')) {
+          window.lenis?.start?.();
+        }
+      }
     };
 
     const closeBar = () => barDropdowns.forEach((item) => (item.open = false));
 
     toggle?.addEventListener('click', () => {
-      const open = panel?.classList.contains('hidden') ?? false;
-      setPanel(open);
-      if (open) closeBar();
+      const open = drawer?.classList.contains('translate-x-full') ?? false;
+      setDrawer(open);
+      if (open) {
+        closeBar();
+        setSearch(false);
+      }
+    });
+
+    closeBtn?.addEventListener('click', () => setDrawer(false));
+    backdrop?.addEventListener('click', () => setDrawer(false));
+
+    searchToggle?.addEventListener('click', () => {
+      const open = !searchPanel?.classList.contains('is-open');
+      setSearch(open);
+    });
+
+    searchClose?.addEventListener('click', () => setSearch(false));
+    searchBackdrop?.addEventListener('click', () => setSearch(false));
+
+    searchInput?.addEventListener('input', (event) => {
+      renderSearchResults(event.target.value);
+    });
+
+    searchInput?.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setSearch(false);
+      }
+      if (event.key === 'Enter') {
+        const first = searchResults?.querySelector('a.site-search__result');
+        if (first instanceof HTMLAnchorElement) {
+          event.preventDefault();
+          window.location.href = first.href;
+        }
+      }
     });
 
     barDropdowns.forEach((item) => {
@@ -244,7 +570,6 @@ const esActiva = (familia: WebMenuFamilia) => {
         barDropdowns.forEach((other) => {
           if (other !== item) other.open = false;
         });
-        setPanel(false);
       });
     });
 
@@ -254,15 +579,172 @@ const esActiva = (familia: WebMenuFamilia) => {
     });
 
     document.addEventListener('keydown', (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setSearch(!searchPanel?.classList.contains('is-open'));
+        return;
+      }
+
       if (event.key !== 'Escape') return;
       closeBar();
-      setPanel(false);
+      setDrawer(false);
+      setSearch(false);
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.matchMedia('(min-width: 768px)').matches) setDrawer(false);
     });
   }
 </script>
 
 <style>
+  .site-header {
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  }
+
+  .site-header__icon-btn {
+    display: inline-flex;
+    height: 2.75rem;
+    width: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .site-header__icon-btn:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .site-header__nav-link {
+    position: relative;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .site-header__nav-link:hover {
+    color: var(--color-cimak-yellow);
+  }
+
+  .site-header__nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.35rem;
+    height: 2px;
+    border-radius: 9999px;
+    background: var(--color-cimak-yellow);
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+  }
+
+  .site-header__nav-link:hover::after,
+  .site-header__nav-link.text-cimak-yellow::after {
+    transform: scaleX(1);
+  }
+
+  .site-header__menu-icon {
+    position: relative;
+    display: block;
+    width: 1.125rem;
+    height: 0.875rem;
+  }
+
+  .site-header__menu-icon span {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    border-radius: 9999px;
+    background: currentColor;
+    transition: transform 0.25s ease, top 0.25s ease, opacity 0.2s ease;
+  }
+
+  .site-header__menu-icon span:nth-child(1) { top: 0; }
+  .site-header__menu-icon span:nth-child(2) { top: 6px; }
+  .site-header__menu-icon span:nth-child(3) { top: 12px; }
+
+  .site-header__menu-btn.is-open .site-header__menu-icon span:nth-child(1) {
+    top: 6px;
+    transform: rotate(45deg);
+  }
+
+  .site-header__menu-btn.is-open .site-header__menu-icon span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .site-header__menu-btn.is-open .site-header__menu-icon span:nth-child(3) {
+    top: 6px;
+    transform: rotate(-45deg);
+  }
+
+  @media (min-width: 768px) {
+    .site-header__menu-btn,
+    .site-header__drawer,
+    .site-header__backdrop {
+      display: none !important;
+    }
+  }
+
+  .site-header__drawer-link {
+    display: block;
+    border-radius: 0.25rem;
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .site-header__drawer-link:hover {
+    color: var(--color-cimak-yellow);
+    background-color: rgba(255, 255, 255, 0.04);
+  }
+
+  .site-header__drawer-summary {
+    display: flex;
+    cursor: pointer;
+    list-style: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-radius: 0.25rem;
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .site-header__drawer-summary::-webkit-details-marker {
+    display: none;
+  }
+
   [data-nav-details] > summary::-webkit-details-marker {
     display: none;
+  }
+
+  :global(html.site-menu-open),
+  :global(html.site-menu-open body),
+  :global(html.site-search-open),
+  :global(html.site-search-open body) {
+    overflow: hidden !important;
+  }
+
+  .site-search__panel.is-open {
+    display: block;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 </style>

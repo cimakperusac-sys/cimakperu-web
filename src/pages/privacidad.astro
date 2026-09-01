@@ -1,0 +1,203 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site } from '../data/site';
+---
+
+<Layout
+  title="Políticas de Privacidad"
+  description="Política de privacidad y tratamiento de datos personales de CIMAK PERU S.A.C., conforme a la Ley N° 29733 del Perú."
+  canonical="/privacidad"
+  type="article"
+>
+  <main class="bg-[#f3f3f3] py-8 sm:py-12 lg:py-14">
+    <article class="container-cimak">
+      <div class="legal-page mx-auto max-w-3xl rounded-xl bg-white px-5 py-8 shadow-sm sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+        <header class="border-b border-black/10 pb-6">
+          <nav class="mb-4 text-xs text-cimak-black/55" aria-label="Ruta">
+            <a href="/" class="hover:text-cimak-black">Inicio</a>
+            <span class="mx-1.5">/</span>
+            <span class="text-cimak-black">Políticas de privacidad</span>
+          </nav>
+          <h1 class="text-xl font-extrabold leading-tight text-cimak-black sm:text-2xl lg:text-[1.65rem]">
+            Políticas de Privacidad y Tratamiento de Datos Personales
+          </h1>
+          <p class="mt-4 text-sm leading-relaxed text-cimak-black/80 sm:text-[0.95rem]">
+            En {site.legalName}, la protección de los datos personales de nuestros clientes, contratistas
+            y prospectos comerciales es una prioridad fundamental. La presente Política describe cómo
+            recopilamos, usamos, almacenamos y protegemos su información de acuerdo con la normativa
+            peruana vigente.
+          </p>
+        </header>
+
+        <div class="legal-page__body mt-8 space-y-8 text-sm leading-relaxed text-cimak-black/85 sm:text-[0.95rem]">
+          <section>
+            <h2>1. Identidad y Domicilio del Responsable</h2>
+            <ul>
+              <li><strong>Razón Social:</strong> {site.legalName}</li>
+              <li>
+                <strong>Domicilio Legal / Planta Industrial:</strong> Jr. Sodio 252, Urb. Industrial
+                Infantas, Los Olivos, Lima, Perú.
+              </li>
+              <li>
+                <strong>Canal Oficial de Contacto:</strong>{' '}
+                <a href={site.social.whatsapp} target="_blank" rel="noopener noreferrer">
+                  WhatsApp {site.phone}
+                </a>
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>2. Marco Legal Aplicable</h2>
+            <p>
+              En cumplimiento de la <strong>Ley N° 29733</strong>, Ley de Protección de Datos Personales
+              del Perú, y su Reglamento aprobado por el <strong>Decreto Supremo N° 003-2013-JUS</strong>.
+            </p>
+          </section>
+
+          <section>
+            <h2>3. Información que Recopilamos</h2>
+            <p>
+              A través de formularios web, landing pages (incluyendo Meta Ads y TikTok Ads) o el canal de
+              WhatsApp corporativo, podemos recopilar los siguientes datos:
+            </p>
+            <ul>
+              <li>
+                <strong>Datos de Contacto e Identificación:</strong> Nombre completo, número de teléfono o
+                WhatsApp, correo electrónico, documento de identidad (DNI/RUC) y razón social de la empresa.
+              </li>
+              <li>
+                <strong>Datos del Proyecto y Requerimientos Técnicos:</strong> Dirección o departamento de
+                la obra, dimensiones, modelos de cobertura seleccionados (Aluzinc TR3, TR4, TR5, TR6,
+                Curvos, UPVC, Paneles Termoaislantes, Policarbonato, Fibra de Vidrio, entre otros),
+                espesores y colores.
+              </li>
+              <li>
+                <strong>Datos de Facturación y Pago:</strong> Razón social, RUC, dirección fiscal e
+                información necesaria para la emisión de comprobantes de pago y facturación.
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>4. Finalidades del Tratamiento de Datos</h2>
+            <p>La información recopilada se utiliza exclusivamente para los siguientes fines:</p>
+            <ol>
+              <li>
+                <strong>Elaboración y Envío de Cotizaciones:</strong> Calcular presupuestos precisos basados
+                en las medidas exactas y especificaciones técnicas provistas.
+              </li>
+              <li>
+                <strong>Asesoría Técnica Especializada:</strong> Contactar al usuario vía telefónica o
+                WhatsApp para resolver dudas técnicas sobre perfiles, resistencia, accesorios de fijación
+                y compatibilidad estructural.
+              </li>
+              <li>
+                <strong>Gestión Logística y Despacho:</strong> Coordinar la entrega de pedidos a nivel
+                nacional, emisión de Guías de Remisión y validación de protocolos de recojo en planta.
+              </li>
+              <li>
+                <strong>Emisión de Documentación Oficial:</strong> Generación de comprobantes de pago y
+                emisión de Certificados de Calidad y Garantía de los lotes despachados.
+              </li>
+              <li>
+                <strong>Comunicaciones Comerciales (Opcional):</strong> Envío de alertas de stock,
+                actualizaciones de listas de precios de fábrica o promociones especiales, siempre que el
+                usuario no haya revocado su consentimiento.
+              </li>
+            </ol>
+          </section>
+
+          <section>
+            <h2>5. Confidencialidad y Transferencia a Terceros</h2>
+            <ul>
+              <li>
+                <strong>No Comercialización:</strong> {site.legalName} no vende, alquila ni comercializa
+                bases de datos personales bajo ninguna circunstancia.
+              </li>
+              <li>
+                <strong>Terceros Encargados:</strong> La información podrá ser tratada por proveedores de
+                servicios tecnológicos indispensables para la operación de la empresa (plataformas de CRM,
+                servicios de alojamiento en la nube y mensajería corporativa), quienes mantienen acuerdos
+                de confidencialidad y estándares de seguridad de datos.
+              </li>
+              <li>
+                <strong>Empresas de Transporte:</strong> Los datos indispensables de destino y contacto se
+                comparten con los operadores logísticos o transportistas únicamente para asegurar la
+                correcta entrega del pedido en obra o agencia.
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>6. Seguridad y Almacenamiento</h2>
+            <p>
+              Adoptamos medidas técnicas, legales y organizativas para proteger los datos personales
+              contra accesos no autorizados, pérdidas, alteraciones o divulgaciones indebidas. La
+              información se conserva únicamente durante el tiempo necesario para cumplir las finalidades
+              descritas o según los plazos legales y tributarios vigentes.
+            </p>
+          </section>
+
+          <section>
+            <h2>7. Ejercicio de Derechos ARCO</h2>
+            <p>
+              Todo titular de datos personales tiene el derecho de ejercer sus derechos de{' '}
+              <strong>Acceso, Rectificación, Cancelación y Oposición (ARCO)</strong> reconocidos por la ley
+              peruana.
+            </p>
+            <p>
+              Para ejercer cualquiera de estos derechos, el usuario puede enviar una solicitud formal a
+              través de nuestros canales oficiales:
+            </p>
+            <ul>
+              <li>
+                <strong>Asunto:</strong> «Ejercicio de Derechos ARCO - Datos Personales»
+              </li>
+              <li>
+                <strong>Requisitos:</strong> Indicar nombre completo, número de documento de identidad y
+                el detalle específico de la solicitud (acceso, actualización o retiro de la base de
+                datos).
+              </li>
+            </ul>
+            <p>
+              Contacto:{' '}
+              <a href={`mailto:${site.email}`}>{site.email}</a> o{' '}
+              <a href={site.social.whatsapp} target="_blank" rel="noopener noreferrer">
+                WhatsApp {site.phone}
+              </a>
+            </p>
+          </section>
+
+          <section>
+            <h2>8. Uso de Cookies y Tecnologías de Rastreo</h2>
+            <p>
+              El sitio web puede utilizar cookies técnicas y analíticas (como Google Analytics, Meta Pixel
+              o TikTok Pixel) para optimizar la experiencia de navegación, evaluar el rendimiento de la
+              página y mostrar anuncios relevantes relacionados con soluciones de techado y coberturas
+              metálicas. El usuario puede deshabilitar o configurar el uso de cookies desde las opciones de
+              su navegador web en cualquier momento.
+            </p>
+          </section>
+
+          <section>
+            <h2>9. Modificaciones a la Política de Privacidad</h2>
+            <p>
+              {site.legalName} se reserva el derecho de actualizar o modificar la presente política para
+              adaptarla a novedades legislativas, jurisprudenciales o prácticas comerciales. Cualquier
+              cambio será publicado oportunamente en esta misma sección del sitio web.
+            </p>
+            <p>
+              Consulte también nuestros{' '}
+              <a href="/terminos">Términos y Condiciones</a>.
+            </p>
+          </section>
+        </div>
+
+        <footer class="mt-10 border-t border-black/10 pt-6 text-xs text-cimak-black/55">
+          <p>Última actualización: {new Date().getFullYear()}. RUC: {site.ruc}</p>
+        </footer>
+      </div>
+    </article>
+  </main>
+</Layout>

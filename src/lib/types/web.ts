@@ -26,6 +26,37 @@ export type WebTestimonio = {
   orden?: number;
 };
 
+export type WebBlogEnlace = {
+  titulo: string;
+  url: string;
+  tipo?: string | null;
+};
+
+export type WebBlogCard = {
+  titulo: string;
+  slug: string;
+  resumen?: string | null;
+  autor: string;
+  autor_cargo?: string | null;
+  autor_avatar_url?: string | null;
+  tipo_portada?: string | null;
+  portada_url?: string | null;
+  tipo_media?: WebTipoMedia | null;
+  video_url?: string | null;
+  etiquetas?: string[] | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  tiempo_lectura?: number | null;
+  publicado_en?: string | null;
+  destacado?: number;
+};
+
+export type WebBlog = WebBlogCard & {
+  contenido?: string | null;
+  enlaces?: WebBlogEnlace[] | null;
+  seo_keywords?: string | null;
+};
+
 export type WebMeta = {
   clave: string;
   seo_title?: string | null;
@@ -137,6 +168,7 @@ export type WebProducto = {
   url?: string | null;
   hero_url?: string | null;
   hero_url_mobile?: string | null;
+  diagrama_url?: string | null;
   ficha_url?: string | null;
   familia?: {
     id: number;
@@ -156,6 +188,7 @@ export type WebHome = {
   familias: WebFamilia[];
   menu?: WebMenuFamilia[];
   testimonios: WebTestimonio[];
+  blogs_recientes?: WebBlogCard[];
 };
 
 export type ApiEnvelope<T> = {

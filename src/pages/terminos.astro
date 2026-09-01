@@ -1,0 +1,191 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site } from '../data/site';
+---
+
+<Layout
+  title="Términos y Condiciones"
+  description="Términos comerciales, logística y garantías de CIMAK PERU S.A.C."
+  canonical="/terminos"
+  type="article"
+>
+  <main class="bg-[#f3f3f3] py-8 sm:py-12 lg:py-14">
+    <article class="container-cimak">
+      <div class="legal-page mx-auto max-w-3xl rounded-xl bg-white px-5 py-8 shadow-sm sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+        <header class="border-b border-black/10 pb-6">
+          <nav class="mb-4 text-xs text-cimak-black/55" aria-label="Ruta">
+            <a href="/" class="hover:text-cimak-black">Inicio</a>
+            <span class="mx-1.5">/</span>
+            <span class="text-cimak-black">Términos y condiciones</span>
+          </nav>
+          <h1 class="text-xl font-extrabold leading-tight text-cimak-black sm:text-2xl lg:text-[1.65rem]">
+            Términos y Condiciones
+          </h1>
+          <p class="mt-4 text-sm leading-relaxed text-cimak-black/80 sm:text-[0.95rem]">
+            El presente documento establece las normativas comerciales, logísticas y técnicas que rigen
+            las operaciones de venta de {site.legalName}, en cumplimiento con la normativa legal vigente
+            en el Perú. Para el tratamiento de datos personales, consulte nuestras{' '}
+            <a href="/privacidad" class="font-semibold underline">Políticas de Privacidad</a>.
+          </p>
+        </header>
+
+        <div class="legal-page__body mt-8 space-y-8 text-sm leading-relaxed text-cimak-black/85 sm:text-[0.95rem]">
+          <section>
+            <h2>Información Legal de la Empresa</h2>
+            <ul>
+              <li><strong>Razón social:</strong> {site.legalName}</li>
+              <li>
+                <strong>Planta Industrial y Oficinas:</strong> Jr. Sodio 252, Urb. Industrial Infantas -
+                Los Olivos, Lima, Perú
+              </li>
+              <li>
+                <strong>Canal Oficial de Atención:</strong>{' '}
+                <a href={site.social.whatsapp} target="_blank" rel="noopener noreferrer">
+                  WhatsApp Corporativo {site.phone}
+                </a>
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Términos y Condiciones de Fabricación a Medida</h2>
+            <p>
+              Nuestra principal propuesta de valor en {site.legalName} es la producción de coberturas
+              metálicas (Aluzinc TR3, TR4, TR5, TR6, Curvos, Modelo Teja), UPVC, Paneles Termoaislantes,
+              Policarbonatos y Fibra de Vidrio fabricados a la longitud exacta requerida por la obra del
+              cliente, con cortes personalizados de hasta 12 metros.
+            </p>
+            <p>
+              <strong>Política de Devoluciones Cero:</strong> Al tratarse de una fabricación estrictamente a
+              la medida exacta para evitar desperdicios, <strong>NO SE ACEPTAN CAMBIOS NI DEVOLUCIONES</strong>{' '}
+              motivados por errores de cálculo, fallas en los planos o mediciones incorrectas proporcionadas
+              por el cliente o su personal técnico.
+            </p>
+            <p>
+              <strong>Aprobación de Medidas:</strong> Todo proceso de perfilado y corte en planta inicia
+              únicamente tras la confirmación formal de las medidas detalladas en la orden de compra y la
+              validación del abono correspondiente.
+            </p>
+          </section>
+
+          <section>
+            <h2>Cotizaciones, Precios y Política Antifraude</h2>
+            <p>
+              La transparencia y protección de la inversión de nuestros clientes es fundamental.
+            </p>
+            <p>
+              <strong>Vigencia de Precios:</strong> Debido a la fluctuación internacional del mercado del
+              acero y las materias primas, todas las cotizaciones emitidas poseen un periodo de vigencia
+              limitado, el cual se encuentra expresamente detallado en el documento. Transcurrido dicho
+              plazo, los precios estarán sujetos a actualización.
+            </p>
+            <p>
+              <strong>Política de Pagos y Antifraude:</strong> {site.legalName} opera de manera exclusiva
+              mediante cuentas corrientes corporativas registradas a nombre de la empresa. Bajo ningún motivo
+              la fábrica solicitará transferencia, depósitos o pagos a cuentas de personas naturales ni
+              terceros.
+            </p>
+          </section>
+
+          <section>
+            <h2>Logística, Transporte y Despachos</h2>
+            <p>
+              Contamos con una amplia capacidad logística a nivel nacional, la cual se rige bajo los
+              siguientes parámetros de responsabilidad:
+            </p>
+            <div class="legal-page__table-wrap">
+              <table class="legal-page__table">
+                <thead>
+                  <tr>
+                    <th scope="col">Modalidad</th>
+                    <th scope="col">Responsabilidades</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Recojo en planta (Transporte del Cliente)</strong></td>
+                    <td>
+                      La responsabilidad de {site.legalName} culmina tras la carga de material y la firma
+                      de conformidad en la Guía de Remisión.
+                      <br /><br />
+                      <strong>Requisito Crítico:</strong> Es estrictamente obligatorio que el transportista
+                      enviado por el cliente cuente con tacos de madera adecuados para soportar las planchas
+                      y evitar cualquier daño, fricción o deformación del producto durante el traslado.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Despacho a Obra (Flota CIMAK)</strong></td>
+                    <td>
+                      Garantizamos la integridad del material durante todo el trayecto hasta llegar al
+                      lugar de destino. Sin embargo, las maniobras de estiba, descarga en obra y elevación
+                      de las planchas hacia la estructura son responsabilidad exclusiva del personal del
+                      cliente.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section>
+            <h2>Tolerancias Técnicas de Manufactura</h2>
+            <p>
+              El cliente reconoce y comprende que, dentro de los estándares internacionales de la
+              industria del acero y polímeros, existen tolerancias permisibles:
+            </p>
+            <ul>
+              <li>
+                <strong>Dimensiones:</strong> Pueden existir tolerancias de fabricación milimétricas tanto en
+                los anchos útiles de los perfiles como en la calibración de los espesores estructurales
+                (0.30 mm a 0.60 mm).
+              </li>
+              <li>
+                <strong>Variaciones de Tono:</strong> Es posible que se presenten ligeras variaciones de color
+                entre distintos lotes de pintura industrial, lo cual es normal en el proceso de recubrimiento
+                y no afecta el rendimiento, durabilidad ni la resistencia a la corrosión del producto.
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Certificados de Calidad y Validez de Garantía</h2>
+            <p>
+              Nuestras coberturas cuentan con Certificados de Calidad emitidos por la fábrica que
+              garantizan una prolongada vida útil (generalmente superior a 15 años en condiciones
+              estándar). No obstante, la garantía quedará invalidada automáticamente si se incurre en:
+            </p>
+            <ul>
+              <li>
+                <strong>Almacenamiento inadecuado</strong> a la intemperie por periodos prolongados antes
+                de la instalación, generando manchas o deterioro prematuro por humedad atrapada.
+              </li>
+              <li>
+                <strong>Mala praxis en la instalación</strong> estructural o aplicación de soldadura
+                directa sobre las planchas pre-pintadas.
+              </li>
+              <li>
+                <strong>Uso de accesorios incorrectos:</strong> Para asegurar la hermeticidad total y evitar
+                la oxidación por perforación, es de uso obligatorio emplear accesorios compatibles provistos
+                o avalados por la empresa, tales como tornillos autoperforantes y capuchones de PVC con
+                arandela de neopreno.
+              </li>
+            </ul>
+          </section>
+
+          <section class="rounded-lg border border-black/10 bg-[#fafafa] px-4 py-4 sm:px-5">
+            <h2>Políticas de Privacidad</h2>
+            <p>
+              El tratamiento de datos personales se rige por un documento independiente. Revise la{' '}
+              <a href="/privacidad">Política de Privacidad y Tratamiento de Datos Personales</a> de{' '}
+              {site.legalName}.
+            </p>
+          </section>
+        </div>
+
+        <footer class="mt-10 border-t border-black/10 pt-6 text-xs text-cimak-black/55">
+          <p>Última actualización: {new Date().getFullYear()}. RUC: {site.ruc}</p>
+        </footer>
+      </div>
+    </article>
+  </main>
+</Layout>

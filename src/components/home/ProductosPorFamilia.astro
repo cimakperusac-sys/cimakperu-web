@@ -15,14 +15,8 @@ if (conProductos.length === 0) {
 }
 ---
 
-<section id="productos" class="w-full bg-[#f3f3f3] pb-10 pt-8 sm:pb-14 md:pt-0" aria-label="Productos por categoría">
+<section id="productos" class="w-full bg-[#f3f3f3] pb-10 md:pb-14" aria-label="Productos por categoría">
   <div class="container-cimak">
-    <div class="mb-6 flex justify-center md:hidden">
-      <h2 class="rounded-md bg-cimak-black px-5 py-2 text-center text-sm font-bold uppercase tracking-wide text-white">
-        Productos por categoría
-      </h2>
-    </div>
-
     <div class="flex flex-col gap-8 sm:gap-10">
       {conProductos.map((familia) => {
         const href = familiaHref(familia);

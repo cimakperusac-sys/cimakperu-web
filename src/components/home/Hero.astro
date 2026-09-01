@@ -39,33 +39,33 @@ const titleHtml = cmsTitleHtml(bloque.titulo);
 const bodyHtml = cmsHtml(bloque.contenido || bloque.subtitulo);
 const aria = cmsPlain(bloque.titulo) || 'Hero';
 
-const mediaClass = 'h-full w-full object-cover md:h-auto';
+const mediaClass = 'hero-home__img';
 ---
 
 <section
   id="hero"
-  class="relative flex min-h-[70svh] w-full overflow-hidden bg-cimak-black md:min-h-0"
+  class="hero-home relative z-0 w-full overflow-visible bg-cimak-black md:overflow-hidden md:min-h-0"
   aria-label={aria}
 >
-  <div class="absolute inset-0 md:relative md:inset-auto md:w-full">
+  <div class="hero-home__media absolute inset-0 overflow-hidden md:relative md:inset-auto md:w-full md:overflow-visible">
     {soloImagenes ? (
-      <picture class="block h-full">
+      <picture class="hero-home__picture">
         <source media="(min-width: 768px)" srcset={desktop.src} />
         <img
           src={mobile!.src}
           alt={aria}
-          class={`block ${mediaClass}`}
+          class={mediaClass}
           loading="eager"
           fetchpriority="high"
           decoding="async"
         />
       </picture>
     ) : mobile ? (
-      <div class="h-full" data-hero-media>
-        <div class="h-full md:hidden">
+      <div class="hero-home__swap" data-hero-media>
+        <div class="hero-home__swap-pane md:hidden">
           {mobile.video ? (
             <video
-              class={`block ${mediaClass}`}
+              class={mediaClass}
               data-hero-src={mobile.src}
               data-hero-when="mobile"
               autoplay
@@ -77,7 +77,7 @@ const mediaClass = 'h-full w-full object-cover md:h-auto';
             ></video>
           ) : (
             <img
-              class={`block ${mediaClass}`}
+              class={mediaClass}
               data-hero-src={mobile.src}
               data-hero-when="mobile"
               alt={aria}
@@ -86,10 +86,10 @@ const mediaClass = 'h-full w-full object-cover md:h-auto';
           )}
         </div>
 
-        <div class="hidden h-full md:block">
+        <div class="hero-home__swap-pane hidden md:block">
           {desktop.video ? (
             <video
-              class={`block ${mediaClass}`}
+              class={mediaClass}
               data-hero-src={desktop.src}
               data-hero-when="desktop"
               autoplay
@@ -101,7 +101,7 @@ const mediaClass = 'h-full w-full object-cover md:h-auto';
             ></video>
           ) : (
             <img
-              class={`block ${mediaClass}`}
+              class={mediaClass}
               data-hero-src={desktop.src}
               data-hero-when="desktop"
               alt={aria}
@@ -111,25 +111,25 @@ const mediaClass = 'h-full w-full object-cover md:h-auto';
         </div>
 
         <noscript>
-          <div class="h-full md:hidden">
+          <div class="hero-home__swap-pane md:hidden">
             {mobile.video ? (
-              <video class={`block ${mediaClass}`} src={mobile.src} autoplay muted loop playsinline></video>
+              <video class={mediaClass} src={mobile.src} autoplay muted loop playsinline></video>
             ) : (
-              <img class={`block ${mediaClass}`} src={mobile.src} alt={aria} />
+              <img class={mediaClass} src={mobile.src} alt={aria} />
             )}
           </div>
-          <div class="hidden h-full md:block">
+          <div class="hero-home__swap-pane hidden md:block">
             {desktop.video ? (
-              <video class={`block ${mediaClass}`} src={desktop.src} autoplay muted loop playsinline></video>
+              <video class={mediaClass} src={desktop.src} autoplay muted loop playsinline></video>
             ) : (
-              <img class={`block ${mediaClass}`} src={desktop.src} alt={aria} />
+              <img class={mediaClass} src={desktop.src} alt={aria} />
             )}
           </div>
         </noscript>
       </div>
     ) : desktop.video ? (
       <video
-        class={`block ${mediaClass}`}
+        class={mediaClass}
         src={desktop.src}
         autoplay
         muted
@@ -140,7 +140,7 @@ const mediaClass = 'h-full w-full object-cover md:h-auto';
       ></video>
     ) : (
       <img
-        class={`block ${mediaClass}`}
+        class={mediaClass}
         src={desktop.src}
         alt={aria}
         loading="eager"
@@ -151,20 +151,20 @@ const mediaClass = 'h-full w-full object-cover md:h-auto';
   </div>
 
   {(titleHtml || bodyHtml || bloque.cta_texto) && (
-    <div class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/35 px-4 text-center text-white">
+    <div class="hero-home__overlay absolute inset-0 z-10 flex flex-col items-center justify-center px-5 text-center text-white md:px-4">
       {titleHtml && (
         <div
-          class="cms-prose cms-prose--title text-2xl font-extrabold uppercase tracking-tight sm:text-4xl lg:text-[2.75rem]"
+          class="cms-prose cms-prose--title hero-home__title font-extrabold uppercase tracking-tight"
           set:html={titleHtml}
         />
       )}
       {bodyHtml && (
-        <div class="cms-prose mt-3 max-w-xl text-sm sm:text-base text-white/90" set:html={bodyHtml} />
+        <div class="cms-prose hero-home__body mt-3 max-w-xl text-sm text-white/90 sm:text-base" set:html={bodyHtml} />
       )}
       {bloque.cta_texto && bloque.cta_url && (
         <a
           href={bloque.cta_url}
-          class="mt-5 inline-flex min-h-11 items-center rounded-md bg-cimak-yellow px-5 py-2 text-sm font-bold text-cimak-black"
+          class="hero-home__cta mt-5 inline-flex min-h-11 items-center rounded-md bg-cimak-yellow px-5 py-2 text-sm font-bold text-cimak-black"
         >
           {bloque.cta_texto}
         </a>
@@ -174,7 +174,7 @@ const mediaClass = 'h-full w-full object-cover md:h-auto';
 
   <a
     href={nextHref}
-    class="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-1.5 text-white no-underline sm:bottom-8 sm:gap-2"
+    class="hero-home__scroll absolute bottom-4 left-1/2 z-20 hidden -translate-x-1/2 flex-col items-center gap-1.5 text-white no-underline sm:bottom-8 sm:flex sm:gap-2"
     aria-label="Desplázate hacia abajo"
   >
     <span class="text-[10px] font-semibold uppercase tracking-[0.2em] opacity-90 sm:text-xs">

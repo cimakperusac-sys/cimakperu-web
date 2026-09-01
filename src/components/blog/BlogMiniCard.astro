@@ -1,0 +1,39 @@
+---
+import type { WebBlogCard } from '../../lib/types/web';
+
+interface Props {
+  item: WebBlogCard;
+  compact?: boolean;
+}
+
+const { item, compact = false } = Astro.props;
+
+const fecha = item.publicado_en
+  ? new Date(item.publicado_en).toLocaleDateString('es-PE', {
+      month: 'short',
+      day: 'numeric',
+    })
+  : '';
+---
+
+<a href={`/blog/${item.slug}`} class:list={['blog-mini-card', { 'blog-mini-card--compact': compact }]}>
+  <div class="blog-mini-card__thumb">
+    {item.portada_url ? (
+      <img src={item.portada_url} alt="" loading="lazy" decoding="async" />
+    ) : (
+      <span class="blog-mini-card__placeholder" aria-hidden="true">CIMAK</span>
+    )}
+  </div>
+  <div class="blog-mini-card__body">
+    <p class="blog-mini-card__meta">
+      {fecha && <time datetime={item.publicado_en}>{fecha}</time>}
+      {item.tiempo_lectura && (
+        <>
+          <span aria-hidden="true">·</span>
+          <span>{item.tiempo_lectura} min</span>
+        </>
+      )}
+    </p>
+    <p class="blog-mini-card__title">{item.titulo}</p>
+  </div>
+</a>

@@ -1,16 +1,18 @@
 ---
-import type { WebAtributo } from '../../lib/types/web';
-
 interface Props {
   familiaNombre: string;
   modelo: string;
   nombreCompleto: string;
+  /** Imagen del producto (lámina PNG transparente). */
   productoImg: string | null;
+  /** Fondo ambiente (escritorio). */
   fondoDesktop: string | null;
+  /** Fondo ambiente (móvil). */
   fondoMobile: string | null;
+  /** Diagrama de dimensiones / perfil (PNG o SVG). */
+  diagramaImg: string | null;
   cotizarHref: string;
   fichaUrl: string | null;
-  atributos?: WebAtributo[];
   familiaHref?: string;
 }
 
@@ -21,19 +23,21 @@ const {
   productoImg,
   fondoDesktop,
   fondoMobile,
+  diagramaImg,
   cotizarHref,
   fichaUrl,
-  atributos = [],
   familiaHref = '/#productos',
 } = Astro.props;
 
 const fondoMovil = fondoMobile || fondoDesktop;
+const fichaEsImagen = fichaUrl ? /\.(png|jpe?g|webp|gif|svg)(\?|#|$)/i.test(fichaUrl) && !/\.pdf(\?|#|$)/i.test(fichaUrl) : false;
 ---
 
 <section
-  class="producto-hero relative flex min-h-[100svh] w-full flex-col overflow-hidden bg-cimak-black text-white"
+  class="producto-hero relative flex w-full flex-col overflow-hidden bg-cimak-black text-white md:min-h-[100svh]"
   aria-label={nombreCompleto}
 >
+  <!-- Capa 1: fondo -->
   <div class="absolute inset-0" data-producto-hero-bg>
     {fondoDesktop ? (
       <img
@@ -58,7 +62,7 @@ const fondoMovil = fondoMobile || fondoDesktop;
       <div class="h-full w-full bg-cimak-black" aria-hidden="true"></div>
     )}
     <div
-      class="absolute inset-0 bg-gradient-to-b from-transparent via-cimak-black/55 to-cimak-black"
+      class="absolute inset-0 bg-gradient-to-b from-cimak-black/80 via-cimak-black/50 to-cimak-black"
       aria-hidden="true"
     ></div>
     <div
@@ -67,23 +71,29 @@ const fondoMovil = fondoMobile || fondoDesktop;
     ></div>
   </div>
 
-  <div class="container-cimak relative z-10 flex flex-1 flex-col py-4 sm:py-6 lg:py-8">
-    <nav class="text-[0.65rem] text-white/50 sm:text-[0.7rem]" aria-label="Ruta">
-      <a href="/" class="hover:text-white">Inicio</a>
+  <div class="container-cimak relative z-10 flex flex-col py-3 sm:py-6 lg:py-8">
+    <nav
+      class="no-scrollbar flex items-center gap-1 overflow-x-auto whitespace-nowrap text-[0.68rem] text-white/55 sm:text-[0.7rem]"
+      aria-label="Ruta"
+    >
+      <a href="/" class="shrink-0 hover:text-white">Inicio</a>
       {familiaNombre && (
         <>
-          <span class="mx-1.5">/</span>
-          <a href={familiaHref} class="hover:text-white">{familiaNombre}</a>
+          <span class="shrink-0 opacity-50">/</span>
+          <a href={familiaHref} class="max-w-[42vw] shrink-0 truncate hover:text-white sm:max-w-none">
+            {familiaNombre}
+          </a>
         </>
       )}
-      <span class="mx-1.5">/</span>
-      <span class="text-white/80">{nombreCompleto}</span>
+      <span class="shrink-0 opacity-50">/</span>
+      <span class="truncate text-white/90">{nombreCompleto}</span>
     </nav>
 
-    <div class="mt-4 flex flex-1 items-center pb-8 sm:mt-6 sm:pb-12 lg:pb-16">
-      <div class="grid w-full items-center gap-6 sm:gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-4 lg:gap-6">
+    <div class="mt-3 flex flex-col gap-5 pb-6 sm:mt-5 sm:gap-7 sm:pb-10 md:min-h-[calc(100svh-8rem)] md:justify-center md:pb-12 lg:pb-14">
+      <div class="grid w-full items-center gap-5 sm:gap-7 md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] md:gap-6 lg:gap-10">
+        <!-- Capa 2: producto -->
         <div class="flex justify-center md:justify-start">
-          <div class="producto-hero__media w-full max-w-[300px] min-[420px]:max-w-[400px] sm:max-w-[480px] md:max-w-none md:translate-x-2 lg:translate-x-6">
+          <div class="w-full max-w-[220px] min-[390px]:max-w-[260px] sm:max-w-[320px] md:max-w-none md:translate-x-1 lg:translate-x-4">
             {productoImg ? (
               <img
                 id="producto-hero-img"
@@ -102,59 +112,170 @@ const fondoMovil = fondoMobile || fondoDesktop;
           </div>
         </div>
 
-        <div class="producto-hero__panel relative flex min-h-[240px] flex-col justify-center sm:min-h-[280px] md:min-h-[420px]">
-          <div class="text-center md:text-left">
-            {familiaNombre && (
-              <p class="text-[2rem] font-black uppercase leading-none tracking-tight text-white min-[420px]:text-[2.75rem] sm:text-5xl md:text-[3.25rem] lg:text-[3.75rem]">
-                {familiaNombre}
-              </p>
-            )}
-            <h1
-              class:list={[
-                'font-black uppercase leading-none tracking-tight text-cimak-yellow',
-                familiaNombre
-                  ? 'mt-1 text-[2rem] min-[420px]:text-[2.75rem] sm:text-5xl md:text-[3.25rem] lg:text-[3.75rem]'
-                  : 'text-[2rem] min-[420px]:text-[2.75rem] sm:text-5xl md:text-[3.25rem] lg:text-[3.75rem]',
-              ]}
-            >
-              {modelo}
-            </h1>
+        <!-- Texto + botones (HTML) -->
+        <div class="flex flex-col items-center text-center md:items-start md:text-left">
+          {familiaNombre && (
+            <p class="text-[1.35rem] font-black uppercase leading-[0.95] tracking-tight text-white min-[390px]:text-[1.65rem] sm:text-4xl md:text-[3.1rem] lg:text-[3.6rem]">
+              {familiaNombre}
+            </p>
+          )}
+          <h1
+            class:list={[
+              'font-black uppercase leading-[0.95] tracking-tight text-cimak-yellow',
+              familiaNombre
+                ? 'mt-0.5 text-[1.35rem] min-[390px]:text-[1.65rem] sm:text-4xl md:mt-1 md:text-[3.1rem] lg:text-[3.6rem]'
+                : 'text-[1.35rem] min-[390px]:text-[1.65rem] sm:text-4xl md:text-[3.1rem] lg:text-[3.6rem]',
+            ]}
+          >
+            {modelo}
+          </h1>
 
-            <div class="mt-5 flex flex-wrap justify-center gap-2.5 md:justify-start lg:mt-7">
-              <a
-                href={cotizarHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex min-h-11 min-w-[140px] items-center justify-center rounded-sm bg-cimak-yellow px-7 text-xs font-bold uppercase tracking-wide text-cimak-black transition hover:brightness-105 sm:text-sm"
-              >
-                Cotizar
-              </a>
-              {fichaUrl && (
-                <a
-                  href={fichaUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex min-h-11 min-w-[140px] items-center justify-center rounded-sm border border-white px-7 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-white hover:text-cimak-black sm:text-sm"
+          <div class="mt-4 grid w-full max-w-sm grid-cols-2 gap-2.5 sm:mt-5 sm:max-w-md md:mt-7 md:flex md:max-w-none md:flex-wrap md:justify-start">
+            <a
+              href={cotizarHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex min-h-11 w-full items-center justify-center rounded-sm bg-cimak-yellow px-4 text-[0.7rem] font-bold uppercase tracking-wide text-cimak-black transition hover:brightness-105 sm:text-sm md:min-w-[140px] md:w-auto md:px-7"
+            >
+              Cotizar
+            </a>
+            {fichaUrl && (
+              <div class="ficha-tecnica" data-ficha-modal>
+                <button
+                  type="button"
+                  data-ficha-open
+                  class="inline-flex min-h-11 w-full items-center justify-center rounded-sm border border-white px-4 text-[0.7rem] font-bold uppercase tracking-wide text-white transition hover:bg-white hover:text-cimak-black sm:text-sm md:min-w-[140px] md:w-auto md:px-7"
                 >
                   Ficha técnica
-                </a>
-              )}
-            </div>
+                </button>
+
+                <div
+                  data-ficha-dialog
+                  class="ficha-tecnica__dialog fixed inset-0 z-[200] hidden items-center justify-center p-3 sm:p-6"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="ficha-tecnica-titulo"
+                  aria-hidden="true"
+                  data-lenis-prevent
+                >
+                  <button
+                    type="button"
+                    data-ficha-close
+                    class="absolute inset-0 bg-cimak-black/92 backdrop-blur-sm"
+                    aria-label="Cerrar ficha técnica"
+                  ></button>
+
+                  <div
+                    class="ficha-tecnica__panel relative z-10 flex max-h-[92svh] w-full max-w-5xl flex-col overflow-hidden rounded-sm border border-cimak-black/20 bg-[#f3f3f3] shadow-[0_24px_80px_rgba(0,0,0,0.45)]"
+                    data-lenis-prevent
+                  >
+                    <div class="h-1 shrink-0 bg-cimak-yellow" aria-hidden="true"></div>
+
+                    <header class="flex shrink-0 items-center justify-between gap-3 bg-cimak-black px-4 py-3 sm:px-5 sm:py-4">
+                      <div class="min-w-0">
+                        <p class="text-[0.6rem] font-bold uppercase tracking-[0.22em] text-cimak-yellow sm:text-[0.65rem]">
+                          CIMAK Perú
+                        </p>
+                        <h2
+                          id="ficha-tecnica-titulo"
+                          class="truncate text-sm font-black uppercase tracking-wide text-white sm:text-base"
+                        >
+                          Ficha técnica
+                        </h2>
+                        <p class="truncate text-xs text-white/55 sm:text-sm">{nombreCompleto}</p>
+                      </div>
+                      <div class="flex shrink-0 items-center gap-2">
+                        <a
+                          href={fichaUrl}
+                          download
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="hidden min-h-10 items-center justify-center rounded-sm bg-cimak-yellow px-4 text-[0.65rem] font-bold uppercase tracking-wide text-cimak-black transition hover:brightness-105 sm:inline-flex sm:text-xs"
+                        >
+                          Descargar
+                        </a>
+                        <button
+                          type="button"
+                          data-ficha-close
+                          class="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-white/35 text-lg leading-none text-white transition hover:border-white hover:bg-white hover:text-cimak-black"
+                          aria-label="Cerrar"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    </header>
+
+                    <div class="ficha-tecnica__body min-h-0 flex-1 overflow-hidden p-2 sm:p-3" data-lenis-prevent>
+                      <div class="ficha-tecnica__viewer h-full overflow-hidden rounded-sm border border-black/10 bg-white shadow-sm">
+                        {fichaEsImagen ? (
+                          <div class="flex h-full min-h-[50svh] items-start justify-center overflow-auto p-4 sm:p-6">
+                            <img
+                              src={fichaUrl}
+                              alt={`Ficha técnica de ${nombreCompleto}`}
+                              class="w-auto max-w-full object-contain"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          </div>
+                        ) : (
+                          <iframe
+                            src={`${fichaUrl}#view=FitH`}
+                            title={`Ficha técnica de ${nombreCompleto}`}
+                            class="ficha-tecnica__iframe block h-full min-h-[60svh] w-full border-0 bg-white"
+                            loading="lazy"
+                          ></iframe>
+                        )}
+                      </div>
+                    </div>
+
+                    <footer class="flex shrink-0 items-center gap-2 border-t border-cimak-black/10 bg-cimak-black px-4 py-3 sm:hidden">
+                      <a
+                        href={fichaUrl}
+                        download
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex min-h-11 flex-1 items-center justify-center rounded-sm bg-cimak-yellow text-xs font-bold uppercase tracking-wide text-cimak-black transition hover:brightness-105"
+                      >
+                        Descargar
+                      </a>
+                      <button
+                        type="button"
+                        data-ficha-close
+                        class="inline-flex min-h-11 items-center justify-center rounded-sm border border-white/35 px-4 text-xs font-bold uppercase tracking-wide text-white"
+                      >
+                        Cerrar
+                      </button>
+                    </footer>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
-          {atributos.length > 0 && (
-            <dl class="producto-hero__specs mt-8 grid gap-3 text-center md:absolute md:bottom-0 md:right-0 md:mt-0 md:text-left">
-              {atributos.map((atributo) => (
-                <div>
-                  <dt class="text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-cimak-yellow/90">
-                    {atributo.label}
-                  </dt>
-                  <dd class="mt-0.5 text-sm font-bold text-white sm:text-base">{atributo.valor}</dd>
-                </div>
-              ))}
-            </dl>
+          {diagramaImg && (
+            <div class="mt-5 w-full max-w-[280px] sm:max-w-[320px] md:mt-10 md:hidden">
+              <img
+                src={diagramaImg}
+                alt={`Dimensiones de ${nombreCompleto}`}
+                class="producto-hero__img h-auto w-full object-contain opacity-95"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
           )}
 
+          <!-- Capa 3: diagrama (escritorio) -->
+          {diagramaImg && (
+            <div class="mt-8 hidden w-full max-w-[420px] md:mt-10 md:block lg:max-w-[480px]">
+              <img
+                src={diagramaImg}
+                alt={`Dimensiones de ${nombreCompleto}`}
+                class="producto-hero__img h-auto w-full object-contain object-left"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -167,15 +288,120 @@ const fondoMovil = fondoMobile || fondoDesktop;
     box-shadow: none;
   }
 
-  .producto-hero__media,
-  .producto-hero__panel h1,
-  .producto-hero__panel p,
-  .producto-hero__panel a {
-    text-shadow: none;
+  .producto-hero a,
+  .producto-hero button[data-ficha-open] {
     box-shadow: none;
+    text-shadow: none;
   }
 
-  .producto-hero__panel a.bg-cimak-yellow {
+  .ficha-tecnica__dialog:not(.hidden) {
+    display: flex;
+    overscroll-behavior: contain;
+  }
+
+  .ficha-tecnica__panel {
+    touch-action: pan-y;
+    font-family: var(--font-sans);
+  }
+
+  .ficha-tecnica__body {
+    overscroll-behavior: contain;
+    background-color: #f3f3f3;
+  }
+
+  .ficha-tecnica__viewer {
+    background: #fff;
+  }
+
+  .ficha-tecnica__iframe {
+    min-height: min(75svh, 720px);
+  }
+
+  .ficha-tecnica__panel a,
+  .ficha-tecnica__panel button[data-ficha-close] {
     box-shadow: none;
+    text-shadow: none;
+  }
+
+  :global(html.ficha-modal-open),
+  :global(html.ficha-modal-open body) {
+    overflow: hidden !important;
   }
 </style>
+
+<script>
+  const modales = document.querySelectorAll('[data-ficha-modal]');
+
+  const bloquearScrollPagina = () => {
+    const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.documentElement.classList.add('ficha-modal-open');
+    document.body.dataset.fichaScrollY = String(scrollY);
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+    window.lenis?.stop?.();
+  };
+
+  const desbloquearScrollPagina = () => {
+    const scrollY = Number(document.body.dataset.fichaScrollY || 0);
+    document.documentElement.classList.remove('ficha-modal-open');
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    delete document.body.dataset.fichaScrollY;
+    window.lenis?.start?.();
+    if (window.lenis?.scrollTo) {
+      window.lenis.scrollTo(scrollY, { immediate: true });
+    } else {
+      window.scrollTo(0, scrollY);
+    }
+  };
+
+  modales.forEach((root) => {
+    const dialog = root.querySelector('[data-ficha-dialog]');
+    const openBtn = root.querySelector('[data-ficha-open]');
+    const closeBtns = root.querySelectorAll('[data-ficha-close]');
+    if (!dialog || !openBtn) return;
+
+    let ultimoFoco = null;
+
+    const abrir = () => {
+      ultimoFoco = document.activeElement;
+      dialog.classList.remove('hidden');
+      dialog.classList.add('flex');
+      dialog.setAttribute('aria-hidden', 'false');
+      bloquearScrollPagina();
+      dialog.querySelector('[data-ficha-close][aria-label="Cerrar"]')?.focus();
+    };
+
+    const cerrar = () => {
+      dialog.classList.add('hidden');
+      dialog.classList.remove('flex');
+      dialog.setAttribute('aria-hidden', 'true');
+      desbloquearScrollPagina();
+      ultimoFoco?.focus?.();
+    };
+
+    openBtn.addEventListener('click', abrir);
+    closeBtns.forEach((btn) => btn.addEventListener('click', cerrar));
+
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        cerrar();
+      }
+    });
+
+    dialog.addEventListener(
+      'wheel',
+      (event) => {
+        event.stopPropagation();
+      },
+      { passive: true },
+    );
+  });
+</script>

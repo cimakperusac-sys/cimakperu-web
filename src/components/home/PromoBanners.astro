@@ -12,8 +12,32 @@ const slides = [
 ];
 ---
 
-<section id="promociones" class="reveal-on-scroll w-full" aria-label="Promociones">
-  <div class="relative grid grid-cols-1 items-stretch lg:grid-cols-2">
+<section id="promociones" class="reveal-on-scroll relative z-10 w-full overflow-visible" aria-label="Promociones">
+  <!-- Móvil: franja catálogo (Figma) -->
+  <a
+    href="/catalogo"
+    class="promo-catalog-mobile group relative z-10 block overflow-visible bg-cimak-yellow lg:hidden"
+    aria-label="Catálogo de productos"
+  >
+    <div class="promo-catalog-mobile__text relative z-10">
+      <h2 class="text-[1.05rem] font-extrabold uppercase leading-[1.05] tracking-tight text-cimak-black">
+        Catálogo<br />de productos
+      </h2>
+    </div>
+    <div class="promo-catalog-mobile__book pointer-events-none absolute z-30">
+      <Image
+        src={catalogoImg}
+        alt=""
+        class="h-auto w-full drop-shadow-xl"
+        width={339}
+        height={223}
+        loading="eager"
+        decoding="async"
+      />
+    </div>
+  </a>
+
+  <div class="relative hidden grid-cols-1 items-stretch lg:grid lg:grid-cols-2">
     <!-- Izquierda amarilla -->
     <a
       href="/catalogo"
@@ -54,8 +78,8 @@ const slides = [
       </div>
     </a>
 
-    <!-- Derecha: imagen producto -->
-    <div id="promo-carousel" class="relative z-0 overflow-hidden bg-[#2a6aa8]" data-slides={slides.length}>
+    <!-- Derecha: imagen producto (solo escritorio; en móvil va el catálogo arriba) -->
+    <div id="promo-carousel" class="relative z-0 hidden overflow-hidden bg-[#2a6aa8] lg:block" data-slides={slides.length}>
       {slides.map((slide, index) => (
         <a
           href={slide.href}
@@ -99,6 +123,24 @@ const slides = [
 </section>
 
 <style>
+  .promo-catalog-mobile {
+    padding: 0.9rem 44% 0.9rem 1rem;
+  }
+
+  .promo-catalog-mobile__book {
+    right: 0;
+    bottom: 0;
+    width: min(58vw, 13.25rem);
+    transform: translateX(5%);
+    line-height: 0;
+  }
+
+  .promo-catalog-mobile__book img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
   .promo-content-left {
     padding-left: var(--spacing-gutter);
   }

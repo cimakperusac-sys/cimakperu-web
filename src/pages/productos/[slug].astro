@@ -53,13 +53,13 @@ const galeria = (producto.galeria ?? []).filter((g) => g?.url);
 const productoImg = producto.url || galeria[0]?.url || null;
 const fondoDesktop = producto.hero_url || producto.familia?.url || null;
 const fondoMobile = producto.hero_url_mobile || producto.hero_url || producto.familia?.url || null;
+const diagramaImg = producto.diagrama_url || null;
 
 const miniaturas = [
   ...(producto.url ? [{ url: producto.url, alt: nombre }] : []),
   ...galeria.map((g) => ({ url: g.url as string, alt: g.alt || g.titulo || nombre })),
 ].filter((item, index, list) => list.findIndex((x) => x.url === item.url) === index);
 
-const atributos = (producto.atributos ?? []).filter((a) => a?.label || a?.valor);
 const colores = (producto.colores ?? []).filter((c) => c?.hex || c?.url || c?.codigo);
 const relacionados = producto.relacionados ?? [];
 const fichaUrl = producto.ficha_url || null;
@@ -131,9 +131,9 @@ const schemas = [
       productoImg={productoImg}
       fondoDesktop={fondoDesktop}
       fondoMobile={fondoMobile}
+      diagramaImg={diagramaImg}
       cotizarHref={cotizarHref(nombre)}
       fichaUrl={fichaUrl}
-      atributos={atributos}
       familiaHref={familiaHrefUrl}
     />
 

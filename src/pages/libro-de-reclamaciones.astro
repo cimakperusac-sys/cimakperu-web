@@ -1,0 +1,411 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site } from '../data/site';
+---
+
+<Layout
+  title="Libro de Reclamaciones Virtual | CIMAK Perú"
+  description="Formulario virtual del Libro de Reclamaciones de CIMAK PERU S.A.C., conforme a la normativa peruana."
+  canonical="/libro-de-reclamaciones"
+  type="article"
+>
+  <main class="bg-[#f3f3f3] py-8 sm:py-10 lg:py-12">
+    <div class="container-cimak">
+      <article class="reclamos-page mx-auto max-w-4xl rounded-xl bg-white px-5 py-8 shadow-sm sm:px-8 sm:py-10 lg:px-10">
+        <header class="border-b border-black/10 pb-6 text-center">
+          <nav class="mb-4 text-left text-xs text-cimak-black/55" aria-label="Ruta">
+            <a href="/" class="hover:text-cimak-black">Inicio</a>
+            <span class="mx-1.5">/</span>
+            <span class="text-cimak-black">Libro de reclamaciones</span>
+          </nav>
+
+          <div class="h-1 w-16 bg-cimak-yellow mx-auto mb-4" aria-hidden="true"></div>
+          <h1 class="text-lg font-black uppercase tracking-wide text-cimak-black sm:text-xl">
+            Libro de Reclamaciones Virtual
+          </h1>
+
+          <div class="mt-5 space-y-1 text-sm text-cimak-black/80">
+            <p><strong>Razón Social:</strong> {site.legalName.toUpperCase()}</p>
+            <p>
+              <strong>Dirección:</strong> Jr. Sodio 252, Urb. Industrial Infantas, Los Olivos, Lima, Perú.
+            </p>
+            <p>
+              <strong>Canal Oficial de Atención:</strong>{' '}
+              <a href={site.social.whatsapp} target="_blank" rel="noopener noreferrer" class="text-cimak-black underline">
+                WhatsApp {site.phone}
+              </a>
+            </p>
+          </div>
+        </header>
+
+        <form id="form-libro-reclamaciones" class="mt-8 space-y-8" novalidate>
+          <section class="reclamos-section" aria-labelledby="reclamos-sec-1">
+            <h2 id="reclamos-sec-1" class="reclamos-section__title">1. Identificación del Consumidor Reclamante</h2>
+            <div class="reclamos-grid">
+              <div class="reclamos-field reclamos-field--full">
+                <label for="nombre_completo">Nombre completo / Razón Social</label>
+                <input id="nombre_completo" name="nombre_completo" type="text" required />
+              </div>
+              <div class="reclamos-field">
+                <label for="tipo_documento">Tipo de Documento</label>
+                <select id="tipo_documento" name="tipo_documento" required>
+                  <option value="DNI">DNI</option>
+                  <option value="CE">CE</option>
+                  <option value="RUC">RUC</option>
+                </select>
+              </div>
+              <div class="reclamos-field">
+                <label for="numero_documento">Número de DNI / CE / RUC</label>
+                <input id="numero_documento" name="numero_documento" type="text" required />
+              </div>
+              <div class="reclamos-field">
+                <label for="telefono">Teléfono / Celular (Campo numérico obligatorio)</label>
+                <input id="telefono" name="telefono" type="tel" inputmode="numeric" required />
+              </div>
+              <div class="reclamos-field">
+                <label for="email">Correo Electrónico</label>
+                <input id="email" name="email" type="email" required />
+              </div>
+              <div class="reclamos-field reclamos-field--full">
+                <label for="direccion">Dirección Completa</label>
+                <input id="direccion" name="direccion" type="text" required />
+              </div>
+            </div>
+          </section>
+
+          <section class="reclamos-section" aria-labelledby="reclamos-sec-2">
+            <h2 id="reclamos-sec-2" class="reclamos-section__title">2. Identificación del Bien Contratado</h2>
+            <div class="reclamos-grid">
+              <div class="reclamos-field">
+                <label for="tipo_bien">Tipo</label>
+                <select id="tipo_bien" name="tipo_bien" required>
+                  <option value="producto">Producto</option>
+                  <option value="servicio">Servicio</option>
+                </select>
+              </div>
+              <div class="reclamos-field">
+                <label for="monto_reclamado">Monto Reclamado (S/.)</label>
+                <input id="monto_reclamado" name="monto_reclamado" type="text" inputmode="decimal" />
+              </div>
+              <div class="reclamos-field reclamos-field--full">
+                <label for="numero_comprobante">Número de Pedido / Factura / Guía de Remisión</label>
+                <input id="numero_comprobante" name="numero_comprobante" type="text" />
+              </div>
+              <div class="reclamos-field reclamos-field--full">
+                <label for="descripcion_bien">Descripción del Bien</label>
+                <textarea id="descripcion_bien" name="descripcion_bien" rows="3"></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="reclamos-section" aria-labelledby="reclamos-sec-3">
+            <h2 id="reclamos-sec-3" class="reclamos-section__title">3. Detalle de la Reclamación</h2>
+
+            <fieldset class="reclamos-radio-group">
+              <legend class="sr-only">Tipo de solicitud</legend>
+              <label class="reclamos-radio">
+                <input type="radio" name="tipo_reclamo" value="reclamo" required />
+                <span>
+                  <strong>Reclamo:</strong> Disconformidad relacionada directamente con los productos o servicios.
+                </span>
+              </label>
+              <label class="reclamos-radio">
+                <input type="radio" name="tipo_reclamo" value="queja" />
+                <span>
+                  <strong>Queja:</strong> Disconformidad no relacionada a los productos, sino a la atención al cliente.
+                </span>
+              </label>
+            </fieldset>
+
+            <div class="reclamos-grid mt-4">
+              <div class="reclamos-field reclamos-field--full">
+                <label for="detalle">Detalle / Descripción de la solicitud</label>
+                <textarea id="detalle" name="detalle" rows="5" maxlength="1200" required></textarea>
+                <p class="reclamos-hint"><span id="detalle-count">0</span> / 1200 caracteres</p>
+              </div>
+              <div class="reclamos-field reclamos-field--full">
+                <label for="pedido_consumidor">Pedido / Solicitud del Consumidor</label>
+                <textarea id="pedido_consumidor" name="pedido_consumidor" rows="3" maxlength="300" required></textarea>
+                <p class="reclamos-hint"><span id="pedido-count">0</span> / 300 caracteres</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="reclamos-section" aria-labelledby="reclamos-sec-4">
+            <h2 id="reclamos-sec-4" class="reclamos-section__title">4. Aceptación Legal y Envío</h2>
+
+            <div class="space-y-3 text-sm text-cimak-black/85">
+              <label class="reclamos-check">
+                <input type="checkbox" name="acepta_declaracion" value="1" required />
+                <span>
+                  Declaro ser el titular del servicio y confirmo que los hechos descritos son verídicos.
+                </span>
+              </label>
+              <label class="reclamos-check">
+                <input type="checkbox" name="acepta_privacidad" value="1" required />
+                <span>
+                  Acepto las{' '}
+                  <a href="/privacidad" target="_blank" rel="noopener noreferrer" class="underline">
+                    Políticas de Privacidad
+                  </a>{' '}
+                  y el tratamiento de mis datos personales.
+                </span>
+              </label>
+            </div>
+
+            <p class="reclamos-note mt-4">
+              La formulación de la reclamación no impide acudir a otras vías de solución de controversias ni es requisito
+              previo para interponer una denuncia ante el INDECOPI. El plazo máximo de respuesta es de quince (15) días
+              calendario.
+            </p>
+
+            <p id="reclamos-feedback" class="reclamos-feedback hidden" role="status" aria-live="polite"></p>
+
+            <div class="mt-6 flex justify-center">
+              <button type="submit" id="reclamos-submit" class="reclamos-submit">
+                Enviar
+              </button>
+            </div>
+          </section>
+        </form>
+      </article>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .reclamos-page {
+    font-family: var(--font-sans);
+  }
+
+  .reclamos-section__title {
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--color-cimak-yellow);
+    font-size: 0.95rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-cimak-black);
+  }
+
+  .reclamos-grid {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  @media (min-width: 640px) {
+    .reclamos-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .reclamos-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .reclamos-field--full {
+    grid-column: 1 / -1;
+  }
+
+  .reclamos-field label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-cimak-black);
+  }
+
+  .reclamos-field input,
+  .reclamos-field select,
+  .reclamos-field textarea {
+    width: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 0.25rem;
+    background: #fff;
+    padding: 0.65rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-cimak-black);
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .reclamos-field input:focus,
+  .reclamos-field select:focus,
+  .reclamos-field textarea:focus {
+    border-color: var(--color-cimak-yellow);
+  }
+
+  .reclamos-hint {
+    margin: 0.25rem 0 0;
+    font-size: 0.72rem;
+    color: rgba(17, 17, 17, 0.55);
+    text-align: right;
+  }
+
+  .reclamos-radio-group {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .reclamos-radio {
+    display: flex;
+    gap: 0.65rem;
+    align-items: flex-start;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: var(--color-cimak-black);
+    cursor: pointer;
+  }
+
+  .reclamos-radio input {
+    margin-top: 0.2rem;
+    accent-color: var(--color-cimak-yellow);
+  }
+
+  .reclamos-check {
+    display: flex;
+    gap: 0.65rem;
+    align-items: flex-start;
+    cursor: pointer;
+  }
+
+  .reclamos-check input {
+    margin-top: 0.15rem;
+    accent-color: var(--color-cimak-yellow);
+  }
+
+  .reclamos-note {
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: rgba(17, 17, 17, 0.7);
+    border-left: 3px solid var(--color-cimak-yellow);
+    padding-left: 0.75rem;
+  }
+
+  .reclamos-submit {
+    min-width: 180px;
+    border: 0;
+    border-radius: 0.25rem;
+    background: var(--color-cimak-black);
+    color: #fff;
+    padding: 0.8rem 2.5rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .reclamos-submit:hover:not(:disabled) {
+    background: var(--color-cimak-yellow);
+    color: var(--color-cimak-black);
+  }
+
+  .reclamos-submit:disabled {
+    opacity: 0.65;
+    cursor: wait;
+  }
+
+  .reclamos-feedback {
+    margin-top: 1rem;
+    border-radius: 0.35rem;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.85rem;
+    line-height: 1.45;
+  }
+
+  .reclamos-feedback.is-error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+
+  .reclamos-feedback.is-success {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+</style>
+
+<script>
+  import { enviarLibroReclamacion } from '../lib/api';
+
+  const form = document.getElementById('form-libro-reclamaciones');
+  const feedback = document.getElementById('reclamos-feedback');
+  const submitBtn = document.getElementById('reclamos-submit');
+  const detalle = document.getElementById('detalle');
+  const pedido = document.getElementById('pedido_consumidor');
+  const detalleCount = document.getElementById('detalle-count');
+  const pedidoCount = document.getElementById('pedido-count');
+
+  const actualizarContador = (input, output) => {
+    if (!input || !output) return;
+    output.textContent = String(input.value.length);
+  };
+
+  detalle?.addEventListener('input', () => actualizarContador(detalle, detalleCount));
+  pedido?.addEventListener('input', () => actualizarContador(pedido, pedidoCount));
+
+  const mostrarMensaje = (texto, tipo) => {
+    if (!feedback) return;
+    feedback.textContent = texto;
+    feedback.classList.remove('hidden', 'is-error', 'is-success');
+    feedback.classList.add(tipo === 'success' ? 'is-success' : 'is-error');
+  };
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!(form instanceof HTMLFormElement) || !(submitBtn instanceof HTMLButtonElement)) return;
+
+    const data = new FormData(form);
+    const tipoReclamo = data.get('tipo_reclamo');
+    if (!tipoReclamo) {
+      mostrarMensaje('Seleccione si su solicitud es un reclamo o una queja.', 'error');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando...';
+
+    const resultado = await enviarLibroReclamacion({
+      nombre_completo: String(data.get('nombre_completo') || '').trim(),
+      tipo_documento: String(data.get('tipo_documento') || 'DNI') as 'DNI' | 'CE' | 'RUC',
+      numero_documento: String(data.get('numero_documento') || '').trim(),
+      telefono: String(data.get('telefono') || '').trim(),
+      email: String(data.get('email') || '').trim(),
+      direccion: String(data.get('direccion') || '').trim(),
+      tipo_bien: String(data.get('tipo_bien') || 'producto') as 'producto' | 'servicio',
+      monto_reclamado: String(data.get('monto_reclamado') || '').trim(),
+      numero_comprobante: String(data.get('numero_comprobante') || '').trim(),
+      descripcion_bien: String(data.get('descripcion_bien') || '').trim(),
+      tipo_reclamo: String(tipoReclamo) as 'reclamo' | 'queja',
+      detalle: String(data.get('detalle') || '').trim(),
+      pedido_consumidor: String(data.get('pedido_consumidor') || '').trim(),
+      acepta_declaracion: data.get('acepta_declaracion') === '1',
+      acepta_privacidad: data.get('acepta_privacidad') === '1',
+    });
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Enviar';
+
+    if (!resultado.success) {
+      mostrarMensaje(resultado.error || 'No se pudo enviar la reclamación.', 'error');
+      return;
+    }
+
+    const codigo = resultado.data?.codigo ? ` Código: ${resultado.data.codigo}.` : '';
+    mostrarMensaje(
+      `Su reclamación fue registrada correctamente.${codigo} Le responderemos en un plazo máximo de 15 días.`,
+      'success',
+    );
+    form.reset();
+    actualizarContador(detalle, detalleCount);
+    actualizarContador(pedido, pedidoCount);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>

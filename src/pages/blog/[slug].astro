@@ -1,0 +1,250 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import BlogMiniCard from '../../components/blog/BlogMiniCard.astro';
+import { getBlog, getBlogs } from '../../lib/api';
+import { cmsHtml } from '../../lib/cmsHtml';
+import { site } from '../../data/site';
+import type { WebBlogCard } from '../../lib/types/web';
+
+export async function getStaticPaths() {
+  const articulos = await getBlogs();
+  return articulos
+    .filter((a) => a.slug)
+    .map((a) => ({ params: { slug: String(a.slug) } }));
+}
+
+const { slug } = Astro.params;
+if (!slug) {
+  return Astro.redirect('/blog');
+}
+
+const [articulo, todos] = await Promise.all([getBlog(slug), getBlogs()]);
+if (!articulo) {
+  return Astro.redirect('/blog');
+}
+
+const canonical = `/blog/${slug}`;
+const seoTitle = articulo.seo_title || `${articulo.titulo} | Blog CIMAK`;
+const seoDesc = articulo.seo_description || articulo.resumen || articulo.titulo;
+const heroImg = articulo.portada_url || undefined;
+const fecha = articulo.publicado_en
+  ? new Date(articulo.publicado_en).toLocaleDateString('es-PE', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+  : '';
+
+const contenidoHtml = cmsHtml(articulo.contenido || '');
+const enlaces = articulo.enlaces ?? [];
+const etiquetas = articulo.etiquetas ?? [];
+
+const tagSet = new Set(etiquetas.map((t) => t.toLowerCase()));
+
+const ordenarOtros = (lista: WebBlogCard[]) =>
+  [...lista].sort((a, b) => {
+    const scoreA = (a.etiquetas ?? []).filter((t) => tagSet.has(t.toLowerCase())).length;
+    const scoreB = (b.etiquetas ?? []).filter((t) => tagSet.has(t.toLowerCase())).length;
+    if (scoreB !== scoreA) return scoreB - scoreA;
+    const dateA = a.publicado_en ? new Date(a.publicado_en).getTime() : 0;
+    const dateB = b.publicado_en ? new Date(b.publicado_en).getTime() : 0;
+    return dateB - dateA;
+  });
+
+const otros = ordenarOtros(todos.filter((a) => a.slug !== slug));
+const izquierda = otros.slice(0, 3);
+const derecha = otros.slice(3, 6);
+const movil = otros.slice(0, 6);
+
+const siteUrl = (Astro.site?.href || site.url).replace(/\/$/, '');
+const absoluta = (path: string) => new URL(path, `${siteUrl}/`).href;
+
+const schemas = [
+  {
+    '@type': 'BlogPosting',
+    headline: articulo.titulo,
+    description: seoDesc,
+    ...(heroImg ? { image: heroImg } : {}),
+    datePublished: articulo.publicado_en,
+    author: { '@type': 'Person', name: articulo.autor },
+    publisher: { '@type': 'Organization', name: site.legalName },
+    url: absoluta(canonical),
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: absoluta('/') },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: absoluta('/blog') },
+      { '@type': 'ListItem', position: 3, name: articulo.titulo, item: absoluta(canonical) },
+    ],
+  },
+];
+---
+
+<Layout
+  title={seoTitle}
+  description={seoDesc}
+  image={heroImg}
+  imageAlt={articulo.titulo}
+  canonical={canonical}
+  keywords={articulo.seo_keywords || undefined}
+  type="article"
+  schemas={schemas}
+>
+  <main class="blog-page blog-article">
+    <div class="container-cimak blog-article__wrap">
+      <nav class="blog-page__crumb blog-article__crumb" aria-label="Ruta">
+        <a href="/">Inicio</a>
+        <span aria-hidden="true">/</span>
+        <a href="/blog">Blog</a>
+      </nav>
+
+      <div class:list={['blog-article__grid', { 'blog-article__grid--with-left': izquierda.length > 0 }]}>
+        {izquierda.length > 0 && (
+          <aside class="blog-article__rail blog-article__rail--left" aria-label="Más artículos">
+            <p class="blog-article__rail-title">Más artículos</p>
+            <div class="blog-article__rail-list">
+              {izquierda.map((item) => (
+                <BlogMiniCard item={item} compact />
+              ))}
+            </div>
+          </aside>
+        )}
+
+        <article class="blog-article__main">
+          <header class="blog-article__header">
+            {etiquetas.length > 0 && (
+              <div class="blog-article__tags">
+                {etiquetas.slice(0, 4).map((tag) => (
+                  <span>{tag}</span>
+                ))}
+              </div>
+            )}
+
+            <h1 class="blog-article__title">{articulo.titulo}</h1>
+
+            {articulo.resumen && (
+              <p class="blog-article__lead">{articulo.resumen}</p>
+            )}
+
+            <div class="blog-article__byline">
+              <div class="blog-article__author">
+                {articulo.autor_avatar_url ? (
+                  <img src={articulo.autor_avatar_url} alt="" class="blog-article__avatar" loading="lazy" />
+                ) : (
+                  <span class="blog-article__avatar blog-article__avatar--initial" aria-hidden="true">
+                    {(articulo.autor || 'C').charAt(0).toUpperCase()}
+                  </span>
+                )}
+                <div>
+                  <p class="blog-article__author-name">{articulo.autor}</p>
+                  {articulo.autor_cargo && (
+                    <p class="blog-article__author-role">{articulo.autor_cargo}</p>
+                  )}
+                </div>
+              </div>
+              <p class="blog-article__date">
+                {fecha && <time datetime={articulo.publicado_en}>{fecha}</time>}
+                {articulo.tiempo_lectura && <span>{articulo.tiempo_lectura} min de lectura</span>}
+              </p>
+            </div>
+          </header>
+
+          {(articulo.portada_url || articulo.video_url) && (
+            <figure class="blog-article__figure">
+              {articulo.tipo_media === 'video' && articulo.video_url ? (
+                <div class="blog-article__video">
+                  <iframe
+                    src={articulo.video_url}
+                    title={articulo.titulo}
+                    loading="lazy"
+                    allowfullscreen
+                  ></iframe>
+                </div>
+              ) : articulo.portada_url ? (
+                <img
+                  src={articulo.portada_url}
+                  alt={articulo.titulo}
+                  loading="eager"
+                  decoding="async"
+                />
+              ) : null}
+            </figure>
+          )}
+
+          <div class="blog-article__content cms-prose cms-prose--blog" set:html={contenidoHtml} />
+
+          {enlaces.length > 0 && (
+            <aside class="blog-article__related blog-article__related--mobile" aria-label="Enlaces relacionados">
+              <h2>Te puede interesar</h2>
+              <ul>
+                {enlaces.map((enlace) => (
+                  <li>
+                    <a href={enlace.url}>{enlace.titulo}</a>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
+        </article>
+
+        <aside class="blog-article__rail blog-article__rail--right" aria-label="Artículos relacionados">
+          {derecha.length > 0 && (
+            <div class="blog-article__rail-block">
+              <p class="blog-article__rail-title">También leer</p>
+              <div class="blog-article__rail-list">
+                {derecha.map((item) => (
+                  <BlogMiniCard item={item} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div class="blog-article__aside-card">
+            <p class="blog-article__aside-label">Este artículo</p>
+            {fecha && (
+              <p class="blog-article__aside-meta">
+                <time datetime={articulo.publicado_en}>{fecha}</time>
+              </p>
+            )}
+            {articulo.tiempo_lectura && (
+              <p class="blog-article__aside-meta">{articulo.tiempo_lectura} min de lectura</p>
+            )}
+            <a href="/blog" class="blog-article__aside-back">Ver todos los artículos</a>
+          </div>
+
+          {enlaces.length > 0 && (
+            <div class="blog-article__aside-card blog-article__related blog-article__related--desktop">
+              <h2>Enlaces útiles</h2>
+              <ul>
+                {enlaces.map((enlace) => (
+                  <li>
+                    <a href={enlace.url}>{enlace.titulo}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </aside>
+      </div>
+
+      {movil.length > 0 && (
+        <section class="blog-article__more" aria-label="Más artículos del blog">
+          <div class="blog-article__more-head">
+            <h2>Más artículos</h2>
+            <a href="/blog">Ver todos</a>
+          </div>
+          <div class="blog-article__more-scroll">
+            {movil.map((item) => (
+              <BlogMiniCard item={item} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <footer class="blog-article__footer">
+        <a href="/blog" class="blog-article__aside-back">← Volver al blog</a>
+      </footer>
+    </div>
+  </main>
+</Layout>

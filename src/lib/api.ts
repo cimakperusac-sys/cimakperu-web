@@ -1,5 +1,7 @@
 import type {
   ApiEnvelope,
+  WebBlog,
+  WebBlogCard,
   WebFamilia,
   WebHome,
   WebMenuFamilia,
@@ -84,4 +86,60 @@ export async function getMeta(clave: string): Promise<WebMeta | null> {
   return crmGet<WebMeta>(`/meta/${encodeURIComponent(clave)}`);
 }
 
+export async function getBlogs(limite?: number): Promise<WebBlogCard[]> {
+  const q = limite && limite > 0 ? `?limite=${limite}` : '';
+  return (await crmGet<WebBlogCard[]>(`/blogs${q}`)) ?? [];
+}
+
+export async function getBlog(slug: string): Promise<WebBlog | null> {
+  return crmGet<WebBlog>(`/blogs/${encodeURIComponent(slug)}`);
+}
+
 export { baseUrl as crmApiBaseUrl };
+
+export type LibroReclamacionPayload = {
+  nombre_completo: string;
+  tipo_documento: 'DNI' | 'CE' | 'RUC';
+  numero_documento: string;
+  telefono: string;
+  email: string;
+  direccion: string;
+  tipo_bien: 'producto' | 'servicio';
+  monto_reclamado?: string;
+  numero_comprobante?: string;
+  descripcion_bien?: string;
+  tipo_reclamo: 'reclamo' | 'queja';
+  detalle: string;
+  pedido_consumidor: string;
+  acepta_declaracion: boolean;
+  acepta_privacidad: boolean;
+};
+
+export async function enviarLibroReclamacion(
+  payload: LibroReclamacionPayload,
+): Promise<{ success: boolean; data?: { id: number; codigo: string; mensaje?: string }; error?: string }> {
+  const url = `${baseUrl()}/v1/public/web/libro-reclamaciones`;
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const json = (await res.json()) as ApiEnvelope<{ id: number; codigo: string; mensaje?: string }> & {
+      error?: string;
+    };
+
+    if (!res.ok || !json?.success) {
+      return { success: false, error: json?.error || 'No se pudo enviar la reclamación.' };
+    }
+
+    return { success: true, data: json.data ?? undefined };
+  } catch {
+    return { success: false, error: 'Error de conexión. Intente nuevamente.' };
+  }
+}

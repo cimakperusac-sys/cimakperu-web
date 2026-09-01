@@ -1,0 +1,129 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getBlogs } from '../../lib/api';
+
+const articulos = await getBlogs();
+const destacado = articulos.find((a) => a.destacado === 1) ?? articulos[0] ?? null;
+const resto = destacado
+  ? articulos.filter((a) => a.slug !== destacado.slug)
+  : articulos;
+
+const formatFecha = (iso?: string | null) =>
+  iso
+    ? new Date(iso).toLocaleDateString('es-PE', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+    : '';
+
+const canonical = '/blog';
+---
+
+<Layout
+  title="Blog | CIMAK Perú"
+  description="Artículos técnicos, guías y novedades sobre coberturas metálicas, Aluzinc, paneles y soluciones CIMAK Perú."
+  canonical={canonical}
+  type="website"
+>
+  <main class="blog-page">
+    <div class="container-cimak blog-page__wrap">
+      <header class="blog-page__header">
+        <nav class="blog-page__crumb" aria-label="Ruta">
+          <a href="/">Inicio</a>
+          <span aria-hidden="true">/</span>
+          <span>Blog</span>
+        </nav>
+        <p class="blog-page__kicker">Recursos técnicos</p>
+        <h1 class="blog-page__title">Blog CIMAK</h1>
+        <p class="blog-page__lead">
+          Guías prácticas sobre techos, paneles y coberturas metálicas para tu obra.
+        </p>
+      </header>
+
+      {articulos.length === 0 ? (
+        <div class="blog-empty">Pronto publicaremos nuevos artículos.</div>
+      ) : (
+        <>
+          {destacado && (
+            <a href={`/blog/${destacado.slug}`} class="blog-featured group">
+              <div class="blog-featured__media">
+                {destacado.portada_url ? (
+                  <img
+                    src={destacado.portada_url}
+                    alt=""
+                    loading="eager"
+                    decoding="async"
+                  />
+                ) : (
+                  <div class="blog-featured__placeholder" aria-hidden="true">CIMAK</div>
+                )}
+                <span class="blog-featured__badge">Destacado</span>
+              </div>
+              <div class="blog-featured__body">
+                <p class="blog-card__meta">
+                  {destacado.autor}
+                  {destacado.publicado_en && (
+                    <>
+                      <span aria-hidden="true">·</span>
+                      <time datetime={destacado.publicado_en}>{formatFecha(destacado.publicado_en)}</time>
+                    </>
+                  )}
+                  {destacado.tiempo_lectura && (
+                    <>
+                      <span aria-hidden="true">·</span>
+                      <span>{destacado.tiempo_lectura} min</span>
+                    </>
+                  )}
+                </p>
+                <h2 class="blog-featured__title">{destacado.titulo}</h2>
+                {destacado.resumen && <p class="blog-featured__excerpt">{destacado.resumen}</p>}
+                <span class="blog-card__link">Leer artículo</span>
+              </div>
+            </a>
+          )}
+
+          {resto.length > 0 && (
+            <div class="blog-grid">
+              {resto.map((item) => (
+                <article class="blog-card group">
+                  <a href={`/blog/${item.slug}`} class="blog-card__media">
+                    {item.portada_url ? (
+                      <img src={item.portada_url} alt="" loading="lazy" decoding="async" />
+                    ) : (
+                      <div class="blog-card__placeholder" aria-hidden="true">CIMAK</div>
+                    )}
+                  </a>
+                  <div class="blog-card__body">
+                    <p class="blog-card__meta">
+                      {item.publicado_en && (
+                        <time datetime={item.publicado_en}>{formatFecha(item.publicado_en)}</time>
+                      )}
+                      {item.tiempo_lectura && (
+                        <>
+                          <span aria-hidden="true">·</span>
+                          <span>{item.tiempo_lectura} min</span>
+                        </>
+                      )}
+                    </p>
+                    <h2 class="blog-card__title">
+                      <a href={`/blog/${item.slug}`}>{item.titulo}</a>
+                    </h2>
+                    {item.resumen && <p class="blog-card__excerpt">{item.resumen}</p>}
+                    {item.etiquetas && item.etiquetas.length > 0 && (
+                      <div class="blog-card__tags">
+                        {item.etiquetas.slice(0, 3).map((tag) => (
+                          <span>{tag}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  </main>
+</Layout>
