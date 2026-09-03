@@ -3,27 +3,10 @@ import Layout from '../../layouts/Layout.astro';
 import CatalogoSidebar from '../../components/catalogo/CatalogoSidebar.astro';
 import ProductoCard from '../../components/catalogo/ProductoCard.astro';
 import ProductoHero from '../../components/catalogo/ProductoHero.astro';
-import { getFamilia, getFamilias, getProducto } from '../../lib/api';
+import { getProducto } from '../../lib/api';
 import { cotizarHref, getMenuConFallback } from '../../lib/catalogo';
 import { cmsHtml, cmsPlain } from '../../lib/cmsHtml';
 import { site } from '../../data/site';
-
-export async function getStaticPaths() {
-  const familias = await getFamilias();
-  const slugs = new Set<string>();
-
-  for (const f of familias) {
-    if (!f.slug) continue;
-    const detalle = await getFamilia(String(f.slug));
-    for (const p of detalle?.productos ?? []) {
-      if (p.slug) slugs.add(String(p.slug));
-    }
-  }
-
-  slugs.delete('aluzinc');
-
-  return [...slugs].map((slug) => ({ params: { slug } }));
-}
 
 const { slug } = Astro.params;
 if (!slug) {

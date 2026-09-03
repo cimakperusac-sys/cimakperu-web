@@ -2,27 +2,12 @@
 import Layout from '../../layouts/Layout.astro';
 import CatalogoSidebar from '../../components/catalogo/CatalogoSidebar.astro';
 import CatalogoFilas from '../../components/catalogo/CatalogoFilas.astro';
-import { getFamilia, getFamilias } from '../../lib/api';
+import { getFamilia } from '../../lib/api';
 import { getMenuConFallback } from '../../lib/catalogo';
 import { cmsHtml, cmsPlain } from '../../lib/cmsHtml';
 import { categoriesFallback } from '../../data/categories';
 import { site } from '../../data/site';
 import type { WebProductoCard, WebSubcategoria } from '../../lib/types/web';
-
-export async function getStaticPaths() {
-  const fromApi = await getFamilias();
-  const slugs = new Set<string>();
-
-  for (const f of fromApi) {
-    if (f.slug) slugs.add(String(f.slug));
-  }
-  for (const c of categoriesFallback) {
-    const slug = c.href.replace(/^\/familias\//, '');
-    if (slug) slugs.add(slug);
-  }
-
-  return [...slugs].map((slug) => ({ params: { slug } }));
-}
 
 const { slug } = Astro.params;
 if (!slug) {

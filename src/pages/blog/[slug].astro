@@ -6,13 +6,6 @@ import { cmsHtml } from '../../lib/cmsHtml';
 import { site } from '../../data/site';
 import type { WebBlogCard } from '../../lib/types/web';
 
-export async function getStaticPaths() {
-  const articulos = await getBlogs();
-  return articulos
-    .filter((a) => a.slug)
-    .map((a) => ({ params: { slug: String(a.slug) } }));
-}
-
 const { slug } = Astro.params;
 if (!slug) {
   return Astro.redirect('/blog');

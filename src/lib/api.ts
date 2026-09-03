@@ -16,20 +16,33 @@ function baseUrl(): string {
   return String(raw).replace(/\/$/, '');
 }
 
-/** En build (SSG) las mismas rutas se piden muchas veces; en dev siempre se refresca. */
-const cache = new Map<string, unknown>();
+/**
+ * El proceso SSR vive semanas: sin expiración la web se quedaría con la primera
+ * respuesta para siempre. 5s evita que una misma visita repita llamadas y deja
+ * que un cambio guardado en el CRM se vea al recargar.
+ */
+const CACHE_TTL_MS = Number(import.meta.env.PUBLIC_CRM_CACHE_TTL_MS ?? 5000);
+const TIMEOUT_MS = Number(import.meta.env.PUBLIC_CRM_TIMEOUT_MS ?? 8000);
+
+type EntradaCache = { data: unknown; expiraEn: number };
+const cache = new Map<string, EntradaCache>();
 
 async function crmGet<T>(path: string): Promise<T | null> {
-  if (import.meta.env.PROD && cache.has(path)) {
-    return cache.get(path) as T | null;
+  const ahora = Date.now();
+  const guardado = cache.get(path);
+
+  if (guardado && guardado.expiraEn > ahora) {
+    return guardado.data as T | null;
   }
 
   const url = `${baseUrl()}/v1/public/web${path}`;
   let data: T | null = null;
+  let ok = false;
 
   try {
     const res = await fetch(url, {
       headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
 
     if (!res.ok) {
@@ -40,13 +53,20 @@ async function crmGet<T>(path: string): Promise<T | null> {
         console.warn(`[crm] ${url} success=false`, json?.error);
       } else {
         data = (json.data ?? null) as T | null;
+        ok = true;
       }
     }
   } catch (err) {
     console.warn(`[crm] fallo ${url}`, err);
   }
 
-  if (import.meta.env.PROD) cache.set(path, data);
+  // Si el CRM falla pero ya había datos, servir la copia vencida antes que vaciar la página.
+  if (!ok && guardado) {
+    cache.set(path, { data: guardado.data, expiraEn: ahora + CACHE_TTL_MS });
+    return guardado.data as T | null;
+  }
+
+  cache.set(path, { data, expiraEn: ahora + CACHE_TTL_MS });
   return data;
 }
 
