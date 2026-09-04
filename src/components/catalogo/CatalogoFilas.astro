@@ -12,66 +12,19 @@ interface Props {
   familiaNombre?: string;
 }
 
-const { secciones, familiaNombre = '' } = Astro.props;
+const { secciones } = Astro.props;
 ---
 
 {secciones.map((seccion) => (
   <section class="reveal-on-scroll min-w-0" aria-label={seccion.nombre}>
-    <h2 class="mb-3 text-sm font-bold text-cimak-black sm:text-base">
+    <h2 class="mb-3 text-sm font-bold text-cimak-black sm:mb-4 sm:text-base">
       {seccion.nombre}
     </h2>
 
-    <div class="relative" data-carrusel>
-      <div
-        class="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 lg:gap-4"
-        data-carrusel-pista
-      >
-        {seccion.productos.map((producto, index) => (
-          <div class="w-[44vw] min-w-[140px] max-w-[240px] shrink-0 snap-start sm:w-[210px] lg:w-[calc((100%-2rem)/3)] lg:max-w-none">
-            <ProductoCard producto={producto} eager={index < 3} />
-          </div>
-        ))}
-      </div>
-
-      <button
-        type="button"
-        class="absolute -right-1 top-[42%] z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-cimak-black text-white shadow-lg transition hover:bg-cimak-black/85 sm:-right-3"
-        data-carrusel-next
-        aria-label={`Ver más productos de ${seccion.nombre || familiaNombre}`}
-        style="display:none"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="h-4 w-4" aria-hidden="true">
-          <path d="m9 18 6-6-6-6" />
-        </svg>
-      </button>
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:gap-5">
+      {seccion.productos.map((producto, index) => (
+        <ProductoCard producto={producto} eager={index < 6} />
+      ))}
     </div>
   </section>
 ))}
-
-<script>
-  document.querySelectorAll('[data-carrusel]').forEach((root) => {
-    const pista = root.querySelector('[data-carrusel-pista]');
-    const boton = root.querySelector('[data-carrusel-next]');
-    if (!pista || !boton) return;
-
-    const sincronizar = () => {
-      const desborda = pista.scrollWidth - pista.clientWidth > 8;
-      boton.style.display = desborda ? '' : 'none';
-      if (!desborda) return;
-      const alFinal = pista.scrollLeft + pista.clientWidth >= pista.scrollWidth - 8;
-      boton.style.opacity = alFinal ? '0.35' : '1';
-    };
-
-    boton.addEventListener('click', () => {
-      const alFinal = pista.scrollLeft + pista.clientWidth >= pista.scrollWidth - 8;
-      pista.scrollTo({
-        left: alFinal ? 0 : pista.scrollLeft + pista.clientWidth * 0.85,
-        behavior: 'smooth',
-      });
-    });
-
-    pista.addEventListener('scroll', sincronizar, { passive: true });
-    window.addEventListener('resize', sincronizar);
-    sincronizar();
-  });
-</script>

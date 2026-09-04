@@ -17,13 +17,13 @@ if (conProductos.length === 0) {
 
 <section id="productos" class="w-full bg-[#f3f3f3] pb-10 md:pb-14" aria-label="Productos por categoría">
   <div class="container-cimak">
-    <div class="flex flex-col gap-8 sm:gap-10">
+    <div class="reveal-stagger flex flex-col gap-8 sm:gap-10" data-reveal-gap="120">
       {conProductos.map((familia) => {
         const href = familiaHref(familia);
         const productos = familia.productos ?? [];
 
         return (
-          <div class="reveal-on-scroll">
+          <div class="reveal-on-scroll reveal-up reveal-item">
             <div class="flex items-end justify-between gap-3">
               <h3 class="text-sm font-extrabold uppercase tracking-[0.08em] text-cimak-black sm:text-base">
                 <a href={href} class="hover:text-cimak-black/60">{familia.nombre}</a>

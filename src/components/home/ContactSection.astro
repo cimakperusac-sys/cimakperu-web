@@ -38,7 +38,7 @@ const aria = cmsPlain(bloque.titulo) || 'Contáctanos';
 
 <section
   id="contactanos"
-  class="reveal-on-scroll relative w-full overflow-hidden border-b-[3px] border-cimak-yellow min-h-[420px] lg:min-h-[520px]"
+  class="relative w-full overflow-hidden border-b-[3px] border-cimak-yellow min-h-[420px] lg:min-h-[520px]"
   aria-label={aria}
 >
   {bg ? (
@@ -57,19 +57,21 @@ const aria = cmsPlain(bloque.titulo) || 'Contáctanos';
   <div class="container-cimak relative z-10 min-h-[420px] lg:min-h-[520px]">
     {persona && (
       <div class="absolute bottom-0 left-1/2 z-20 hidden max-w-[42%] -translate-x-[72%] lg:block xl:-translate-x-[68%]">
-        <img
-          src={persona}
-          alt="Asesor"
-          class="block h-auto w-auto max-h-[min(580px,92vh)] translate-y-4 object-contain object-bottom drop-shadow-md"
-          loading="lazy"
-          decoding="async"
-        />
+        <div class="reveal-on-scroll reveal-left">
+          <img
+            src={persona}
+            alt="Asesor"
+            class="block h-auto w-auto max-h-[min(580px,92vh)] translate-y-4 object-contain object-bottom drop-shadow-md"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
       </div>
     )}
 
     <div class="flex min-h-[420px] items-center justify-center py-10 lg:min-h-[520px] lg:justify-end lg:py-12 lg:pr-4 xl:pr-10">
       <div
-        class="relative z-10 w-full max-w-md rounded-2xl border border-white/50 bg-white/90 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.18)] backdrop-blur-sm sm:p-6 lg:max-w-[490px]"
+        class="reveal-on-scroll reveal-right reveal-delay-1 relative z-10 w-full max-w-md rounded-2xl border border-white/50 bg-white/90 p-5 shadow-[0_12px_40px_rgba(0,0,0,0.18)] backdrop-blur-sm sm:p-6 lg:max-w-[490px]"
       >
       <div class="cms-prose cms-prose--title text-[1.4rem] font-extrabold leading-tight text-cimak-black sm:text-[1.55rem]" set:html={titleHtml} />
       <div

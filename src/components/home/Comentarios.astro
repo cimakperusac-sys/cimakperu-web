@@ -23,10 +23,10 @@ if (!reviews.length) {
 
 <section
   id="comentarios"
-  class="reveal-on-scroll w-full overflow-hidden bg-[#f3f3f3] py-10 sm:py-16"
+  class="w-full overflow-hidden bg-[#f3f3f3] py-10 sm:py-16"
   aria-label="Opiniones de clientes"
 >
-  <div class="container-cimak flex flex-col items-center">
+  <div class="reveal-on-scroll reveal-zoom container-cimak flex flex-col items-center">
     <Image
       src={logoEstrellas}
       alt="CIMAK 4.8 estrellas"
@@ -41,7 +41,7 @@ if (!reviews.length) {
     </p>
   </div>
 
-  <div id="reviews-viewport" class="relative mt-7 w-full overflow-hidden sm:mt-10">
+  <div class="reveal-on-scroll reveal-up reveal-delay-2 relative mt-7 w-full overflow-hidden sm:mt-10" id="reviews-viewport">
     <div
       class="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[#f3f3f3] via-[#f3f3f3]/80 to-transparent sm:w-24 lg:w-32"
       aria-hidden="true"

@@ -22,22 +22,22 @@ if (!items.length) {
 
 <section
   id="productos-categoria"
-  class="reveal-on-scroll w-full bg-white pt-4 pb-8 sm:py-12 md:bg-[#f3f3f3]"
+  class="w-full bg-white pt-4 pb-8 sm:py-12 md:bg-[#f3f3f3]"
   aria-label="Productos por categoría"
 >
   <div class="container-cimak">
-    <div class="mb-5 flex justify-center sm:mb-6">
+    <div class="reveal-on-scroll reveal-up mb-5 flex justify-center sm:mb-6">
       <h2 class="rounded-md bg-cimak-black px-5 py-2 text-center text-sm font-bold uppercase tracking-wide text-white sm:px-7 sm:text-base">
         Productos por categoría
       </h2>
     </div>
 
     <!-- Desktop: grilla 2×3 como Figma -->
-    <div class="hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+    <div class="reveal-stagger hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 lg:gap-8" data-reveal-gap="90">
       {items.map((item) => (
         <a
           href={item.href}
-          class="group relative block aspect-[4/5] w-full overflow-hidden rounded-xl"
+          class="reveal-on-scroll reveal-rise reveal-item group relative block aspect-[4/5] w-full overflow-hidden rounded-xl"
           aria-label={item.title || 'Ver categoría'}
         >
           {item.imageUrl ? (
@@ -71,7 +71,7 @@ if (!items.length) {
     </div>
 
     <!-- Mobile: carrusel -->
-    <div class="md:hidden">
+    <div class="reveal-on-scroll reveal-up md:hidden">
       <div
         id="category-viewport"
         class="relative cursor-grab overflow-hidden touch-none active:cursor-grabbing"

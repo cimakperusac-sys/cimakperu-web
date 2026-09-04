@@ -77,8 +77,16 @@ const hasAnyContent =
   canonical={meta?.canonical || undefined}
 >
   <main>
-    <Hero bloque={bloques.hero} />
-    <PromoBanners />
+    <div class="hero-parallax-scene" data-hero-parallax>
+      <div class="hero-parallax-scene__rail">
+        <div class="hero-parallax-scene__viewport">
+          <Hero bloque={bloques.hero} />
+          <div class="hero-parallax-scene__sheet" data-hero-sheet>
+            <PromoBanners />
+          </div>
+        </div>
+      </div>
+    </div>
     <CategoryGrid items={categoryItems} />
     {hayProductos && (
       <div class="hidden md:block">

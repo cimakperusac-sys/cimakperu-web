@@ -29,16 +29,16 @@ const aria = cmsPlain(bloque.titulo) || 'Características';
 
 <section
   id="caracteristicas"
-  class="reveal-on-scroll w-full bg-[#f3f3f3] pb-10 pt-6 sm:pb-16 sm:pt-4"
+  class="w-full bg-[#f3f3f3] pb-10 pt-6 sm:pb-16 sm:pt-4"
   aria-label={aria}
 >
   <div class="container-cimak">
     {sectionTitleHtml && (
-      <div class="cms-prose mb-6 text-center text-xl font-extrabold text-cimak-black sm:text-2xl" set:html={sectionTitleHtml} />
+      <div class="reveal-on-scroll reveal-up cms-prose mb-6 text-center text-xl font-extrabold text-cimak-black sm:text-2xl" set:html={sectionTitleHtml} />
     )}
-    <div class="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-3 md:gap-6 lg:gap-8">
+    <div class="reveal-stagger grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-3 md:gap-6 lg:gap-8" data-reveal-gap="100">
       {items.map((item) => (
-        <div class="flex flex-col items-center rounded-2xl bg-cimak-black px-6 py-8 text-center text-white sm:px-7 sm:py-10">
+        <div class="reveal-on-scroll reveal-rise reveal-item flex flex-col items-center rounded-2xl bg-cimak-black px-6 py-8 text-center text-white sm:px-7 sm:py-10">
           {item.icon_url ? (
             <img
               src={item.icon_url}

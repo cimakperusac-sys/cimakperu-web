@@ -147,43 +147,15 @@ const jsonLd = {
 		{showWhatsApp && <WhatsAppButton />}
 
 		<script>
+			import { syncSiteHeaderHeight } from '../scripts/siteHeader.js';
 			import '../scripts/lenis.js';
-		</script>
+			import { initHeroParallax } from '../scripts/heroParallax.js';
+			import { initScrollReveal, initHeroScrollHint } from '../scripts/scrollReveal.js';
 
-		<script>
-			const reveals = document.querySelectorAll('.reveal-on-scroll');
-
-			if (reveals.length && 'IntersectionObserver' in window) {
-				const observer = new IntersectionObserver(
-					(entries) => {
-						entries.forEach((entry) => {
-							if (entry.isIntersecting) {
-								entry.target.classList.add('is-visible');
-								observer.unobserve(entry.target);
-							}
-						});
-					},
-					{ threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
-				);
-
-				reveals.forEach((el) => observer.observe(el));
-			} else {
-				reveals.forEach((el) => el.classList.add('is-visible'));
-			}
-
-			const hero = document.getElementById('hero');
-			const scrollHint = hero?.querySelector('a[href="#promociones"]');
-
-			if (hero && scrollHint && 'IntersectionObserver' in window) {
-				const hintObserver = new IntersectionObserver(
-					([entry]) => {
-						scrollHint.classList.toggle('opacity-0', !entry.isIntersecting);
-						scrollHint.classList.toggle('pointer-events-none', !entry.isIntersecting);
-					},
-					{ threshold: 0.55 }
-				);
-				hintObserver.observe(hero);
-			}
+			syncSiteHeaderHeight();
+			initHeroParallax();
+			initScrollReveal();
+			initHeroScrollHint();
 		</script>
 	</body>
 </html>

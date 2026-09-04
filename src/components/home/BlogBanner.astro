@@ -21,7 +21,7 @@ const aria = cmsPlain(bloque.titulo) || 'Blog';
 
 <section
   id="blog-banner"
-  class="reveal-on-scroll relative w-full overflow-hidden min-h-[220px] sm:min-h-[280px]"
+  class="relative w-full overflow-hidden min-h-[220px] sm:min-h-[280px]"
   aria-label={aria}
 >
   {bg ? (
@@ -38,12 +38,12 @@ const aria = cmsPlain(bloque.titulo) || 'Blog';
   )}
   <div class="absolute inset-0 bg-black/55"></div>
 
-  <div class="container-cimak relative z-10 flex flex-col items-start gap-4 py-12 text-white sm:py-16">
-    <div class="cms-prose cms-prose--title max-w-md text-[1.35rem] font-semibold leading-snug sm:text-[1.65rem]" set:html={titleHtml} />
-    {bodyHtml && <div class="cms-prose max-w-lg text-sm text-white/90 sm:text-base" set:html={bodyHtml} />}
+  <div class="reveal-stagger container-cimak relative z-10 flex flex-col items-start gap-4 py-12 text-white sm:py-16" data-reveal-gap="110">
+    <div class="reveal-on-scroll reveal-up reveal-item cms-prose cms-prose--title max-w-md text-[1.35rem] font-semibold leading-snug sm:text-[1.65rem]" set:html={titleHtml} />
+    {bodyHtml && <div class="reveal-on-scroll reveal-up reveal-item cms-prose max-w-lg text-sm text-white/90 sm:text-base" set:html={bodyHtml} />}
     <a
       href={href}
-      class="inline-block rounded-md bg-[#ffba2e] px-5 py-2 text-sm font-bold text-cimak-black transition hover:brightness-105"
+      class="reveal-on-scroll reveal-up reveal-item inline-block rounded-md bg-[#ffba2e] px-5 py-2 text-sm font-bold text-cimak-black transition hover:brightness-105"
     >
       {cta}
     </a>

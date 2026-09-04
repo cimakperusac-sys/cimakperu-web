@@ -31,11 +31,11 @@ const aria = cmsPlain(bloque.titulo) || 'Quiénes somos';
 
 <section
   id="nosotros"
-  class="reveal-on-scroll w-full bg-[#f3f3f3] py-10 sm:py-12 lg:py-14"
+  class="w-full bg-[#f3f3f3] py-10 sm:py-12 lg:py-14"
   aria-label={aria}
 >
   <div class="container-cimak">
-    <header class="mb-8 text-center lg:mb-10">
+    <header class="reveal-on-scroll reveal-up mb-8 text-center lg:mb-10">
       <div
         class="cms-prose cms-prose--title text-[1.65rem] font-extrabold leading-tight text-cimak-black sm:text-[1.85rem] lg:text-[2rem]"
         set:html={titleHtml}
@@ -49,7 +49,7 @@ const aria = cmsPlain(bloque.titulo) || 'Quiénes somos';
       ]}
     >
       {imagen && (
-        <div class="w-full shrink-0 overflow-hidden rounded-[10px] sm:w-auto">
+        <div class="reveal-on-scroll reveal-left w-full shrink-0 overflow-hidden rounded-[10px] sm:w-auto">
           <img
             src={imagen}
             alt={aria}
@@ -60,7 +60,7 @@ const aria = cmsPlain(bloque.titulo) || 'Quiénes somos';
         </div>
       )}
 
-      <div class="w-full min-w-0 lg:max-w-[480px]">
+      <div class="reveal-on-scroll reveal-right reveal-delay-1 w-full min-w-0 lg:max-w-[480px]">
         <div class="mb-5 flex justify-center">
           <img
             src={logoCimak.src}

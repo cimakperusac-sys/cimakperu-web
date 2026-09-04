@@ -108,18 +108,92 @@ body {
   display: none;
 }
 
-/* Aparición al hacer scroll */
-.reveal-on-scroll {
+/* ——— Aparición al scroll (sistema global) ——— */
+.reveal-on-scroll.reveal-item {
   opacity: 0;
-  transform: translateY(40px);
+  transform: translate3d(0, 40px, 0);
   transition:
-    opacity 0.7s ease,
-    transform 0.7s ease;
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll:not(.reveal-item) {
+  opacity: 0;
+  transform: translate3d(0, 40px, 0);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
 }
 
 .reveal-on-scroll.is-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
+  filter: none;
+}
+
+.reveal-up { transform: translate3d(0, 44px, 0); }
+.reveal-down { transform: translate3d(0, -28px, 0); }
+.reveal-left { transform: translate3d(-40px, 0, 0); }
+.reveal-right { transform: translate3d(40px, 0, 0); }
+.reveal-rise { transform: translate3d(0, 36px, 0) scale(0.96); }
+.reveal-zoom { transform: scale(0.94); }
+.reveal-blur {
+  transform: translate3d(0, 24px, 0);
+  filter: blur(7px);
+}
+
+.reveal-delay-1 { --reveal-delay: 100ms; }
+.reveal-delay-2 { --reveal-delay: 200ms; }
+.reveal-delay-3 { --reveal-delay: 320ms; }
+
+.reveal-stagger {
+  /* contenedor: no se oculta, anima hijos .reveal-item */
+}
+
+/* Sidebar catálogo — fijo al hacer scroll (familias / producto) */
+@media (min-width: 1024px) {
+  .catalogo-sidebar {
+    position: sticky;
+    top: calc(var(--site-header-h, 6.75rem) + 0.75rem);
+    align-self: start;
+    z-index: 20;
+    max-height: calc(100dvh - var(--site-header-h, 6.75rem) - 1.5rem);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .catalogo-sidebar #catalogo-panel {
+    max-height: calc(100dvh - var(--site-header-h, 6.75rem) - 5.25rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+/* Hover suave en tarjetas con reveal */
+.reveal-item.group:hover,
+a.reveal-item.group:hover {
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-on-scroll,
+  .reveal-on-scroll.reveal-item {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+    will-change: auto;
+  }
 }
 
 a[href='#promociones'] {
@@ -136,7 +210,8 @@ a[href='#promociones'] {
     animation: none;
   }
 
-  .reveal-on-scroll {
+  .reveal-on-scroll,
+  .reveal-on-scroll.reveal-item {
     opacity: 1;
     transform: none;
     transition: none;
@@ -215,16 +290,108 @@ a[href='#promociones'] {
   letter-spacing: -0.02em;
 }
 
-/* Hero home — móvil full-bleed como Figma */
-.hero-home {
-  min-height: calc(100svh - 3.5rem);
-  min-height: calc(100dvh - 3.5rem);
+/*
+  Parallax hero: viewport fijo; banner anclado abajo sube hasta encajar.
+*/
+:root {
+  --site-header-h: 3.5rem;
+  --hero-promo-peek: 4.75rem;
+  --hero-dim: 0.44;
+  --hero-sheet-shadow: 0.18;
+  --hero-sheet-lift: 1;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --site-header-h: 3.75rem;
+    --hero-promo-peek: 5.25rem;
+  }
 }
 
 @media (min-width: 768px) {
-  .hero-home {
-    min-height: 0;
+  :root {
+    --site-header-h: 6.75rem;
+    --hero-promo-peek: 7rem;
   }
+}
+
+.hero-parallax-scene {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero-parallax-scene__rail {
+  position: relative;
+  height: calc(100svh - var(--site-header-h) + var(--hero-parallax-travel, 42vh));
+  height: calc(100dvh - var(--site-header-h) + var(--hero-parallax-travel, 42vh));
+}
+
+.hero-parallax-scene__viewport {
+  position: sticky;
+  top: var(--site-header-h);
+  z-index: 5;
+  height: calc(100svh - var(--site-header-h));
+  height: calc(100dvh - var(--site-header-h));
+  overflow: hidden;
+  contain: layout style paint;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.hero-parallax-scene__sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  background: #fff;
+  backface-visibility: hidden;
+  box-shadow: 0 calc(-16px - 12px * var(--hero-sheet-lift))
+    calc(32px + 28px * var(--hero-sheet-shadow))
+    rgba(0, 0, 0, var(--hero-sheet-shadow));
+}
+
+.hero-parallax-scene.is-scrolling .hero-parallax-scene__sheet::after {
+  content: '';
+  position: absolute;
+  inset: -1.25rem 0 auto;
+  height: 1.25rem;
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1));
+  pointer-events: none;
+  opacity: calc(var(--hero-sheet-lift) * 0.85);
+}
+
+.hero-home {
+  min-height: 0;
+  height: 100%;
+  --hero-dim: 0.44;
+}
+
+.hero-home__media {
+  top: -18%;
+  bottom: -18%;
+  height: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.hero-home__overlay {
+  background: rgba(0, 0, 0, var(--hero-dim));
+  backface-visibility: hidden;
+}
+
+.hero-home__title {
+  will-change: opacity, transform;
+  transition: none;
+  backface-visibility: hidden;
+}
+
+.hero-home__scroll {
+  will-change: opacity, transform;
+  transition: none;
+  backface-visibility: hidden;
 }
 
 .hero-home__media,
@@ -233,6 +400,13 @@ a[href='#promociones'] {
 .hero-home__swap-pane {
   display: block;
   width: 100%;
+}
+
+.hero-home__picture,
+.hero-home__swap,
+.hero-home__swap-pane {
+  position: absolute;
+  inset: 0;
   height: 100%;
 }
 
@@ -241,23 +415,92 @@ a[href='#promociones'] {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center center;
 }
 
-@media (min-width: 768px) {
-  .hero-home__img {
-    height: auto;
-    object-fit: cover;
+/* Animaciones del banner al encajar */
+.hero-parallax-scene.is-revealed .promo-catalog-mobile__text,
+.hero-parallax-scene.is-revealed .promo-content-left {
+  animation: hero-promo-text-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero-parallax-scene.is-revealed .promo-catalog-mobile__book {
+  animation: hero-promo-book-in 1s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+}
+
+.hero-parallax-scene.is-revealed .promo-content-left + span,
+.hero-parallax-scene.is-revealed .promo-content-left span.inline-block {
+  animation: hero-promo-cta-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+
+.hero-parallax-scene.is-revealed #promo-carousel,
+.hero-parallax-scene.is-revealed .promo-catalog-mobile {
+  animation: hero-promo-panel-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+}
+
+.hero-parallax-scene.is-settled .hero-parallax-scene__sheet {
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.12);
+}
+
+@keyframes hero-promo-text-in {
+  from {
+    opacity: 0;
+    transform: translate3d(-22px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }
 
-.hero-home__overlay {
-  background: rgba(0, 0, 0, 0.44);
+@keyframes hero-promo-book-in {
+  from {
+    opacity: 0;
+    transform: translate3d(18%, 12%, 0) rotate(4deg) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(5%, 0, 0) rotate(0deg) scale(1);
+  }
 }
 
-@media (min-width: 768px) {
-  .hero-home__overlay {
-    background: rgba(0, 0, 0, 0.35);
+@keyframes hero-promo-cta-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hero-promo-panel-in {
+  from {
+    opacity: 0.82;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-home__media {
+    top: 0;
+    bottom: 0;
+    transform: none !important;
+  }
+
+  .hero-parallax-scene.is-revealed .promo-catalog-mobile__text,
+  .hero-parallax-scene.is-revealed .promo-content-left,
+  .hero-parallax-scene.is-revealed .promo-catalog-mobile__book,
+  .hero-parallax-scene.is-revealed .promo-content-left + span,
+  .hero-parallax-scene.is-revealed .promo-content-left span.inline-block,
+  .hero-parallax-scene.is-revealed #promo-carousel,
+  .hero-parallax-scene.is-revealed .promo-catalog-mobile {
+    animation: none;
   }
 }
 

@@ -44,10 +44,10 @@ const mediaClass = 'hero-home__img';
 
 <section
   id="hero"
-  class="hero-home relative z-0 w-full overflow-visible bg-cimak-black md:overflow-hidden md:min-h-0"
+  class="hero-home relative z-0 h-full w-full overflow-hidden bg-cimak-black"
   aria-label={aria}
 >
-  <div class="hero-home__media absolute inset-0 overflow-hidden md:relative md:inset-auto md:w-full md:overflow-visible">
+  <div class="hero-home__media absolute inset-x-0 overflow-hidden">
     {soloImagenes ? (
       <picture class="hero-home__picture">
         <source media="(min-width: 768px)" srcset={desktop.src} />
@@ -66,6 +66,7 @@ const mediaClass = 'hero-home__img';
           {mobile.video ? (
             <video
               class={mediaClass}
+              src={mobile.src}
               data-hero-src={mobile.src}
               data-hero-when="mobile"
               autoplay
@@ -78,6 +79,7 @@ const mediaClass = 'hero-home__img';
           ) : (
             <img
               class={mediaClass}
+              src={mobile.src}
               data-hero-src={mobile.src}
               data-hero-when="mobile"
               alt={aria}
@@ -90,18 +92,20 @@ const mediaClass = 'hero-home__img';
           {desktop.video ? (
             <video
               class={mediaClass}
+              src={desktop.src}
               data-hero-src={desktop.src}
               data-hero-when="desktop"
               autoplay
               muted
               loop
               playsinline
-              preload="metadata"
+              preload="auto"
               aria-label={aria}
             ></video>
           ) : (
             <img
               class={mediaClass}
+              src={desktop.src}
               data-hero-src={desktop.src}
               data-hero-when="desktop"
               alt={aria}

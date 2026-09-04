@@ -28,7 +28,7 @@ const subcategorias: WebSubcategoria[] = Array.isArray(familia?.subcategorias)
   ? familia.subcategorias.filter((s) => s.productos?.length)
   : [];
 
-/** Sin subcategorías en CRM: una sola fila "Modelos" con todos los productos. */
+/** Sin subcategorías en CRM: una sola sección "Modelos" con todos los productos en grilla. */
 const secciones: WebSubcategoria[] =
   subcategorias.length > 0
     ? subcategorias
@@ -91,7 +91,7 @@ const schemas = [
         <span class="font-semibold text-cimak-black">{nombre}</span>
       </nav>
 
-      <div class="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8">
+      <div class="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start lg:gap-8">
         <CatalogoSidebar menu={menu} familiaActiva={slug} />
 
         <div class="min-w-0">
