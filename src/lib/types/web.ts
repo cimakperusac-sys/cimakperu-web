@@ -79,6 +79,7 @@ export type WebProductoCard = {
   subcategoria_orden?: number | null;
   oferta?: 0 | 1 | number;
   oferta_texto?: string | null;
+  mensaje_whatsapp?: string | null;
   url?: string | null;
   prioridad?: number | null;
 };
@@ -119,6 +120,7 @@ export type WebFamilia = {
   descripcion_web?: string | null;
   seo_title?: string | null;
   seo_description?: string | null;
+  mensaje_whatsapp?: string | null;
   color?: string | null;
   prioridad?: number | null;
   url?: string | null;
@@ -162,6 +164,7 @@ export type WebProducto = {
   subcategoria?: string | null;
   oferta?: 0 | 1 | number;
   oferta_texto?: string | null;
+  mensaje_whatsapp?: string | null;
   colores?: WebColor[];
   atributos?: WebAtributo[];
   color?: string | null;
@@ -175,6 +178,7 @@ export type WebProducto = {
     nombre: string;
     slug?: string | null;
     descripcion_web?: string | null;
+    mensaje_whatsapp?: string | null;
     url?: string | null;
   } | null;
   galeria?: WebGaleriaItem[];

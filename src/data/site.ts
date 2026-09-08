@@ -2,7 +2,7 @@ export const site = {
   name: 'CIMAK Perú',
   legalName: 'Cimak Perú SAC',
   ruc: '20609125919',
-  url: 'https://cimak.com',
+  url: 'https://cimakperu.com',
   phone: '(+51) 912397609',
   phoneHref: 'tel:+51912397609',
   email: 'info@cimak.com',

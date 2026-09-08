@@ -60,9 +60,52 @@ export function productoHref(producto: { href?: string | null; slug?: string | n
   return producto.slug ? `/productos/${producto.slug}` : null;
 }
 
-export function cotizarHref(nombre?: string | null): string {
-  const texto = nombre
-    ? `Hola, quiero cotizar ${nombre}.`
-    : 'Hola, quiero cotizar coberturas CIMAK.';
+export function cotizarHref(options?: {
+  nombre?: string | null;
+  familia?: string | null;
+  mensaje?: string | null;
+  mensajeFamilia?: string | null;
+  url?: string | null;
+} | string | null): string {
+  const opts =
+    typeof options === 'string' || options == null
+      ? { nombre: options }
+      : options;
+
+  const nombre = String(opts.nombre || '').trim();
+  const familia = String(opts.familia || '').trim();
+  const pageUrl = String(opts.url || '').trim();
+  const plantilla =
+    String(opts.mensaje || '').trim() ||
+    String(opts.mensajeFamilia || '').trim();
+
+  const texto = plantilla
+    ? reemplazarPlaceholders(plantilla, { nombre, familia, url: pageUrl })
+    : mensajeCotizarPorDefecto(nombre, familia, pageUrl);
+
   return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(texto)}`;
+}
+
+function reemplazarPlaceholders(
+  plantilla: string,
+  vars: { nombre: string; familia: string; url: string },
+): string {
+  return plantilla
+    .replaceAll('{nombre}', vars.nombre || 'sus productos')
+    .replaceAll('{familia}', vars.familia || vars.nombre || 'CIMAK')
+    .replaceAll('{url}', vars.url);
+}
+
+function mensajeCotizarPorDefecto(nombre: string, familia: string, url: string): string {
+  const foco = nombre
+    ? familia
+      ? `sus coberturas de ${familia} "${nombre}"`
+      : `"${nombre}"`
+    : 'sus coberturas';
+
+  const lineas = [
+    `👋 ¡Hola! Vi su página web, estoy interesado(a) en ${foco}. Me gustaría recibir información y una cotización.`,
+  ];
+  if (url) lineas.push(url);
+  return lineas.join('\n');
 }

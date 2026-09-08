@@ -10,9 +10,10 @@ interface Seccion {
 interface Props {
   secciones: Seccion[];
   familiaNombre?: string;
+  mensajeFamilia?: string | null;
 }
 
-const { secciones } = Astro.props;
+const { secciones, familiaNombre, mensajeFamilia = null } = Astro.props;
 ---
 
 {secciones.map((seccion) => (
@@ -23,7 +24,12 @@ const { secciones } = Astro.props;
 
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:gap-5">
       {seccion.productos.map((producto, index) => (
-        <ProductoCard producto={producto} eager={index < 6} />
+        <ProductoCard
+          producto={producto}
+          eager={index < 6}
+          familiaNombre={familiaNombre}
+          mensajeFamilia={mensajeFamilia}
+        />
       ))}
     </div>
   </section>

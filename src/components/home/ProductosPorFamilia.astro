@@ -42,13 +42,22 @@ if (conProductos.length === 0) {
 
             <div class="no-scrollbar -mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 md:hidden">
               {productos.map((producto) => (
-                <ProductoCard producto={producto} variant="carousel" />
+                <ProductoCard
+                  producto={producto}
+                  variant="carousel"
+                  familiaNombre={familia.nombre}
+                  mensajeFamilia={familia.mensaje_whatsapp}
+                />
               ))}
             </div>
 
             <div class="mt-4 hidden gap-4 md:grid md:grid-cols-3 lg:grid-cols-6">
               {productos.slice(0, 6).map((producto) => (
-                <ProductoCard producto={producto} />
+                <ProductoCard
+                  producto={producto}
+                  familiaNombre={familia.nombre}
+                  mensajeFamilia={familia.mensaje_whatsapp}
+                />
               ))}
             </div>
           </div>

@@ -115,7 +115,13 @@ const schemas = [
       fondoDesktop={fondoDesktop}
       fondoMobile={fondoMobile}
       diagramaImg={diagramaImg}
-      cotizarHref={cotizarHref(nombre)}
+      cotizarHref={cotizarHref({
+        nombre,
+        familia: familiaNombre,
+        mensaje: producto.mensaje_whatsapp,
+        mensajeFamilia: producto.familia?.mensaje_whatsapp,
+        url: absoluta(canonical),
+      })}
       fichaUrl={fichaUrl}
       familiaHref={familiaHrefUrl}
     />
@@ -265,7 +271,12 @@ const schemas = [
 
                 <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3 lg:gap-5">
                   {relacionados.slice(0, 6).map((item) => (
-                    <ProductoCard producto={item} showCotizar />
+                    <ProductoCard
+                      producto={item}
+                      showCotizar
+                      familiaNombre={familiaNombre}
+                      mensajeFamilia={producto.familia?.mensaje_whatsapp}
+                    />
                   ))}
                 </div>
 

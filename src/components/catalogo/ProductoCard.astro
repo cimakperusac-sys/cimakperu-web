@@ -1,17 +1,28 @@
 ---
 import type { WebProductoCard } from '../../lib/types/web';
 import { cotizarHref, productoHref } from '../../lib/catalogo';
+import { site } from '../../data/site';
 
 interface Props {
   producto: WebProductoCard;
   variant?: 'grid' | 'carousel';
   showCotizar?: boolean;
   eager?: boolean;
+  familiaNombre?: string | null;
+  mensajeFamilia?: string | null;
 }
 
-const { producto, variant = 'grid', showCotizar = false, eager = false } = Astro.props;
+const {
+  producto,
+  variant = 'grid',
+  showCotizar = false,
+  eager = false,
+  familiaNombre = null,
+  mensajeFamilia = null,
+} = Astro.props;
 
 const href = productoHref(producto);
+const pageUrl = href ? new URL(href, site.url).toString() : '';
 const enOferta = Number(producto.oferta) === 1;
 const ofertaTexto = (producto.oferta_texto || 'Oferta del día').toUpperCase();
 
@@ -62,7 +73,13 @@ const anchoCarrusel = 'w-[44vw] max-w-[220px] min-w-[140px] shrink-0 snap-start 
 
     {showCotizar && (
       <a
-        href={cotizarHref(producto.nombre)}
+        href={cotizarHref({
+          nombre: producto.nombre,
+          familia: familiaNombre,
+          mensaje: producto.mensaje_whatsapp,
+          mensajeFamilia,
+          url: pageUrl,
+        })}
         target="_blank"
         rel="noopener noreferrer"
         class="relative z-10 mt-auto inline-flex min-h-9 w-fit items-center rounded-sm bg-cimak-yellow px-4 text-xs font-bold text-cimak-black transition hover:brightness-105"
