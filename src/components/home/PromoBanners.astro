@@ -1,88 +1,168 @@
 ---
+
 import { Image } from 'astro:assets';
+
 import catalogoImg from '../../assets/home/catalogo.svg';
+
 import bannerAluzincImg from '../../assets/home/imagen-uno.svg';
+
+
 
 const slides = [
   {
     image: bannerAluzincImg,
     alt: 'Aluzinc para tu techo',
-    href: '/general/aluzinc',
   },
 ];
+
 ---
 
-<section id="promociones" class="hero-promo-cover relative z-10 w-full overflow-visible bg-transparent" aria-label="Promociones">
+
+
+<section id="promociones" class="hero-promo-cover relative z-100 w-full overflow-visible bg-transparent" aria-label="Promociones">
+
   <!-- Móvil: franja catálogo (Figma) -->
-  <a
-    href="/catalogo"
-    class="promo-catalog-mobile group relative z-10 block overflow-visible bg-cimak-yellow lg:hidden"
-    aria-label="Catálogo de productos"
+
+  <button
+
+    type="button"
+
+    data-catalogo-flip-open
+
+    class="promo-catalog-mobile group relative z-10 block w-full overflow-visible bg-cimak-yellow text-left lg:hidden"
+
+    aria-label="Abrir catálogo de productos"
+
   >
+
     <div class="promo-catalog-mobile__text relative z-10">
+
       <h2 class="text-[1.05rem] font-extrabold uppercase leading-[1.05] tracking-tight text-cimak-black">
+
         Catálogo<br />de productos
+
       </h2>
+
     </div>
+
     <div class="promo-catalog-mobile__book pointer-events-none absolute z-30">
+
       <Image
+
         src={catalogoImg}
+
         alt=""
+
         class="h-auto w-full drop-shadow-xl"
+
         width={339}
+
         height={223}
+
         loading="eager"
+
         decoding="async"
+
       />
+
     </div>
-  </a>
+
+  </button>
+
+
 
   <div class="relative hidden grid-cols-1 items-stretch lg:grid lg:grid-cols-2">
+
     <!-- Izquierda amarilla -->
-    <a
-      href="/catalogo"
-      class="group relative z-10 hidden min-h-full items-center overflow-visible bg-cimak-yellow lg:flex"
+
+    <button
+
+      type="button"
+
+      data-catalogo-flip-open
+
+      class="group relative z-10 hidden min-h-full w-full cursor-pointer items-center overflow-visible bg-cimak-yellow text-left lg:flex"
+
+      aria-label="Abrir catálogo de productos"
+
     >
+
       <!-- Texto + VER + flecha (junto al texto, no sobre el catálogo) -->
+
       <div class="promo-content-left relative z-30 flex items-center gap-5 py-5 pr-4 xl:gap-6">
+
         <div class="flex min-w-0 flex-col items-start gap-3">
+
           <h2 class="text-xl font-extrabold uppercase leading-tight tracking-tight text-cimak-black xl:text-2xl">
+
             Catálogo <br /> de productos
+
           </h2>
+
           <span class="inline-block bg-cimak-black px-5 py-1.5 text-sm font-bold uppercase tracking-wider text-white">
+
             Ver
+
           </span>
+
         </div>
 
+
+
         <span
+
           class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cimak-black text-white transition group-hover:scale-105"
+
           aria-hidden="true"
+
         >
+
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+
             <path d="m9 18 6-6-6-6" />
+
           </svg>
+
         </span>
+
       </div>
+
+
 
       <!-- Catálogo más grande, solapa el verde -->
+
       <div class="pointer-events-none absolute top-1/2 right-0 z-20 w-[72%] max-w-[480px] translate-x-[42%] -translate-y-1/2">
+
         <Image
+
           src={catalogoImg}
+
           alt=""
+
           class="h-auto w-full drop-shadow-xl"
+
           width={339}
+
           height={223}
+
           loading="eager"
+
           decoding="async"
+
         />
+
       </div>
-    </a>
+
+    </button>
+
+
 
     <!-- Derecha: imagen producto (solo escritorio; en móvil va el catálogo arriba) -->
+
     <div id="promo-carousel" class="relative z-0 hidden overflow-hidden bg-[#2a6aa8] lg:block" data-slides={slides.length}>
+
       {slides.map((slide, index) => (
-        <a
-          href={slide.href}
+        <div
           class:list={[
             'promo-slide block w-full transition-opacity duration-500',
             index === 0 ? 'relative z-10 opacity-100' : 'pointer-events-none absolute inset-0 z-0 opacity-0',
@@ -100,101 +180,199 @@ const slides = [
             fetchpriority="high"
             decoding="async"
           />
-        </a>
+        </div>
       ))}
 
+
+
       {slides.length > 1 && (
+
         <div class="absolute bottom-3 right-4 z-20 flex gap-2">
+
           {slides.map((_, index) => (
+
             <button
+
               type="button"
+
               class:list={[
+
                 'promo-dot h-2.5 w-2.5 rounded-full transition',
+
                 index === 0 ? 'bg-white' : 'bg-white/40',
+
               ]}
+
               data-index={index}
+
               aria-label={`Ir al slide ${index + 1}`}
+
             />
+
           ))}
+
         </div>
+
       )}
+
     </div>
+
   </div>
+
 </section>
 
+
+
 <style>
+
   .promo-catalog-mobile {
+
     padding: 0.9rem 44% 0.9rem 1rem;
+
   }
+
+
 
   .promo-catalog-mobile__book {
+
     right: 0;
+
     bottom: 0;
+
     width: min(58vw, 13.25rem);
+
     transform: translateX(5%);
+
     line-height: 0;
+
   }
+
+
 
   .promo-catalog-mobile__book img {
+
     display: block;
+
     width: 100%;
+
     height: auto;
+
   }
+
+
 
   .promo-content-left {
+
     padding-left: var(--spacing-gutter);
+
   }
+
+
 
   @media (min-width: 1600px) {
+
     .promo-content-left {
+
       padding-left: calc((100vw - var(--container-cimak)) / 2 + var(--spacing-gutter));
+
     }
+
   }
+
 </style>
 
+
+
 {slides.length > 1 && (
+
   <script>
+
     const root = document.getElementById('promo-carousel');
+
     if (root) {
+
       const slides = [...root.querySelectorAll('.promo-slide')];
+
       const dots = [...root.querySelectorAll('.promo-dot')];
+
       let current = 0;
+
       let timer;
 
+
+
       const show = (index) => {
+
         current = index;
+
         slides.forEach((slide, i) => {
+
           const active = i === index;
+
           slide.classList.toggle('opacity-100', active);
+
           slide.classList.toggle('z-10', active);
+
           slide.classList.toggle('relative', active);
+
           slide.classList.toggle('opacity-0', !active);
+
           slide.classList.toggle('z-0', !active);
+
           slide.classList.toggle('absolute', !active);
+
           slide.classList.toggle('inset-0', !active);
+
           slide.classList.toggle('pointer-events-none', !active);
+
           slide.setAttribute('aria-hidden', String(!active));
+
         });
+
         dots.forEach((dot, i) => {
+
           dot.classList.toggle('bg-white', i === index);
+
           dot.classList.toggle('bg-white/40', i !== index);
+
         });
+
       };
+
+
 
       const next = () => show((current + 1) % slides.length);
+
       const start = () => {
+
         timer = window.setInterval(next, 4500);
+
       };
 
+
+
       dots.forEach((dot) => {
+
         dot.addEventListener('click', () => {
+
           window.clearInterval(timer);
+
           show(Number(dot.dataset.index));
+
           start();
+
         });
+
       });
 
+
+
       start();
+
     }
+
   </script>
+
 )}
+
+

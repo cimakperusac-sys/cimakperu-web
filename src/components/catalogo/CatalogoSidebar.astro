@@ -6,9 +6,10 @@ interface Props {
   menu?: WebMenuFamilia[];
   familiaActiva?: string | null;
   productoActivo?: string | null;
+  enCatalogo?: boolean;
 }
 
-const { menu = [], familiaActiva = null, productoActivo = null } = Astro.props;
+const { menu = [], familiaActiva = null, productoActivo = null, enCatalogo = false } = Astro.props;
 if (menu.length === 0) {
   return null;
 }
@@ -47,6 +48,19 @@ if (menu.length === 0) {
     data-lenis-prevent
   >
     <p class="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-cimak-black/45">Productos</p>
+
+    <a
+      href="/catalogo"
+      aria-current={enCatalogo ? 'page' : undefined}
+      class:list={[
+        'mt-2 flex min-h-11 items-center rounded-md px-2 text-xs font-bold uppercase tracking-wide transition',
+        enCatalogo
+          ? 'bg-cimak-yellow/35 text-cimak-black'
+          : 'text-cimak-black/70 hover:bg-black/[0.04] hover:text-cimak-black',
+      ]}
+    >
+      Catálogo completo
+    </a>
 
     <ul class="mt-2 divide-y divide-black/10">
       {menu.map((familia) => {

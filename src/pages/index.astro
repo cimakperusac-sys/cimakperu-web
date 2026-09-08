@@ -3,7 +3,6 @@ import Layout from '../layouts/Layout.astro';
 import Hero from '../components/home/Hero.astro';
 import PromoBanners from '../components/home/PromoBanners.astro';
 import CategoryGrid from '../components/home/CategoryGrid.astro';
-import ProductosPorFamilia from '../components/home/ProductosPorFamilia.astro';
 import BlogBanner from '../components/home/BlogBanner.astro';
 import ContactSection from '../components/home/ContactSection.astro';
 import Nosotros from '../components/home/Nosotros.astro';
@@ -53,15 +52,10 @@ const categoryItems =
 
 const reviews = testimoniosApi.length ? mapTestimonios(testimoniosApi) : [];
 
-/** Familias con productos publicados (vista detallada en escritorio). */
-const familiasConProductos = familias.filter((f) => (f.productos?.length ?? 0) > 0);
-const hayProductos = familiasConProductos.length > 0;
-
 const hasAnyContent =
   Boolean(bloques.hero?.url) ||
   Boolean(bloques.promo_catalogo?.url) ||
   categoryItems.length > 0 ||
-  hayProductos ||
   Boolean(bloques.blog_banner) ||
   Boolean(bloques.nosotros) ||
   Boolean(bloques.caracteristicas) ||
@@ -88,11 +82,6 @@ const hasAnyContent =
       </div>
     </div>
     <CategoryGrid items={categoryItems} />
-    {hayProductos && (
-      <div class="hidden md:block">
-        <ProductosPorFamilia familias={familiasConProductos} />
-      </div>
-    )}
     <BlogBanner bloque={bloques.blog_banner} />
     <Nosotros bloque={bloques.nosotros} />
     <Caracteristicas bloque={bloques.caracteristicas} />

@@ -1,0 +1,228 @@
+---
+interface Props {
+  flipUrl?: string;
+}
+
+const {
+  flipUrl = 'https://heyzine.com/flip-book/c1d5eed64d.html',
+} = Astro.props;
+---
+
+<div id="catalogo-flip-root" hidden>
+  <div
+    id="catalogo-flip-backdrop"
+    class="catalogo-flip-modal__backdrop fixed inset-0 z-[200] hidden bg-cimak-black/75 backdrop-blur-md"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    id="catalogo-flip-dialog"
+    class="catalogo-flip-modal fixed inset-0 z-[210] hidden items-center justify-center p-3 sm:p-6"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="catalogo-flip-title"
+    aria-hidden="true"
+    data-lenis-prevent
+  >
+    <div class="catalogo-flip-modal__panel flex w-full max-w-[800px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#111] shadow-[0_24px_80px_rgba(0,0,0,0.5)] sm:rounded-3xl">
+      <header class="flex shrink-0 items-center justify-between gap-3 border-b border-white/10 bg-cimak-black px-4 py-3 sm:px-5 sm:py-4">
+        <div class="min-w-0">
+          <p class="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-cimak-yellow">CIMAK Perú</p>
+          <h2 id="catalogo-flip-title" class="truncate text-sm font-extrabold uppercase tracking-wide text-white sm:text-base">
+            Catálogo de productos
+          </h2>
+        </div>
+
+        <div class="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            id="catalogo-flip-fullscreen"
+            class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/15 text-white/85 transition hover:border-white/30 hover:bg-white/10 hover:text-white"
+            aria-label="Pantalla completa"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            id="catalogo-flip-close"
+            class="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-cimak-yellow text-cimak-black transition hover:brightness-105"
+            aria-label="Cerrar catálogo"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="catalogo-flip-modal__body relative w-full overflow-hidden bg-white">
+        <div id="catalogo-flip-loader" class="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-[#1a1a1a] text-white/70">
+          <span class="catalogo-flip-modal__spinner h-9 w-9 rounded-full border-2 border-white/15 border-t-cimak-yellow"></span>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em]">Cargando catálogo…</p>
+        </div>
+        <iframe
+          id="catalogo-flip-iframe"
+          title="Catálogo interactivo CIMAK Perú"
+          class="fp-iframe block h-full w-full border border-[lightgray] bg-white"
+          allowfullscreen="allowfullscreen"
+          allow="autoplay; fullscreen; clipboard-write"
+          scrolling="no"
+          data-src={flipUrl}
+        ></iframe>
+        <!-- Tapa visual: la marca Heyzine vive dentro del iframe (otro dominio) y no se puede quitar por CSS ahí. -->
+        <div class="catalogo-flip-modal__heyzine-cover" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ flipUrl }}>
+  const root = document.getElementById('catalogo-flip-root');
+  const backdrop = document.getElementById('catalogo-flip-backdrop');
+  const dialog = document.getElementById('catalogo-flip-dialog');
+  const closeBtn = document.getElementById('catalogo-flip-close');
+  const fullscreenBtn = document.getElementById('catalogo-flip-fullscreen');
+  const iframe = document.getElementById('catalogo-flip-iframe');
+  const loader = document.getElementById('catalogo-flip-loader');
+  const panel = dialog?.querySelector('.catalogo-flip-modal__panel');
+
+  /** Fuera de contenedores con transform (parallax) para que fixed cubra el viewport. */
+  const mountToBody = () => {
+    if (backdrop?.parentElement !== document.body) document.body.appendChild(backdrop);
+    if (dialog?.parentElement !== document.body) document.body.appendChild(dialog);
+    root?.remove();
+  };
+
+  mountToBody();
+
+  const triggers = [...document.querySelectorAll('[data-catalogo-flip-open]')];
+
+  if (backdrop && dialog && iframe) {
+    let loaded = false;
+    let open = false;
+
+    const hideLoader = () => loader?.classList.add('hidden');
+    const showLoader = () => loader?.classList.remove('hidden');
+
+    const ensureIframe = () => {
+      if (loaded) return;
+      const src = iframe.dataset.src || flipUrl;
+      if (!src) return;
+
+      showLoader();
+      iframe.addEventListener('load', hideLoader, { once: true });
+      iframe.src = src;
+      loaded = true;
+    };
+
+    const setOpen = (next) => {
+      open = next;
+      backdrop.classList.toggle('hidden', !open);
+      dialog.classList.toggle('hidden', !open);
+      dialog.classList.toggle('flex', open);
+      backdrop.setAttribute('aria-hidden', String(!open));
+      dialog.setAttribute('aria-hidden', String(!open));
+      document.documentElement.classList.toggle('catalogo-flip-open', open);
+
+      if (open) {
+        ensureIframe();
+        window.lenis?.stop?.();
+        window.setTimeout(() => closeBtn?.focus(), 50);
+      } else {
+        window.lenis?.start?.();
+      }
+    };
+
+    triggers.forEach((trigger) => {
+      trigger.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setOpen(true);
+      });
+    });
+
+    closeBtn?.addEventListener('click', () => setOpen(false));
+    backdrop.addEventListener('click', () => setOpen(false));
+
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && open) setOpen(false);
+    });
+
+    fullscreenBtn?.addEventListener('click', async () => {
+      const target = panel?.requestFullscreen ? panel : iframe;
+      try {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+        } else {
+          await target?.requestFullscreen?.();
+        }
+      } catch {
+        // ignore
+      }
+    });
+  }
+</script>
+
+<style is:global>
+  .catalogo-flip-modal__body {
+    aspect-ratio: 800 / 600;
+    max-height: min(600px, calc(100dvh - 7rem));
+    width: 100%;
+  }
+
+  .catalogo-flip-modal__body .fp-iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+  }
+
+  /* Cubre "Powered by Heyzine" (esquina inferior izquierda del visor). */
+  .catalogo-flip-modal__heyzine-cover {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 5;
+    width: min(22%, 168px);
+    height: clamp(40px, 9%, 56px);
+    background: linear-gradient(135deg, #ffffff 70%, #f5f5f5 100%);
+    border-top: 1px solid rgb(211 211 211 / 0.65);
+    border-right: 1px solid rgb(211 211 211 / 0.45);
+    pointer-events: none;
+  }
+
+  .catalogo-flip-modal__spinner {
+    animation: catalogo-flip-spin 0.75s linear infinite;
+  }
+
+  @keyframes catalogo-flip-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .catalogo-flip-modal:not(.hidden) .catalogo-flip-modal__panel {
+    animation: catalogo-flip-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @keyframes catalogo-flip-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  html.catalogo-flip-open,
+  html.catalogo-flip-open body {
+    overflow: hidden !important;
+  }
+</style>

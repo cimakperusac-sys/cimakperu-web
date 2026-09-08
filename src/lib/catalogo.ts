@@ -1,7 +1,7 @@
 import { getMenu } from './api';
 import { navLinks } from '../data/navigation';
 import { site } from '../data/site';
-import type { WebMenuFamilia } from './types/web';
+import type { WebFamilia, WebMenuFamilia, WebProductoCard, WebSubcategoria } from './types/web';
 
 /** Menú del CRM; si la API no responde se usa la navegación hardcodeada. */
 export async function getMenuConFallback(): Promise<WebMenuFamilia[]> {
@@ -19,6 +19,35 @@ export async function getMenuConFallback(): Promise<WebMenuFamilia[]> {
       subcategorias: [],
     };
   });
+}
+
+/** Secciones de productos para grilla (subcategorías CRM o lista plana). */
+export function seccionesFromFamilia(familia: WebFamilia): WebSubcategoria[] {
+  const productos: WebProductoCard[] = Array.isArray(familia.productos) ? familia.productos : [];
+  const subcategorias = (familia.subcategorias ?? []).filter((s) => s.productos?.length);
+
+  if (subcategorias.length > 0) return subcategorias;
+  if (productos.length > 0) return [{ nombre: 'Modelos', productos }];
+  return [];
+}
+
+export function normalizeBusqueda(value: string): string {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+export function textoBusquedaProducto(
+  producto: WebProductoCard,
+  familiaNombre?: string | null,
+): string {
+  return normalizeBusqueda(
+    [producto.nombre, producto.subcategoria, producto.descripcion, familiaNombre]
+      .filter(Boolean)
+      .join(' '),
+  );
 }
 
 export function familiaHref(familia: { href?: string | null; slug?: string | null }): string {

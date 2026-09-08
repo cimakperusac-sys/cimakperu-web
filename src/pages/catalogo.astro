@@ -1,0 +1,168 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CatalogoSidebar from '../components/catalogo/CatalogoSidebar.astro';
+import CatalogoBusqueda from '../components/catalogo/CatalogoBusqueda.astro';
+import ProductoCard from '../components/catalogo/ProductoCard.astro';
+import { getFamilias } from '../lib/api';
+import {
+  familiaHref,
+  getMenuConFallback,
+  normalizeBusqueda,
+  seccionesFromFamilia,
+  textoBusquedaProducto,
+} from '../lib/catalogo';
+import { site } from '../data/site';
+
+const familias = await getFamilias({ conProductos: true });
+const menu = await getMenuConFallback();
+
+const familiasConProductos = familias.filter((f) => seccionesFromFamilia(f).length > 0);
+const totalProductos = familiasConProductos.reduce(
+  (total, familia) => total + (familia.productos?.length ?? 0),
+  0,
+);
+
+const canonical = '/catalogo';
+const siteUrl = (Astro.site?.href || site.url).replace(/\/$/, '');
+const absoluta = (path: string) => new URL(path, `${siteUrl}/`).href;
+
+const schemas = [
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: absoluta('/') },
+      { '@type': 'ListItem', position: 2, name: 'Catálogo', item: absoluta(canonical) },
+    ],
+  },
+  {
+    '@type': 'CollectionPage',
+    name: 'Catálogo de productos CIMAK',
+    description: 'Catálogo completo de coberturas metálicas, Aluzinc, UPVC y paneles termoaislantes.',
+    url: absoluta(canonical),
+  },
+];
+---
+
+<Layout
+  title="Catálogo de productos | CIMAK Perú"
+  description="Explora todo el catálogo CIMAK: familias, modelos y coberturas metálicas. Busca por producto o categoría y cotiza directo con fábrica."
+  canonical={canonical}
+  schemas={schemas}
+>
+  <main class="bg-[#f3f3f3]">
+    <div class="container-cimak py-5 lg:py-8">
+      <nav class="mb-4 text-xs text-cimak-black/60 lg:hidden" aria-label="Ruta">
+        <a href="/" class="hover:text-cimak-black">Inicio</a>
+        <span class="mx-1.5">/</span>
+        <span class="font-semibold text-cimak-black">Catálogo</span>
+      </nav>
+
+      <div class="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start lg:gap-8">
+        <CatalogoSidebar menu={menu} enCatalogo />
+
+        <div class="min-w-0">
+          <header class="mb-5 lg:mb-6">
+            <p class="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-cimak-black/45">
+              Catálogo
+            </p>
+            <h1 class="mt-1 text-2xl font-extrabold uppercase tracking-tight text-cimak-black sm:text-3xl">
+              Todos los productos
+            </h1>
+            <p class="mt-2 max-w-2xl text-sm text-cimak-black/70">
+              Navega por familia, busca un modelo o entra al detalle de cada producto para cotizar.
+            </p>
+          </header>
+
+          <div class="mb-5 rounded-xl bg-white p-4 shadow-sm sm:p-5">
+            <CatalogoBusqueda
+              totalProductos={totalProductos}
+              totalFamilias={familiasConProductos.length}
+            />
+          </div>
+
+          {familiasConProductos.length > 0 ? (
+            <div id="catalogo-resultados" class="flex flex-col gap-6">
+              {familiasConProductos.map((familia) => {
+                const secciones = seccionesFromFamilia(familia);
+                const href = familiaHref(familia);
+                const busquedaFamilia = normalizeBusqueda(
+                  [familia.nombre, familia.slug, ...(familia.productos ?? []).map((p) => p.nombre)]
+                    .filter(Boolean)
+                    .join(' '),
+                );
+
+                return (
+                  <section
+                    class="rounded-xl bg-white p-4 shadow-sm sm:p-5 lg:p-6"
+                    data-catalogo-familia
+                    data-search={busquedaFamilia}
+                    aria-label={familia.nombre}
+                  >
+                    <div class="mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-black/8 pb-4">
+                      <div>
+                        <p class="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-cimak-black/45">
+                          Familia
+                        </p>
+                        <h2 class="mt-0.5 text-lg font-extrabold uppercase tracking-tight text-cimak-black sm:text-xl">
+                          <a href={href} class="transition hover:text-cimak-black/70">
+                            {familia.nombre}
+                          </a>
+                        </h2>
+                      </div>
+                      <a
+                        href={href}
+                        class="inline-flex min-h-10 items-center gap-1 rounded-md border border-black/10 px-4 text-xs font-bold uppercase tracking-wide text-cimak-black transition hover:border-black/25 hover:bg-[#fafafa]"
+                      >
+                        Ver familia
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="h-3.5 w-3.5" aria-hidden="true">
+                          <path d="m9 18 6-6-6-6" />
+                        </svg>
+                      </a>
+                    </div>
+
+                    <div class="flex flex-col gap-8">
+                      {secciones.map((seccion) => (
+                        <div>
+                          {secciones.length > 1 && (
+                            <h3 class="mb-3 text-sm font-bold text-cimak-black">{seccion.nombre}</h3>
+                          )}
+                          <div class="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:gap-5">
+                            {seccion.productos.map((producto, index) => (
+                              <div
+                                data-catalogo-item
+                                data-search={textoBusquedaProducto(producto, familia.nombre)}
+                              >
+                                <ProductoCard producto={producto} eager={index < 4} />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                );
+              })}
+            </div>
+          ) : (
+            <div class="rounded-xl border border-dashed border-cimak-black/20 bg-white px-6 py-12 text-center">
+              <p class="font-semibold text-cimak-black">El catálogo se está actualizando</p>
+              <p class="mt-2 text-sm text-cimak-black/60">
+                Aún no hay productos publicados. Mientras tanto puedes explorar nuestras familias.
+              </p>
+              <div class="mt-6 flex flex-wrap justify-center gap-2">
+                {menu.slice(0, 6).map((familia) => (
+                  <a
+                    href={familiaHref(familia)}
+                    class="inline-flex min-h-10 items-center rounded-md bg-cimak-yellow px-4 text-xs font-bold uppercase tracking-wide text-cimak-black transition hover:brightness-105"
+                  >
+                    {familia.nombre}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
