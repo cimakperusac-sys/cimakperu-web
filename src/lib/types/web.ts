@@ -64,6 +64,7 @@ export type WebMeta = {
   seo_keywords?: string | null;
   og_image?: string | null;
   canonical?: string | null;
+  mensaje_whatsapp?: string | null;
   extra?: Record<string, unknown> | null;
 };
 

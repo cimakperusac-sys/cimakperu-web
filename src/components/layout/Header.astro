@@ -1,19 +1,30 @@
 ---
 import { Image } from 'astro:assets';
 import logo from '../../assets/logo/logo.svg';
-import { getMenuConFallback, familiaHref, productoHref } from '../../lib/catalogo';
+import { cotizarHref, getMenuConFallback, familiaHref, productoHref } from '../../lib/catalogo';
 import { site } from '../../data/site';
 import type { WebMenuFamilia } from '../../lib/types/web';
 
 interface Props {
   menu?: WebMenuFamilia[];
+  mensajeWhatsapp?: string | null;
+  origenTipo?: 'producto' | 'familia' | 'pagina' | null;
+  origenClave?: string | null;
 }
 
-const { menu: menuProp } = Astro.props;
+const { menu: menuProp, mensajeWhatsapp = null, origenTipo = null, origenClave = null } = Astro.props;
 const menu = menuProp?.length ? menuProp : await getMenuConFallback();
 
 const principales = menu.slice(0, 4);
 const rutaActual = Astro.url.pathname;
+const siteUrl = (Astro.site?.href || site.url).replace(/\/$/, '');
+const pageUrl = new URL(rutaActual || '/', `${siteUrl}/`).href;
+const whatsappHref = cotizarHref({
+  mensaje: mensajeWhatsapp,
+  url: pageUrl,
+  origenTipo,
+  origenClave,
+});
 
 const esActiva = (familia: WebMenuFamilia) => {
   const href = familiaHref(familia);
@@ -98,7 +109,7 @@ for (const familia of menu) {
         </button>
 
         <a
-          href={site.social.whatsapp}
+          href={whatsappHref}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="WhatsApp"
@@ -216,7 +227,9 @@ for (const familia of menu) {
 
         <li class="ml-auto flex items-center">
           <a
-            href="/#contactanos"
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
             class="inline-flex items-center gap-2 rounded-sm bg-cimak-yellow px-4 py-2 text-[0.65rem] font-bold uppercase tracking-wide text-cimak-black transition hover:brightness-105 lg:text-xs"
           >
             Cotizar
@@ -306,7 +319,7 @@ for (const familia of menu) {
 
     <div class="border-t border-white/10 p-4">
       <a
-        href={site.social.whatsapp}
+        href={whatsappHref}
         target="_blank"
         rel="noopener noreferrer"
         class="mb-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-sm bg-cimak-yellow text-sm font-bold text-cimak-black transition hover:brightness-105"

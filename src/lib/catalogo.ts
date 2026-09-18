@@ -1,7 +1,7 @@
-import { getMenu } from './api';
+import { getMenu, getMeta } from './api';
 import { navLinks } from '../data/navigation';
 import { site } from '../data/site';
-import type { WebFamilia, WebMenuFamilia, WebProductoCard, WebSubcategoria } from './types/web';
+import type { WebFamilia, WebMenuFamilia, WebMeta, WebProductoCard, WebSubcategoria } from './types/web';
 
 /** Menú del CRM; si la API no responde se usa la navegación hardcodeada. */
 export async function getMenuConFallback(): Promise<WebMenuFamilia[]> {
@@ -66,6 +66,8 @@ export function cotizarHref(options?: {
   mensaje?: string | null;
   mensajeFamilia?: string | null;
   url?: string | null;
+  origenTipo?: 'producto' | 'familia' | 'pagina' | null;
+  origenClave?: string | null;
 } | string | null): string {
   const opts =
     typeof options === 'string' || options == null
@@ -75,15 +77,38 @@ export function cotizarHref(options?: {
   const nombre = String(opts.nombre || '').trim();
   const familia = String(opts.familia || '').trim();
   const pageUrl = String(opts.url || '').trim();
+  const origen = codigoOrigenWhatsapp(opts.origenTipo, opts.origenClave);
   const plantilla =
     String(opts.mensaje || '').trim() ||
     String(opts.mensajeFamilia || '').trim();
 
-  const texto = plantilla
-    ? reemplazarPlaceholders(plantilla, { nombre, familia, url: pageUrl })
-    : mensajeCotizarPorDefecto(nombre, familia, pageUrl);
+  const texto = conCodigoOrigen(
+    plantilla
+      ? reemplazarPlaceholders(plantilla, { nombre, familia, url: pageUrl })
+      : mensajeCotizarPorDefecto(nombre, familia, pageUrl),
+    origen,
+  );
 
   return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(texto)}`;
+}
+
+/** Código estable. No cambia aunque editen el texto del mensaje. */
+export function codigoOrigenWhatsapp(
+  tipo?: 'producto' | 'familia' | 'pagina' | null,
+  clave?: string | null,
+): string | null {
+  const limpia = String(clave || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  if (!tipo || !limpia) return null;
+  return `cimak:${tipo}:${limpia}`;
+}
+
+function conCodigoOrigen(texto: string, codigo: string | null): string {
+  const limpio = texto.replace(/\n*cimak:(producto|familia|pagina):[a-z0-9_-]+\s*$/i, '').trim();
+  return codigo ? `${limpio}\n\n${codigo}` : limpio;
 }
 
 function reemplazarPlaceholders(
@@ -94,6 +119,21 @@ function reemplazarPlaceholders(
     .replaceAll('{nombre}', vars.nombre || 'sus productos')
     .replaceAll('{familia}', vars.familia || vars.nombre || 'CIMAK')
     .replaceAll('{url}', vars.url);
+}
+
+function textoMensajeMeta(meta: WebMeta | null): string | null {
+  const directo = String(meta?.mensaje_whatsapp || '').trim();
+  if (directo) return directo;
+  const extra = meta?.extra?.mensaje_whatsapp;
+  return typeof extra === 'string' && extra.trim() ? extra.trim() : null;
+}
+
+/** Mensaje de la página. Si esa clave no tiene texto, usa el del inicio. */
+export async function resolverMensajePagina(clave = 'home'): Promise<string | null> {
+  const propio = textoMensajeMeta(await getMeta(clave));
+  if (propio) return propio;
+  if (clave === 'home') return null;
+  return textoMensajeMeta(await getMeta('home'));
 }
 
 function mensajeCotizarPorDefecto(nombre: string, familia: string, url: string): string {

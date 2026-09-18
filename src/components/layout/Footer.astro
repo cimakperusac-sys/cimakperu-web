@@ -9,6 +9,23 @@ import facebook from '../../assets/footer/facebook.svg';
 import instagram from '../../assets/footer/instagram.svg';
 import tiktok from '../../assets/footer/tiktok.svg';
 import whatsapp from '../../assets/footer/whatsapp.svg';
+import { cotizarHref } from '../../lib/catalogo';
+
+interface Props {
+  mensajeWhatsapp?: string | null;
+  origenTipo?: 'producto' | 'familia' | 'pagina' | null;
+  origenClave?: string | null;
+}
+
+const { mensajeWhatsapp = null, origenTipo = null, origenClave = null } = Astro.props;
+const siteUrl = (Astro.site?.href || site.url).replace(/\/$/, '');
+const pageUrl = new URL(Astro.url.pathname || '/', `${siteUrl}/`).href;
+const whatsappHref = cotizarHref({
+  mensaje: mensajeWhatsapp,
+  url: pageUrl,
+  origenTipo,
+  origenClave,
+});
 
 const servicios = [
   { label: 'Preguntas frecuentes', href: '/preguntas-frecuentes' },
@@ -53,8 +70,8 @@ const socials = [
   { label: 'Facebook', href: site.social.facebook, icon: facebook },
   { label: 'Instagram', href: site.social.instagram, icon: instagram },
   { label: 'TikTok', href: site.social.tiktok, icon: tiktok },
-  { label: 'WhatsApp', href: site.social.whatsapp, icon: whatsapp },
-] as const;
+  { label: 'WhatsApp', href: whatsappHref, icon: whatsapp },
+];
 ---
 
 <footer class="bg-cimak-yellow text-cimak-black">

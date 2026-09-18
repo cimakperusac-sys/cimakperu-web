@@ -4,6 +4,7 @@ import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import WhatsAppButton from '../components/ui/WhatsAppButton.astro';
 import CatalogoFlipModal from '../components/catalogo/CatalogoFlipModal.astro';
+import { resolverMensajePagina } from '../lib/catalogo';
 import { site } from '../data/site';
 
 interface Props {
@@ -18,6 +19,12 @@ interface Props {
 	showHeader?: boolean;
 	showFooter?: boolean;
 	showWhatsApp?: boolean;
+	/** Clave de Página Web → Meta. Si no hay mensaje, se usa el de home. */
+	metaClave?: string;
+	/** Mensaje de producto o familia. Tiene prioridad sobre metaClave. */
+	mensajeWhatsapp?: string | null;
+	origenTipo?: 'producto' | 'familia' | 'pagina';
+	origenClave?: string | null;
 	/** Nodos JSON-LD extra que se añaden al @graph global de la página. */
 	schemas?: Record<string, unknown>[];
 }
@@ -34,6 +41,10 @@ const {
 	showHeader = true,
 	showFooter = true,
 	showWhatsApp = true,
+	metaClave = 'home',
+	mensajeWhatsapp = null,
+	origenTipo,
+	origenClave = null,
 	schemas = [],
 } = Astro.props;
 
@@ -43,6 +54,13 @@ const canonicalURL = canonical
 	: new URL(Astro.url.pathname, siteUrl).href;
 const imageURL = image.startsWith('http') ? image : new URL(image, siteUrl).href;
 const fullTitle = title.includes('CIMAK') ? title : `${title} | CIMAK Perú`;
+
+const mensajeWhatsappResuelto =
+	String(mensajeWhatsapp || '').trim() || (await resolverMensajePagina(metaClave));
+const origenWhatsapp = {
+	tipo: origenTipo || 'pagina',
+	clave: origenClave || metaClave || 'home',
+};
 
 const jsonLd = {
 	'@context': 'https://schema.org',
@@ -142,10 +160,10 @@ const jsonLd = {
 		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 	</head>
 	<body>
-		{showHeader && <Header />}
+		{showHeader && <Header mensajeWhatsapp={mensajeWhatsappResuelto} origenTipo={origenWhatsapp.tipo} origenClave={origenWhatsapp.clave} />}
 		<slot />
-		{showFooter && <Footer />}
-		{showWhatsApp && <WhatsAppButton />}
+		{showFooter && <Footer mensajeWhatsapp={mensajeWhatsappResuelto} origenTipo={origenWhatsapp.tipo} origenClave={origenWhatsapp.clave} />}
+		{showWhatsApp && <WhatsAppButton mensaje={mensajeWhatsappResuelto} origenTipo={origenWhatsapp.tipo} origenClave={origenWhatsapp.clave} />}
 		<CatalogoFlipModal />
 
 		<script>

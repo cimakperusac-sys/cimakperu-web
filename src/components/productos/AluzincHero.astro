@@ -12,9 +12,10 @@ interface Props {
   overlayImage?: any;
   /** Lámina de Aluzinc. */
   productImage?: any;
+  whatsappHref?: string;
 }
 
-const { bgImage, overlayImage, productImage } = Astro.props as Props;
+const { bgImage, overlayImage, productImage, whatsappHref = 'https://wa.me/51912397609' } = Astro.props as Props;
 
 const navLinks = [
   { label: 'PRODUCTO', href: '#producto' },
@@ -22,8 +23,6 @@ const navLinks = [
   { label: 'COLORES', href: '#colores' },
   { label: 'CONTACTO', href: '#contacto' },
 ];
-
-const whatsappHref = 'https://wa.link/sp31iy';
 ---
 
 <section

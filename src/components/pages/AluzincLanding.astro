@@ -5,9 +5,20 @@ import AluzincEspecificaciones from '../productos/AluzincEspecificaciones.astro'
 import AluzincColores from '../productos/AluzincColores.astro';
 import AluzincContacto from '../productos/AluzincContacto.astro';
 import AluzincFooter from '../productos/AluzincFooter.astro';
+import { cotizarHref, resolverMensajePagina } from '../../lib/catalogo';
+import { site } from '../../data/site';
 
 import heroFondo from '../../assets/aluzinc/seccion/hero/hero-fondo-dos.svg';
 import productAluzinc from '../../assets/aluzinc/seccion/hero/aluzinc.svg';
+
+const mensaje = await resolverMensajePagina('aluzinc');
+const siteUrl = (Astro.site?.href || site.url).replace(/\/$/, '');
+const whatsappHref = cotizarHref({
+  mensaje,
+  url: new URL('/general/aluzinc', `${siteUrl}/`).href,
+  origenTipo: 'pagina',
+  origenClave: 'aluzinc',
+});
 ---
 
 <Layout
@@ -21,9 +32,12 @@ import productAluzinc from '../../assets/aluzinc/seccion/hero/aluzinc.svg';
   showHeader={false}
   showFooter={false}
   showWhatsApp={true}
+  mensajeWhatsapp={mensaje}
+  origenTipo="pagina"
+  origenClave="aluzinc"
 >
   <main>
-    <AluzincHero bgImage={heroFondo} productImage={productAluzinc} />
+    <AluzincHero bgImage={heroFondo} productImage={productAluzinc} whatsappHref={whatsappHref} />
     <AluzincEspecificaciones />
     <AluzincColores />
     <AluzincContacto />
