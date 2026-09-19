@@ -4,6 +4,7 @@ import logo from '../../assets/logo/logo-blanco.svg';
 import logoNegro from '../../assets/logo/logo.svg';
 import imageFondo from '../../assets/aluzinc/seccion/hero/hero-fondo-dos.svg';
 import whatsappBtn from '../../assets/aluzinc/seccion/hero/whtasapp.svg';
+import { site } from '../../data/site';
 
 interface Props {
   /** Foto de fondo (planta) en tono oscuro. */
@@ -15,7 +16,7 @@ interface Props {
   whatsappHref?: string;
 }
 
-const { bgImage, overlayImage, productImage, whatsappHref = 'https://wa.me/51912397609' } = Astro.props as Props;
+const { bgImage, overlayImage, productImage, whatsappHref = `https://wa.me/${site.whatsapp}` } = Astro.props as Props;
 
 const navLinks = [
   { label: 'PRODUCTO', href: '#producto' },
