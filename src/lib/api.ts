@@ -90,6 +90,9 @@ export async function getFamilias(opts: GetFamiliasOptions = {}): Promise<WebFam
     params.set('limite_productos', String(opts.limiteProductos));
   }
 
+
+  
+
   const query = params.toString();
   return (await crmGet<WebFamilia[]>(`/familias${query ? `?${query}` : ''}`)) ?? [];
 }
