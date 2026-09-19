@@ -8,9 +8,16 @@ import type { WebMenuFamilia } from '../../lib/types/web';
 interface Props {
   menu?: WebMenuFamilia[];
   mensajeWhatsapp?: string | null;
+  cotizarNombre?: string | null;
+  cotizarFamilia?: string | null;
 }
 
-const { menu: menuProp, mensajeWhatsapp = null } = Astro.props;
+const {
+  menu: menuProp,
+  mensajeWhatsapp = null,
+  cotizarNombre = null,
+  cotizarFamilia = null,
+} = Astro.props;
 const menu = menuProp?.length ? menuProp : await getMenuConFallback();
 
 const principales = menu.slice(0, 4);
@@ -19,6 +26,8 @@ const siteUrl = (Astro.site?.href || site.url).replace(/\/$/, '');
 const pageUrl = new URL(rutaActual || '/', `${siteUrl}/`).href;
 const whatsappHref = cotizarHref({
   mensaje: mensajeWhatsapp,
+  nombre: cotizarNombre,
+  familia: cotizarFamilia,
   url: pageUrl,
 });
 

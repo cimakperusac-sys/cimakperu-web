@@ -23,6 +23,10 @@ interface Props {
 	metaClave?: string;
 	/** Mensaje de producto o familia. Tiene prioridad sobre metaClave. */
 	mensajeWhatsapp?: string | null;
+	/** Nombre que reemplaza {nombre} en header, footer y botón flotante. */
+	cotizarNombre?: string | null;
+	/** Familia que reemplaza {familia}. */
+	cotizarFamilia?: string | null;
 	/** Nodos JSON-LD extra que se añaden al @graph global de la página. */
 	schemas?: Record<string, unknown>[];
 }
@@ -41,6 +45,8 @@ const {
 	showWhatsApp = true,
 	metaClave = 'home',
 	mensajeWhatsapp = null,
+	cotizarNombre = null,
+	cotizarFamilia = null,
 	schemas = [],
 } = Astro.props;
 
@@ -152,10 +158,28 @@ const jsonLd = {
 		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 	</head>
 	<body>
-		{showHeader && <Header mensajeWhatsapp={mensajeWhatsappResuelto} />}
+		{showHeader && (
+			<Header
+				mensajeWhatsapp={mensajeWhatsappResuelto}
+				cotizarNombre={cotizarNombre}
+				cotizarFamilia={cotizarFamilia}
+			/>
+		)}
 		<slot />
-		{showFooter && <Footer mensajeWhatsapp={mensajeWhatsappResuelto} />}
-		{showWhatsApp && <WhatsAppButton mensaje={mensajeWhatsappResuelto} />}
+		{showFooter && (
+			<Footer
+				mensajeWhatsapp={mensajeWhatsappResuelto}
+				cotizarNombre={cotizarNombre}
+				cotizarFamilia={cotizarFamilia}
+			/>
+		)}
+		{showWhatsApp && (
+			<WhatsAppButton
+				mensaje={mensajeWhatsappResuelto}
+				nombre={cotizarNombre}
+				familia={cotizarFamilia}
+			/>
+		)}
 		<CatalogoFlipModal />
 
 		<script>

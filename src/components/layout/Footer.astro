@@ -13,13 +13,17 @@ import { cotizarHref } from '../../lib/catalogo';
 
 interface Props {
   mensajeWhatsapp?: string | null;
+  cotizarNombre?: string | null;
+  cotizarFamilia?: string | null;
 }
 
-const { mensajeWhatsapp = null } = Astro.props;
+const { mensajeWhatsapp = null, cotizarNombre = null, cotizarFamilia = null } = Astro.props;
 const siteUrl = (Astro.site?.href || site.url).replace(/\/$/, '');
 const pageUrl = new URL(Astro.url.pathname || '/', `${siteUrl}/`).href;
 const whatsappHref = cotizarHref({
   mensaje: mensajeWhatsapp,
+  nombre: cotizarNombre,
+  familia: cotizarFamilia,
   url: pageUrl,
 });
 

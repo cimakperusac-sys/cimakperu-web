@@ -102,10 +102,18 @@ function reemplazarPlaceholders(
   plantilla: string,
   vars: { nombre: string; familia: string; url: string },
 ): string {
-  return plantilla
-    .replaceAll('{nombre}', vars.nombre || 'sus productos')
-    .replaceAll('{familia}', vars.familia || vars.nombre || 'CIMAK')
-    .replaceAll('{url}', vars.url);
+  const nombre = vars.nombre.trim();
+  const familia = vars.familia.trim() || nombre;
+  const url = vars.url.trim();
+
+  const texto = plantilla.replace(/\{\s*(nombre|producto|familia|url)\s*\}/gi, (_match, key: string) => {
+    const k = key.toLowerCase();
+    if (k === 'nombre' || k === 'producto') return nombre;
+    if (k === 'familia') return familia;
+    return url;
+  });
+
+  return texto.replace(/[ \t]{2,}/g, ' ').replace(/ +([.,])/g, '$1').trim();
 }
 
 function textoMensajeMeta(meta: WebMeta | null): string | null {
