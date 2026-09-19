@@ -66,8 +66,6 @@ export function cotizarHref(options?: {
   mensaje?: string | null;
   mensajeFamilia?: string | null;
   url?: string | null;
-  origenTipo?: 'producto' | 'familia' | 'pagina' | null;
-  origenClave?: string | null;
 } | string | null): string {
   const opts =
     typeof options === 'string' || options == null
@@ -77,38 +75,27 @@ export function cotizarHref(options?: {
   const nombre = String(opts.nombre || '').trim();
   const familia = String(opts.familia || '').trim();
   const pageUrl = String(opts.url || '').trim();
-  const origen = codigoOrigenWhatsapp(opts.origenTipo, opts.origenClave);
   const plantilla =
     String(opts.mensaje || '').trim() ||
     String(opts.mensajeFamilia || '').trim();
 
-  const texto = conCodigoOrigen(
-    plantilla
-      ? reemplazarPlaceholders(plantilla, { nombre, familia, url: pageUrl })
-      : mensajeCotizarPorDefecto(nombre, familia, pageUrl),
-    origen,
-  );
+  let texto = plantilla
+    ? reemplazarPlaceholders(plantilla, { nombre, familia, url: pageUrl })
+    : mensajeCotizarPorDefecto(nombre, familia, pageUrl);
+
+  // El link de la página va en el mensaje: se ve natural y el CRM detecta el origen por esa URL.
+  texto = asegurarUrlEnMensaje(texto, pageUrl);
 
   return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(texto)}`;
 }
 
-/** Código estable. No cambia aunque editen el texto del mensaje. */
-export function codigoOrigenWhatsapp(
-  tipo?: 'producto' | 'familia' | 'pagina' | null,
-  clave?: string | null,
-): string | null {
-  const limpia = String(clave || '')
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9_-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-  if (!tipo || !limpia) return null;
-  return `cimak:${tipo}:${limpia}`;
-}
-
-function conCodigoOrigen(texto: string, codigo: string | null): string {
+function asegurarUrlEnMensaje(texto: string, pageUrl: string): string {
   const limpio = texto.replace(/\n*cimak:(producto|familia|pagina):[a-z0-9_-]+\s*$/i, '').trim();
-  return codigo ? `${limpio}\n\n${codigo}` : limpio;
+  if (!pageUrl) return limpio;
+  if (limpio.includes(pageUrl)) return limpio;
+  // Si ya hay otra URL de cimakperu, no duplicamos.
+  if (/https?:\/\/(?:www\.)?cimakperu\.com\b/i.test(limpio)) return limpio;
+  return `${limpio}\n${pageUrl}`;
 }
 
 function reemplazarPlaceholders(

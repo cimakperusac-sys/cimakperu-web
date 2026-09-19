@@ -4,18 +4,14 @@ import { site } from '../../data/site';
 
 interface Props {
   mensaje?: string | null;
-  origenTipo?: 'producto' | 'familia' | 'pagina' | null;
-  origenClave?: string | null;
 }
 
-const { mensaje = null, origenTipo = null, origenClave = null } = Astro.props;
+const { mensaje = null } = Astro.props;
 const siteUrl = (Astro.site?.href || site.url).replace(/\/$/, '');
 const pageUrl = new URL(Astro.url.pathname || '/', `${siteUrl}/`).href;
 const href = cotizarHref({
   mensaje,
   url: pageUrl,
-  origenTipo,
-  origenClave,
 });
 ---
 

@@ -16,8 +16,6 @@ const siteUrl = (Astro.site?.href || site.url).replace(/\/$/, '');
 const whatsappHref = cotizarHref({
   mensaje,
   url: new URL('/general/aluzinc', `${siteUrl}/`).href,
-  origenTipo: 'pagina',
-  origenClave: 'aluzinc',
 });
 ---
 
@@ -33,8 +31,6 @@ const whatsappHref = cotizarHref({
   showFooter={false}
   showWhatsApp={true}
   mensajeWhatsapp={mensaje}
-  origenTipo="pagina"
-  origenClave="aluzinc"
 >
   <main>
     <AluzincHero bgImage={heroFondo} productImage={productAluzinc} whatsappHref={whatsappHref} />

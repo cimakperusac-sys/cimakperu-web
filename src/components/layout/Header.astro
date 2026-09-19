@@ -8,11 +8,9 @@ import type { WebMenuFamilia } from '../../lib/types/web';
 interface Props {
   menu?: WebMenuFamilia[];
   mensajeWhatsapp?: string | null;
-  origenTipo?: 'producto' | 'familia' | 'pagina' | null;
-  origenClave?: string | null;
 }
 
-const { menu: menuProp, mensajeWhatsapp = null, origenTipo = null, origenClave = null } = Astro.props;
+const { menu: menuProp, mensajeWhatsapp = null } = Astro.props;
 const menu = menuProp?.length ? menuProp : await getMenuConFallback();
 
 const principales = menu.slice(0, 4);
@@ -22,8 +20,6 @@ const pageUrl = new URL(rutaActual || '/', `${siteUrl}/`).href;
 const whatsappHref = cotizarHref({
   mensaje: mensajeWhatsapp,
   url: pageUrl,
-  origenTipo,
-  origenClave,
 });
 
 const esActiva = (familia: WebMenuFamilia) => {

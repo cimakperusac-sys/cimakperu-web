@@ -23,8 +23,6 @@ interface Props {
 	metaClave?: string;
 	/** Mensaje de producto o familia. Tiene prioridad sobre metaClave. */
 	mensajeWhatsapp?: string | null;
-	origenTipo?: 'producto' | 'familia' | 'pagina';
-	origenClave?: string | null;
 	/** Nodos JSON-LD extra que se añaden al @graph global de la página. */
 	schemas?: Record<string, unknown>[];
 }
@@ -43,8 +41,6 @@ const {
 	showWhatsApp = true,
 	metaClave = 'home',
 	mensajeWhatsapp = null,
-	origenTipo,
-	origenClave = null,
 	schemas = [],
 } = Astro.props;
 
@@ -57,10 +53,6 @@ const fullTitle = title.includes('CIMAK') ? title : `${title} | CIMAK Perú`;
 
 const mensajeWhatsappResuelto =
 	String(mensajeWhatsapp || '').trim() || (await resolverMensajePagina(metaClave));
-const origenWhatsapp = {
-	tipo: origenTipo || 'pagina',
-	clave: origenClave || metaClave || 'home',
-};
 
 const jsonLd = {
 	'@context': 'https://schema.org',
@@ -160,10 +152,10 @@ const jsonLd = {
 		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 	</head>
 	<body>
-		{showHeader && <Header mensajeWhatsapp={mensajeWhatsappResuelto} origenTipo={origenWhatsapp.tipo} origenClave={origenWhatsapp.clave} />}
+		{showHeader && <Header mensajeWhatsapp={mensajeWhatsappResuelto} />}
 		<slot />
-		{showFooter && <Footer mensajeWhatsapp={mensajeWhatsappResuelto} origenTipo={origenWhatsapp.tipo} origenClave={origenWhatsapp.clave} />}
-		{showWhatsApp && <WhatsAppButton mensaje={mensajeWhatsappResuelto} origenTipo={origenWhatsapp.tipo} origenClave={origenWhatsapp.clave} />}
+		{showFooter && <Footer mensajeWhatsapp={mensajeWhatsappResuelto} />}
+		{showWhatsApp && <WhatsAppButton mensaje={mensajeWhatsappResuelto} />}
 		<CatalogoFlipModal />
 
 		<script>

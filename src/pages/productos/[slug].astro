@@ -106,8 +106,6 @@ const schemas = [
   type="product"
   schemas={schemas}
   mensajeWhatsapp={producto.mensaje_whatsapp || producto.familia?.mensaje_whatsapp}
-  origenTipo="producto"
-  origenClave={slug}
 >
   <main>
     <ProductoHero
@@ -124,8 +122,6 @@ const schemas = [
         mensaje: producto.mensaje_whatsapp,
         mensajeFamilia: producto.familia?.mensaje_whatsapp,
         url: absoluta(canonical),
-        origenTipo: 'producto',
-        origenClave: slug,
       })}
       fichaUrl={fichaUrl}
       familiaHref={familiaHrefUrl}
