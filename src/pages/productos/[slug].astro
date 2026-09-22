@@ -46,7 +46,7 @@ const miniaturas = [
 const colores = (producto.colores ?? []).filter((c) => c?.hex || c?.url || c?.codigo);
 const relacionados = producto.relacionados ?? [];
 const fichaUrl = producto.ficha_url || null;
-const menu = producto.menu?.length ? producto.menu : await getMenuConFallback();
+const menu = producto.menu?.length ? producto.menu : await getMenuConFallback({ todas: true });
 
 const tabs = [
   { id: 'detalles', label: 'Detalles', html: cmsHtml(producto.especificaciones_web || producto.especificaciones_tecnicas || '') },

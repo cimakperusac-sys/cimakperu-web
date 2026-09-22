@@ -74,13 +74,23 @@ export async function getHome(): Promise<WebHome | null> {
   return crmGet<WebHome>('/home');
 }
 
-export async function getMenu(): Promise<WebMenuFamilia[]> {
-  return (await crmGet<WebMenuFamilia[]>('/menu')) ?? [];
+export type GetMenuOptions = {
+  /** Catálogo completo: todas las familias activas (ignora mostrar_web). */
+  todas?: boolean;
+};
+
+export async function getMenu(opts: GetMenuOptions = {}): Promise<WebMenuFamilia[]> {
+  const params = new URLSearchParams();
+  if (opts.todas) params.set('todas', '1');
+  const query = params.toString();
+  return (await crmGet<WebMenuFamilia[]>(`/menu${query ? `?${query}` : ''}`)) ?? [];
 }
 
 export type GetFamiliasOptions = {
   conProductos?: boolean;
   limiteProductos?: number;
+  /** Catálogo completo: todas las familias activas (ignora mostrar_web). */
+  todas?: boolean;
 };
 
 export async function getFamilias(opts: GetFamiliasOptions = {}): Promise<WebFamilia[]> {
@@ -89,9 +99,7 @@ export async function getFamilias(opts: GetFamiliasOptions = {}): Promise<WebFam
   if (opts.limiteProductos && opts.limiteProductos > 0) {
     params.set('limite_productos', String(opts.limiteProductos));
   }
-
-
-  
+  if (opts.todas) params.set('todas', '1');
 
   const query = params.toString();
   return (await crmGet<WebFamilia[]>(`/familias${query ? `?${query}` : ''}`)) ?? [];

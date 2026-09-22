@@ -4,8 +4,8 @@ import { site } from '../data/site';
 import type { WebFamilia, WebMenuFamilia, WebMeta, WebProductoCard, WebSubcategoria } from './types/web';
 
 /** Menú del CRM; si la API no responde se usa la navegación hardcodeada. */
-export async function getMenuConFallback(): Promise<WebMenuFamilia[]> {
-  const menu = await getMenu();
+export async function getMenuConFallback(opts: { todas?: boolean } = {}): Promise<WebMenuFamilia[]> {
+  const menu = await getMenu(opts);
   if (menu.length > 0) return menu;
 
   return navLinks.map((link, index) => {

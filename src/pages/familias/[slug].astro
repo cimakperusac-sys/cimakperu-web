@@ -36,7 +36,7 @@ const secciones: WebSubcategoria[] =
       ? [{ nombre: 'Modelos', productos }]
       : [];
 
-const menu = familia?.menu?.length ? familia.menu : await getMenuConFallback();
+const menu = familia?.menu?.length ? familia.menu : await getMenuConFallback({ todas: true });
 
 const heroUrl = familia?.url || null;
 const canonical = `/familias/${slug}`;

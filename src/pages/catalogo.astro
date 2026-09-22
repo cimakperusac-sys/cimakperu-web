@@ -13,8 +13,8 @@ import {
 } from '../lib/catalogo';
 import { site } from '../data/site';
 
-const familias = await getFamilias({ conProductos: true });
-const menu = await getMenuConFallback();
+const familias = await getFamilias({ conProductos: true, todas: true });
+const menu = await getMenuConFallback({ todas: true });
 
 const familiasConProductos = familias.filter((f) => seccionesFromFamilia(f).length > 0);
 const totalProductos = familiasConProductos.reduce(
