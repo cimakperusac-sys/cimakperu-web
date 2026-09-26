@@ -3,9 +3,9 @@ export const site = {
   legalName: 'Cimak Perú SAC',
   ruc: '20609125919',
   url: 'https://cimakperu.com',
-  phone: '(+51) 912397609',
-  phoneHref: 'tel:+51912397609',
-  email: 'info@cimak.com',
+  phone: '(+51) 908528231',
+  phoneHref: 'tel:+51908528231',
+  email: 'ventas@cimak.com.pe',
   address: 'Jr. 252 Sodio Urb. Industrial, Los Olivos - Lima',
   whatsapp: '51908528231',
   social: {
